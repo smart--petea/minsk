@@ -6,6 +6,8 @@ import (
     "os"
     "log"
     "strings"
+    "unicode"
+    "strconv"
 )
 
 func main() {
@@ -22,43 +24,134 @@ func main() {
             os.Exit(0)
         }
 
-        if line == "1 + 2 * 3" {
-            fmt.Println("7")
-        } else {
-            fmt.Println("ERROR: Invalid expression!")
+        lexer := NewLexer([]rune(line))
+        for {
+            token := lexer.NextToken()
+            if token.Kind == EndOfFileToken {
+                break
+            }
+
+            fmt.Printf("%s: '%s'", token.Kind, string(token.Runes))
+            if token.Value != nil {
+                fmt.Printf(" value: %v", token.Value)
+            }
+            fmt.Println()
         }
     }
 }
 
-type SyntaxKind int
+type SyntaxKind string
+
+const (
+    NumberToken SyntaxKind = "NumberToken"
+    WhitespaceToken SyntaxKind = "WhitespaceToken"
+    PlusToken SyntaxKind = "PlusToken"
+    EndOfFileToken SyntaxKind = "EndOfFileToken"
+    MinusToken SyntaxKind = "MinusToken"
+    StartToken SyntaxKind = "StartToken"
+    SlashToken SyntaxKind = "SlashToken"
+    OpenParenthesisToken SyntaxKind = "OpenParenthisToken"
+    CloseParenthesisToken SyntaxKind = "CloseParenthisToken"
+    BadToken SyntaxKind = "BadToken"
+)
 
 type SyntaxToken struct {
-    kind SyntaxToken
-    position int
-    text string
+    Kind SyntaxKind
+    Position int
+    Runes []rune
+    Value interface{}
 }
 
-func NewSyntaxToken(kind SyntaxToken, position int, text string) *SyntaxToken {
+func NewSyntaxToken(kind SyntaxKind, position int, runes []rune, value interface{}) *SyntaxToken {
     return &SyntaxToken{
-        kind: SyntaxToken,
-        position: int,
-        text: string,
+        Kind: kind,
+        Position: position,
+        Runes: runes,
+        Value: value,
     }
 }
 
 type Lexer struct {
-    text string
-    position int
+    Runes []rune
+    Position int
 }
 
-func NewLexer(text string) *Lexer {
+func NewLexer(runes []rune) *Lexer {
     return &Lexer{
-        text: text
+        Runes: runes,
     }
 }
 
+func (l *Lexer) Current() rune {
+    if l.Position >= len(l.Runes) {
+        return '\x00'
+    }
+
+    return l.Runes[l.Position]
+}
+
+func (l *Lexer) Next() {
+    l.Position = l.Position + 1
+}
+
 func (l *Lexer) NextToken() *SyntaxToken {
-    //<numbers>
-    //+ - * / ( )
-    //<whitespace>
+    if l.Position >= len(l.Runes) {
+        return NewSyntaxToken(EndOfFileToken, l.Position, []rune{'\x00'}, nil)
+    } 
+
+    if unicode.IsDigit(l.Current()) {
+        start := l.Position
+
+        for unicode.IsDigit(l.Current()) {
+            l.Next()
+        }
+
+        length := l.Position - start 
+        runes := l.Runes[start: start + length]
+        val, _ := strconv.Atoi(string(runes))
+
+        return NewSyntaxToken(NumberToken, start, runes, val)
+    }
+
+    if unicode.IsSpace(l.Current()) {
+        start := l.Position
+
+        for unicode.IsSpace(l.Current()) {
+            l.Next()
+        }
+
+        length := l.Position - start 
+        runes := l.Runes[start: start + length]
+
+        return NewSyntaxToken(WhitespaceToken, start, runes, nil)
+    }
+
+    position := l.Position
+    current := l.Current()
+    l.Next()
+    if current == '+' {
+        return NewSyntaxToken(PlusToken, position, []rune{current}, nil)
+    }
+
+    if current == '-' {
+        return NewSyntaxToken(MinusToken, position, []rune{current}, nil)
+    }
+
+    if current == '*' {
+        return NewSyntaxToken(StartToken, position, []rune{current}, nil)
+    }
+
+    if current == '/' {
+        return NewSyntaxToken(SlashToken, position, []rune{current}, nil)
+    }
+
+    if current == '(' {
+        return NewSyntaxToken(OpenParenthesisToken, position, []rune{current}, nil)
+    }
+
+    if current == ')' {
+        return NewSyntaxToken(CloseParenthesisToken, position, []rune{current}, nil)
+    }
+
+    return NewSyntaxToken(BadToken, position, []rune{current}, nil)
 }
