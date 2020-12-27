@@ -24,19 +24,26 @@ func main() {
             os.Exit(0)
         }
 
-        lexer := NewLexer([]rune(line))
-        for {
-            token := lexer.NextToken()
-            if token.Kind == EndOfFileToken {
-                break
-            }
+        parser := NewParser(line)
+        expression := parser.Parse()
 
-            fmt.Printf("%s: '%s'", token.Kind, string(token.Runes))
-            if token.Value != nil {
-                fmt.Printf(" value: %v", token.Value)
-            }
-            fmt.Println()
-        }
+        fmt.Print("\033[90m")
+        PrettyPrint(expression, "")
+        fmt.Print("\033[37m")
+    }
+}
+
+func PrettyPrint(node SyntaxNode, indent string) {
+    fmt.Print(node.Kind())
+
+    if node.Value() != nil {
+        fmt.Print(" ")
+        fmt.Print(node.Value())
+    }
+
+    indent = indent + "   "
+    for _, child := range node.GetChildren() {
+        PrettyPrint(child, indent)
     }
 }
 
@@ -53,21 +60,35 @@ const (
     OpenParenthesisToken SyntaxKind = "OpenParenthisToken"
     CloseParenthesisToken SyntaxKind = "CloseParenthisToken"
     BadToken SyntaxKind = "BadToken"
+    BinaryExpression SyntaxKind = "BinaryExpression" 
+    NumberExpression SyntaxKind = "NumberExpression" 
 )
 
 type SyntaxToken struct {
-    Kind SyntaxKind
+    kind SyntaxKind
     Position int
     Runes []rune
-    Value interface{}
+    value interface{}
+}
+
+func (s *SyntaxToken) Kind() SyntaxKind {
+    return s.kind
+}
+
+func (s *SyntaxToken) Value() interface{} {
+    return s.value
+}
+
+func (s *SyntaxToken) GetChildren() []SyntaxNode {
+    return nil
 }
 
 func NewSyntaxToken(kind SyntaxKind, position int, runes []rune, value interface{}) *SyntaxToken {
     return &SyntaxToken{
-        Kind: kind,
+        kind: kind,
         Position: position,
         Runes: runes,
-        Value: value,
+        value: value,
     }
 }
 
@@ -154,4 +175,141 @@ func (l *Lexer) NextToken() *SyntaxToken {
     }
 
     return NewSyntaxToken(BadToken, position, []rune{current}, nil)
+}
+
+type Parser struct {
+    Tokens []SyntaxToken
+    Position int
+}
+
+func (p *Parser) Peek(offset int) *SyntaxToken {
+    index := p.Position + offset
+    if index > len(p.Tokens) {
+        return &p.Tokens[len(p.Tokens) - 1]
+    }
+
+    return &p.Tokens[index]
+}
+
+func (p *Parser) Current() *SyntaxToken {
+    return p.Peek(0)
+}
+
+func NewParser(text string) *Parser {
+    lexer := NewLexer([]rune(text))
+    var token *SyntaxToken
+    var tokens []SyntaxToken
+
+    for {
+        token = lexer.NextToken()
+
+        if token.Kind() != EndOfFileToken {
+            break
+        }
+
+        if token.Kind() != WhitespaceToken && token.Kind() != BadToken {
+            tokens = append(tokens, *token)
+        }
+    }
+
+    return &Parser{
+        Tokens: tokens,
+    }
+}
+
+type SyntaxNode interface {
+    Kind() SyntaxKind
+    Value()  interface{}
+    GetChildren() []SyntaxNode //todo IEnumerable
+}
+
+type ExpressionSyntax interface {
+    SyntaxNode
+}
+
+type NumberExpressionSyntax struct {
+    NumberToken *SyntaxToken
+}
+
+func (n *NumberExpressionSyntax) Value() interface{} {
+    return nil
+}
+
+func (n *NumberExpressionSyntax) GetChildren() []SyntaxNode {
+    return []SyntaxNode{n.NumberToken}
+}
+
+func (n *NumberExpressionSyntax) Kind() SyntaxKind {
+    return NumberExpression
+}
+
+func NewNumberExpressionSyntax(numberToken *SyntaxToken) *NumberExpressionSyntax {
+    return &NumberExpressionSyntax{
+        NumberToken: numberToken,
+    }
+}
+
+type BinaryExpressionSyntax struct {
+    Left ExpressionSyntax
+    Right ExpressionSyntax
+    OperatorNode SyntaxNode
+}
+
+func (b *BinaryExpressionSyntax) Value() interface{} {
+    return nil
+}
+
+func NewBinaryExpressionSyntax(left ExpressionSyntax, operatorNode SyntaxNode, right ExpressionSyntax) *BinaryExpressionSyntax {
+    return &BinaryExpressionSyntax{
+        Left: left,
+        Right: right,
+        OperatorNode: operatorNode,
+    }
+}
+
+func (b *BinaryExpressionSyntax) Kind() SyntaxKind {
+    return BinaryExpression
+}
+
+func (b *BinaryExpressionSyntax) GetChildren() []SyntaxNode {
+    //todo yield operator in go
+    return []SyntaxNode{
+        b.Left,
+        b.OperatorNode,
+        b.Right,
+    }
+}
+
+func (p *Parser) Parse() ExpressionSyntax {
+    var left = p.ParsePrimaryExpression()
+    var right ExpressionSyntax
+
+    for p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken {
+            operatorToken := p.NextToken()
+            right = p.ParsePrimaryExpression()
+            left = NewBinaryExpressionSyntax(left, operatorToken, right)
+    }
+
+    return left
+}
+
+func (p *Parser) NextToken() *SyntaxToken {
+    current := p.Current()
+    p.Position = p.Position + 1
+
+    return current
+}
+
+func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
+    if p.Current().Kind() == kind {
+        return p.NextToken()
+    }
+
+    return NewSyntaxToken(kind, p.Current().Position, nil, nil)
+}
+
+func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
+    numberToken := p.Match(NumberToken)
+
+    return NewNumberExpressionSyntax(numberToken)
 }
