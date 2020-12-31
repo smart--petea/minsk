@@ -36,12 +36,13 @@ func main() {
 }
 
 func PrettyPrint(node minsk.SyntaxNode, indent string) {
-    fmt.Print(node.Kind())
+    fmt.Printf("%s%s", indent, node.Kind())
 
     if node.Value() != nil {
         fmt.Print(" ")
         fmt.Print(node.Value())
     }
+    fmt.Printf("\n")
 
     indent = indent + "   "
     for _, child := range node.GetChildren() {

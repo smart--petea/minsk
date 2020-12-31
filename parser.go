@@ -7,8 +7,8 @@ type Parser struct {
 
 func (p *Parser) Peek(offset int) *SyntaxToken {
     index := p.Position + offset
-    if index > len(p.Tokens) {
-        return &p.Tokens[len(p.Tokens) - 1]
+    if index >= len(p.Tokens) {
+        return nil
     }
 
     return &p.Tokens[index]
@@ -26,13 +26,19 @@ func NewParser(text string) *Parser {
     for {
         token = lexer.NextToken()
 
-        if token.Kind() != EndOfFileToken {
+        if token.Kind() == EndOfFileToken {
             break
         }
 
-        if token.Kind() != WhitespaceToken && token.Kind() != BadToken {
-            tokens = append(tokens, *token)
+        if token.Kind() == WhitespaceToken {
+            continue
         }
+
+        if token.Kind() == BadToken {
+            continue
+        }
+
+        tokens = append(tokens, *token)
     }
 
     return &Parser{
@@ -44,7 +50,7 @@ func (p *Parser) Parse() ExpressionSyntax {
     var left = p.ParsePrimaryExpression()
     var right ExpressionSyntax
 
-    for p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken {
+    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken) {
             operatorToken := p.NextToken()
             right = p.ParsePrimaryExpression()
             left = NewBinaryExpressionSyntax(left, operatorToken, right)
@@ -55,21 +61,32 @@ func (p *Parser) Parse() ExpressionSyntax {
 
 func (p *Parser) NextToken() *SyntaxToken {
     current := p.Current()
-    p.Position = p.Position + 1
+    if current != nil {
+        p.Position = p.Position + 1
+    }
 
     return current
 }
 
 func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
-    if p.Current().Kind() == kind {
+    current := p.Current()
+    if current == nil {
+        return nil
+    }
+
+    if current.Kind() == kind {
         return p.NextToken()
     }
 
-    return NewSyntaxToken(kind, p.Current().Position, nil, nil)
+    return NewSyntaxToken(kind, current.Position, nil, nil)
 }
 
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     numberToken := p.Match(NumberToken)
+
+    if numberToken == nil {
+        return nil
+    }
 
     return NewNumberExpressionSyntax(numberToken)
 }
