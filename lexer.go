@@ -48,7 +48,10 @@ func (l *Lexer) NextToken() *SyntaxToken {
 
         length := l.Position - start 
         runes := l.Runes[start: start + length]
-        val, _ := strconv.Atoi(string(runes))
+        val, err := strconv.Atoi(string(runes))
+        if err != nil {
+            l.AddDiagnostic("The number %s isn't valid int32.", string(runes))
+        }
 
         return NewSyntaxToken(NumberToken, start, runes, val)
     }

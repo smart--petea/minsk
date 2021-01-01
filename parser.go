@@ -56,7 +56,14 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
     p.Diagnostics = append(p.Diagnostics, fmt.Sprintf(format, args...))
 }
 
-func (p *Parser) Parse() ExpressionSyntax {
+func (p *Parser) Parse() *SyntaxTree {
+    rootExpression := p.ParseExpression()
+    endOfFileToken := p.Match(EndOfFileToken)
+
+    return NewSyntaxTree(p.Diagnostics, rootExpression, endOfFileToken)
+}
+
+func (p *Parser) ParseExpression() ExpressionSyntax {
     var left = p.ParsePrimaryExpression()
     var right ExpressionSyntax
 
@@ -88,7 +95,7 @@ func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
         return p.NextToken()
     }
 
-    p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind, kind)
+    p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind(), kind)
 
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }

@@ -23,7 +23,6 @@ func (b *BinaryExpressionSyntax) Kind() SyntaxKind {
 }
 
 func (b *BinaryExpressionSyntax) GetChildren() []SyntaxNode {
-    //todo yield operator in go
     return []SyntaxNode{
         b.Left,
         b.OperatorNode,

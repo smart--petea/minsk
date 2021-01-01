@@ -8,7 +8,7 @@ const (
     PlusToken SyntaxKind = "PlusToken"
     EndOfFileToken SyntaxKind = "EndOfFileToken"
     MinusToken SyntaxKind = "MinusToken"
-    StartToken SyntaxKind = "StartToken"
+    StarToken SyntaxKind = "StarToken"
     SlashToken SyntaxKind = "SlashToken"
     OpenParenthesisToken SyntaxKind = "OpenParenthisToken"
     CloseParenthesisToken SyntaxKind = "CloseParenthisToken"

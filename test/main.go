@@ -25,13 +25,13 @@ func main() {
         }
 
         parser := minsk.NewParser(line)
-        expression := parser.Parse()
+        syntaxTree := parser.Parse()
 
         fmt.Print("\033[90m")
-        PrettyPrint(expression, "", true)
+        PrettyPrint(syntaxTree.Root, "", true)
         fmt.Print("\033[37m")
 
-        if len(parser.Diagnostics) > 0  {
+        if len(syntaxTree.Diagnostics) > 0  {
             fmt.Print("\033[31m")
 
             for _, diagnostic := range parser.Diagnostics {
@@ -39,6 +39,10 @@ func main() {
             }
 
             fmt.Print("\033[37m")
+        } else {
+            e := NewEvaluator(syntaxTree.Root)
+            result := e.Evaluate()
+            fmt.Println(result)
         }
     }
 }
