@@ -30,13 +30,20 @@ func main() {
         expression := parser.Parse()
 
         fmt.Print("\033[90m")
-        PrettyPrint(expression, "")
+        PrettyPrint(expression, "", true)
         fmt.Print("\033[37m")
     }
 }
 
-func PrettyPrint(node minsk.SyntaxNode, indent string) {
-    fmt.Printf("%s%s", indent, node.Kind())
+func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
+    var marker string
+    if isLast {
+        marker = "└─"
+    } else {
+        marker = "├─"
+    }
+
+    fmt.Printf("%s%s%s", indent, marker, node.Kind())
 
     if node.Value() != nil {
         fmt.Print(" ")
@@ -44,8 +51,15 @@ func PrettyPrint(node minsk.SyntaxNode, indent string) {
     }
     fmt.Printf("\n")
 
-    indent = indent + "   "
-    for _, child := range node.GetChildren() {
-        PrettyPrint(child, indent)
+    if isLast {
+        indent = indent + "     "
+    } else {
+        indent = indent + "│    "
+    }
+
+    children := node.GetChildren()
+    lenChildren := len(children) - 1
+    for i, child := range children {
+        PrettyPrint(child, indent, i == lenChildren)
     }
 }
