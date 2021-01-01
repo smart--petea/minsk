@@ -3,11 +3,17 @@ package minsk
 import (
     "unicode"
     "strconv"
+    "fmt"
 )
 
 type Lexer struct {
     Runes []rune
     Position int
+    Diagnostics []string
+}
+
+func (l *Lexer) AddDiagnostic(format string, args ...interface{}) {
+    l.Diagnostics = append(l.Diagnostics, fmt.Sprintf(format, args...))
 }
 
 func NewLexer(runes []rune) *Lexer {
@@ -86,6 +92,8 @@ func (l *Lexer) NextToken() *SyntaxToken {
     if current == ')' {
         return NewSyntaxToken(CloseParenthesisToken, position, []rune{current}, nil)
     }
+
+    l.AddDiagnostic("ERROR: bad character input: '%s'", string(current))
 
     return NewSyntaxToken(BadToken, position, []rune{current}, nil)
 }

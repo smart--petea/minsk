@@ -6,8 +6,6 @@ import (
     "os"
     "log"
     "strings"
-//    "unicode"
- //   "strconv"
 
     "minsk"
 )
@@ -32,10 +30,24 @@ func main() {
         fmt.Print("\033[90m")
         PrettyPrint(expression, "", true)
         fmt.Print("\033[37m")
+
+        if len(parser.Diagnostics) > 0  {
+            fmt.Print("\033[31m")
+
+            for _, diagnostic := range parser.Diagnostics {
+                fmt.Println(diagnostic)
+            }
+
+            fmt.Print("\033[37m")
+        }
     }
 }
 
 func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
+    if node == nil {
+        return
+    }
+
     var marker string
     if isLast {
         marker = "└─"

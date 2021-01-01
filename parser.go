@@ -1,8 +1,13 @@
 package minsk
 
+import (
+    "fmt"
+)
+
 type Parser struct {
     Tokens []SyntaxToken
     Position int
+    Diagnostics []string
 }
 
 func (p *Parser) Peek(offset int) *SyntaxToken {
@@ -43,7 +48,12 @@ func NewParser(text string) *Parser {
 
     return &Parser{
         Tokens: tokens,
+        Diagnostics: lexer.Diagnostics,
     }
+}
+
+func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
+    p.Diagnostics = append(p.Diagnostics, fmt.Sprintf(format, args...))
 }
 
 func (p *Parser) Parse() ExpressionSyntax {
@@ -77,6 +87,8 @@ func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
     if current.Kind() == kind {
         return p.NextToken()
     }
+
+    p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind, kind)
 
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
