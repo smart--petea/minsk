@@ -67,7 +67,7 @@ func (p *Parser) ParseExpression() ExpressionSyntax {
     var left = p.ParsePrimaryExpression()
     var right ExpressionSyntax
 
-    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken) {
+    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken || p.Current().Kind() == StarToken || p.Current().Kind() == SlashToken) {
             operatorToken := p.NextToken()
             right = p.ParsePrimaryExpression()
             left = NewBinaryExpressionSyntax(left, operatorToken, right)

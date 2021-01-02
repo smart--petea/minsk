@@ -40,7 +40,7 @@ func main() {
 
             fmt.Print("\033[37m")
         } else {
-            e := NewEvaluator(syntaxTree.Root)
+            e := minsk.NewEvaluator(syntaxTree.Root)
             result := e.Evaluate()
             fmt.Println(result)
         }
