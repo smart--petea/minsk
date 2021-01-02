@@ -57,17 +57,29 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
 }
 
 func (p *Parser) Parse() *SyntaxTree {
-    rootExpression := p.ParseExpression()
+    rootExpression := p.ParseTerm()
     endOfFileToken := p.Match(EndOfFileToken)
 
     return NewSyntaxTree(p.Diagnostics, rootExpression, endOfFileToken)
 }
 
-func (p *Parser) ParseExpression() ExpressionSyntax {
+func (p *Parser) ParseTerm() ExpressionSyntax {
+    var left = p.ParseFactor()
+
+    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken) {
+            operatorToken := p.NextToken()
+            right := p.ParseFactor()
+            left = NewBinaryExpressionSyntax(left, operatorToken, right)
+    }
+
+    return left
+}
+
+func (p *Parser) ParseFactor() ExpressionSyntax {
     var left = p.ParsePrimaryExpression()
     var right ExpressionSyntax
 
-    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken || p.Current().Kind() == StarToken || p.Current().Kind() == SlashToken) {
+    for p.Current() != nil && (p.Current().Kind() == StarToken || p.Current().Kind() == SlashToken) {
             operatorToken := p.NextToken()
             right = p.ParsePrimaryExpression()
             left = NewBinaryExpressionSyntax(left, operatorToken, right)
