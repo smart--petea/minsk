@@ -41,6 +41,12 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         }
     }
 
+    if p, ok := root.(*ParenthesizedExpressionSyntax); ok {
+        result := e.evaluateExpression(p.Expression)
+
+        return result
+    }
+
     if s, ok := root.(*SyntaxToken); ok && s.Kind() == NumberToken{
         return s.Value().(int)
     }

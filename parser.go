@@ -112,7 +112,20 @@ func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
 
+func (p *Parser) ParseExpression() ExpressionSyntax {
+    return p.ParseTerm()
+}
+
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
+    current := p.Current()
+    if current.Kind() == OpenParenthesisToken {
+        left := p.NextToken()
+        expression := p.ParseExpression()
+        right := p.Match(CloseParenthesisToken)
+
+        return NewParenthesizedExpressionSyntax(left, expression, right)
+    }
+
     numberToken := p.Match(NumberToken)
 
     if numberToken == nil {

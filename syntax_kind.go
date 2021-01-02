@@ -15,5 +15,6 @@ const (
     BadToken SyntaxKind = "BadToken"
     BinaryExpression SyntaxKind = "BinaryExpression" 
     NumberExpression SyntaxKind = "NumberExpression" 
+    ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
 )
 
