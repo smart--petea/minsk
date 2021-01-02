@@ -81,7 +81,7 @@ func (l *Lexer) NextToken() *SyntaxToken {
     }
 
     if current == '*' {
-        return NewSyntaxToken(StartToken, position, []rune{current}, nil)
+        return NewSyntaxToken(StarToken, position, []rune{current}, nil)
     }
 
     if current == '/' {
