@@ -32,6 +32,7 @@ func NewParser(text string) *Parser {
         token = lexer.NextToken()
 
         if token.Kind() == EndOfFileToken {
+            tokens = append(tokens, *token)
             break
         }
 
