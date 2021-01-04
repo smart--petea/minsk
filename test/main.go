@@ -48,7 +48,7 @@ func main() {
 }
 
 func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
-    if node == nil {
+    if fmt.Sprintf("%v", node) == "<nil>" {
         return
     }
 
@@ -59,7 +59,6 @@ func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
         marker = "├─"
     }
 
-    fmt.Printf("acesta r.62 %+v %+v\n", node, node==nil)
     fmt.Printf("%s%s%s", indent, marker, node.Kind())
 
     if node.Value() != nil {
@@ -76,12 +75,7 @@ func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
 
     children := node.GetChildren()
     lenChildren := len(children) - 1
-    fmt.Printf("acesta r.78 %+v\n", node)
-    fmt.Printf("acesta r.79 %+v\n", node.GetChildren())
-    fmt.Printf("acesta r.80 %+v\n", len(node.GetChildren()))
     for i, child := range children {
-        fmt.Printf("acesta r.80 %+v\n", node)
-        fmt.Printf("acesta r.81 %+v %+v\n", child, child==nil)
         PrettyPrint(child, indent, i == lenChildren)
     }
 }
