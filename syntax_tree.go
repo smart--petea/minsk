@@ -6,10 +6,13 @@ type SyntaxTree struct {
     Diagnostics []string
 }
 
-func NewSyntaxTree(diagnostics []string, root ExpressionSyntax, endOfFileToken *SyntaxToken) *SyntaxTree {
+func ParseSyntaxTree(text string) *SyntaxTree {
+    parser := NewParser(text)
+    rootExpression, endOfFileToken := parser.Parse()
+
     return &SyntaxTree {
-        Root: root,
+        Root: rootExpression,
         EndOfFileToken: endOfFileToken,
-        Diagnostics: diagnostics,
+        Diagnostics: parser.Diagnostics,
     }
 }

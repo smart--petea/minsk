@@ -57,11 +57,11 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
     p.Diagnostics = append(p.Diagnostics, fmt.Sprintf(format, args...))
 }
 
-func (p *Parser) Parse() *SyntaxTree {
+func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
     rootExpression := p.ParseTerm()
     endOfFileToken := p.Match(EndOfFileToken)
 
-    return NewSyntaxTree(p.Diagnostics, rootExpression, endOfFileToken)
+    return rootExpression, endOfFileToken
 }
 
 func (p *Parser) ParseTerm() ExpressionSyntax {

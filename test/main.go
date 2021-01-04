@@ -24,8 +24,7 @@ func main() {
             os.Exit(0)
         }
 
-        parser := minsk.NewParser(line)
-        syntaxTree := parser.Parse()
+        syntaxTree := minsk.ParseSyntaxTree(line)
 
         fmt.Print("\033[90m")
         PrettyPrint(syntaxTree.Root, "", true)
@@ -34,7 +33,7 @@ func main() {
         if len(syntaxTree.Diagnostics) > 0  {
             fmt.Print("\033[31m")
 
-            for _, diagnostic := range parser.Diagnostics {
+            for _, diagnostic := range syntaxTree.Diagnostics {
                 fmt.Println(diagnostic)
             }
 
