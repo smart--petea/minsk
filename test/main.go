@@ -12,6 +12,8 @@ import (
 
 func main() {
     reader := bufio.NewReader(os.Stdin)
+    var showTree bool
+
     for {
         fmt.Print("> ")
         line, err := reader.ReadString('\n')
@@ -24,11 +26,27 @@ func main() {
             os.Exit(0)
         }
 
+        if line == "#showTree" {
+            showTree = !showTree
+            if showTree {
+                fmt.Println("Showing parse trees.")
+            } else {
+                fmt.Println("Not showing parse trees")
+            }
+
+            continue
+        } else if line == "#cls" {
+            fmt.Print("\033[H\033[2J")
+            continue
+        }
+
         syntaxTree := minsk.ParseSyntaxTree(line)
 
-        fmt.Print("\033[90m")
-        PrettyPrint(syntaxTree.Root, "", true)
-        fmt.Print("\033[37m")
+        if showTree {
+            fmt.Print("\033[90m")
+            PrettyPrint(syntaxTree.Root, "", true)
+            fmt.Print("\033[37m")
+        } 
 
         if len(syntaxTree.Diagnostics) > 0  {
             fmt.Print("\033[31m")
