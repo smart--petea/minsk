@@ -1,4 +1,4 @@
-package minsk
+package CodeAnalysis
 
 type SyntaxNode interface {
     Kind() SyntaxKind

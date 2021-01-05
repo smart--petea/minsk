@@ -1,4 +1,4 @@
-package minsk
+package CodeAnalysis
 
 type BinaryExpressionSyntax struct {
     Left ExpressionSyntax

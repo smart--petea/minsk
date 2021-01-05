@@ -7,7 +7,7 @@ import (
     "log"
     "strings"
 
-    "minsk"
+    CA "minsk/CodeAnalysis"
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
             continue
         }
 
-        syntaxTree := minsk.ParseSyntaxTree(line)
+        syntaxTree := CA.ParseSyntaxTree(line)
 
         if showTree {
             fmt.Print("\033[90m")
@@ -57,14 +57,14 @@ func main() {
 
             fmt.Print("\033[37m")
         } else {
-            e := minsk.NewEvaluator(syntaxTree.Root)
+            e := CA.NewEvaluator(syntaxTree.Root)
             result := e.Evaluate()
             fmt.Println(result)
         }
     }
 }
 
-func PrettyPrint(node minsk.SyntaxNode, indent string, isLast bool) {
+func PrettyPrint(node CA.SyntaxNode, indent string, isLast bool) {
     if fmt.Sprintf("%v", node) == "<nil>" {
         return
     }

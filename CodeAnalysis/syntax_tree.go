@@ -1,4 +1,4 @@
-package minsk
+package CodeAnalysis
 
 type SyntaxTree struct {
     Root ExpressionSyntax

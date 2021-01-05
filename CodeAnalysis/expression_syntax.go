@@ -1,4 +1,4 @@
-package minsk
+package CodeAnalysis
 
 type ExpressionSyntax interface {
     SyntaxNode
