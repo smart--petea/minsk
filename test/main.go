@@ -8,6 +8,7 @@ import (
     "strings"
 
     CA "minsk/CodeAnalysis"
+    Console "minsk/Console"
 )
 
 func main() {
@@ -36,26 +37,26 @@ func main() {
 
             continue
         } else if line == "#cls" {
-            fmt.Print("\033[H\033[2J")
+            Console.Clear()
             continue
         }
 
         syntaxTree := CA.ParseSyntaxTree(line)
 
         if showTree {
-            fmt.Print("\033[90m")
+            Console.ForegroundColour(Console.COLOUR_GRAY)
             PrettyPrint(syntaxTree.Root, "", true)
-            fmt.Print("\033[37m")
+            Console.ResetColour()
         } 
 
         if len(syntaxTree.Diagnostics) > 0  {
-            fmt.Print("\033[31m")
+            Console.ForegroundColour(Console.COLOUR_RED)
 
             for _, diagnostic := range syntaxTree.Diagnostics {
                 fmt.Println(diagnostic)
             }
 
-            fmt.Print("\033[37m")
+            Console.ResetColour()
         } else {
             e := CA.NewEvaluator(syntaxTree.Root)
             result := e.Evaluate()
