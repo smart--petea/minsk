@@ -86,9 +86,9 @@ func PrettyPrint(node CA.SyntaxNode, indent string, isLast bool) {
     fmt.Printf("\n")
 
     if isLast {
-        indent = indent + "     "
+        indent = indent + "    "
     } else {
-        indent = indent + "│    "
+        indent = indent + "│   "
     }
 
     children := node.GetChildren()

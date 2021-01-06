@@ -58,8 +58,8 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
 }
 
 func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
-    rootExpression := p.ParseTerm()
-    endOfFileToken := p.Match(EndOfFileToken)
+    rootExpression := p.ParseExpression()
+    endOfFileToken := p.MatchToken(EndOfFileToken)
 
     return rootExpression, endOfFileToken
 }
@@ -98,7 +98,7 @@ func (p *Parser) NextToken() *SyntaxToken {
     return current
 }
 
-func (p *Parser) Match(kind SyntaxKind) *SyntaxToken {
+func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
     current := p.Current()
     if current == nil {
         return nil
@@ -122,16 +122,16 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     if current.Kind() == OpenParenthesisToken {
         left := p.NextToken()
         expression := p.ParseExpression()
-        right := p.Match(CloseParenthesisToken)
+        right := p.MatchToken(CloseParenthesisToken)
 
         return NewParenthesizedExpressionSyntax(left, expression, right)
     }
 
-    numberToken := p.Match(NumberToken)
+    numberToken := p.MatchToken(NumberToken)
 
     if numberToken == nil {
         return nil
     }
 
-    return NewNumberExpressionSyntax(numberToken)
+    return NewLiteralExpressionSyntax(numberToken)
 }

@@ -3,6 +3,7 @@ package CodeAnalysis
 type SyntaxKind string
 
 const (
+    //tokens
     NumberToken SyntaxKind = "NumberToken"
     WhitespaceToken SyntaxKind = "WhitespaceToken"
     PlusToken SyntaxKind = "PlusToken"
@@ -13,6 +14,8 @@ const (
     OpenParenthesisToken SyntaxKind = "OpenParenthisToken"
     CloseParenthesisToken SyntaxKind = "CloseParenthisToken"
     BadToken SyntaxKind = "BadToken"
+
+    //expressions
     BinaryExpression SyntaxKind = "BinaryExpression" 
     NumberExpression SyntaxKind = "NumberExpression" 
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"

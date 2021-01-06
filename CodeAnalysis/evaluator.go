@@ -19,8 +19,8 @@ func (e *Evaluator) Evaluate() int {
 }
 
 func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
-    if n, ok := root.(*NumberExpressionSyntax); ok {
-        return n.NumberToken.Value().(int)
+    if n, ok := root.(*LiteralExpressionSyntax); ok {
+        return n.LiteralToken.Value().(int)
     }
 
     if b, ok := root.(*BinaryExpressionSyntax); ok {
