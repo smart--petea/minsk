@@ -34,7 +34,7 @@ func (l *Lexer) Next() {
     l.Position = l.Position + 1
 }
 
-func (l *Lexer) NextToken() *SyntaxToken {
+func (l *Lexer) Lex() *SyntaxToken {
     if l.Position >= len(l.Runes) {
         return NewSyntaxToken(EndOfFileToken, l.Position, []rune{'\x00'}, nil)
     } 
@@ -72,31 +72,26 @@ func (l *Lexer) NextToken() *SyntaxToken {
     position := l.Position
     current := l.Current()
     l.Next()
-    if current == '+' {
+    switch current {
+    case '+':
         return NewSyntaxToken(PlusToken, position, []rune{current}, nil)
-    }
 
-    if current == '-' {
+    case '-':
         return NewSyntaxToken(MinusToken, position, []rune{current}, nil)
-    }
 
-    if current == '*' {
+    case '*':
         return NewSyntaxToken(StarToken, position, []rune{current}, nil)
-    }
 
-    if current == '/' {
+    case '/':
         return NewSyntaxToken(SlashToken, position, []rune{current}, nil)
-    }
 
-    if current == '(' {
+    case '(':
         return NewSyntaxToken(OpenParenthesisToken, position, []rune{current}, nil)
-    }
 
-    if current == ')' {
+    case ')':
         return NewSyntaxToken(CloseParenthesisToken, position, []rune{current}, nil)
     }
 
     l.AddDiagnostic("ERROR: bad character input: '%s'", string(current))
-
     return NewSyntaxToken(BadToken, position, []rune{current}, nil)
 }

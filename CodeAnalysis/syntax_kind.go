@@ -17,7 +17,7 @@ const (
 
     //expressions
     BinaryExpression SyntaxKind = "BinaryExpression" 
-    NumberExpression SyntaxKind = "NumberExpression" 
+    LiteralExpression SyntaxKind = "LiteralExpression" 
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
 )
 

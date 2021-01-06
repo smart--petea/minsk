@@ -29,7 +29,7 @@ func NewParser(text string) *Parser {
     var tokens []SyntaxToken
 
     for {
-        token = lexer.NextToken()
+        token = lexer.Lex()
 
         if token.Kind() == EndOfFileToken {
             tokens = append(tokens, *token)
@@ -68,7 +68,7 @@ func (p *Parser) ParseTerm() ExpressionSyntax {
     var left = p.ParseFactor()
 
     for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken) {
-            operatorToken := p.NextToken()
+            operatorToken := p.Lex()
             right := p.ParseFactor()
             left = NewBinaryExpressionSyntax(left, operatorToken, right)
     }
@@ -81,7 +81,7 @@ func (p *Parser) ParseFactor() ExpressionSyntax {
     var right ExpressionSyntax
 
     for p.Current() != nil && (p.Current().Kind() == StarToken || p.Current().Kind() == SlashToken) {
-            operatorToken := p.NextToken()
+            operatorToken := p.Lex()
             right = p.ParsePrimaryExpression()
             left = NewBinaryExpressionSyntax(left, operatorToken, right)
     }
@@ -89,7 +89,7 @@ func (p *Parser) ParseFactor() ExpressionSyntax {
     return left
 }
 
-func (p *Parser) NextToken() *SyntaxToken {
+func (p *Parser) Lex() *SyntaxToken {
     current := p.Current()
     if current != nil {
         p.Position = p.Position + 1
@@ -105,7 +105,7 @@ func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
     }
 
     if current.Kind() == kind {
-        return p.NextToken()
+        return p.Lex()
     }
 
     p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind(), kind)
@@ -120,7 +120,7 @@ func (p *Parser) ParseExpression() ExpressionSyntax {
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     current := p.Current()
     if current.Kind() == OpenParenthesisToken {
-        left := p.NextToken()
+        left := p.Lex()
         expression := p.ParseExpression()
         right := p.MatchToken(CloseParenthesisToken)
 

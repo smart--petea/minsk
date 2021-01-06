@@ -13,7 +13,7 @@ func (n *LiteralExpressionSyntax) GetChildren() []SyntaxNode {
 }
 
 func (n *LiteralExpressionSyntax) Kind() SyntaxKind {
-    return NumberExpression
+    return LiteralExpression
 }
 
 func NewLiteralExpressionSyntax(literalToken *SyntaxToken) *LiteralExpressionSyntax {
