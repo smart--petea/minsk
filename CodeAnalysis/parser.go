@@ -58,38 +58,14 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
 }
 
 func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
-    rootExpression := p.ParseExpression()
+    var rootExpression ExpressionSyntax = p.ParseExpression(0)
+
     endOfFileToken := p.MatchToken(EndOfFileToken)
 
     return rootExpression, endOfFileToken
 }
 
-func (p *Parser) ParseTerm() ExpressionSyntax {
-    var left = p.ParseFactor()
-
-    for p.Current() != nil && (p.Current().Kind() == PlusToken || p.Current().Kind() == MinusToken) {
-            operatorToken := p.Lex()
-            right := p.ParseFactor()
-            left = NewBinaryExpressionSyntax(left, operatorToken, right)
-    }
-
-    return left
-}
-
-func (p *Parser) ParseFactor() ExpressionSyntax {
-    var left = p.ParsePrimaryExpression()
-    var right ExpressionSyntax
-
-    for p.Current() != nil && (p.Current().Kind() == StarToken || p.Current().Kind() == SlashToken) {
-            operatorToken := p.Lex()
-            right = p.ParsePrimaryExpression()
-            left = NewBinaryExpressionSyntax(left, operatorToken, right)
-    }
-
-    return left
-}
-
-func (p *Parser) Lex() *SyntaxToken {
+func (p *Parser) NextToken() *SyntaxToken {
     current := p.Current()
     if current != nil {
         p.Position = p.Position + 1
@@ -105,7 +81,7 @@ func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
     }
 
     if current.Kind() == kind {
-        return p.Lex()
+        return p.NextToken()
     }
 
     p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind(), kind)
@@ -113,15 +89,10 @@ func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
 
-func (p *Parser) ParseExpression() ExpressionSyntax {
-    return p.ParseTerm()
-}
-
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
-    current := p.Current()
-    if current.Kind() == OpenParenthesisToken {
-        left := p.Lex()
-        expression := p.ParseExpression()
+    if p.Current().Kind() == OpenParenthesisToken {
+        left := p.NextToken()
+        expression := p.ParseExpression(0)
         right := p.MatchToken(CloseParenthesisToken)
 
         return NewParenthesizedExpressionSyntax(left, expression, right)
@@ -134,4 +105,37 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     }
 
     return NewLiteralExpressionSyntax(numberToken)
+}
+
+func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
+    left := p.ParsePrimaryExpression()
+
+    for {
+        precedence := p.GetBinaryOperatorPrecedence(p.Current().Kind())
+        if precedence == 0 || precedence <= parentPrecedence {
+            break
+        }
+
+        operatorToken := p.NextToken()
+        right := p.ParseExpression(precedence)
+        left = NewBinaryExpressionSyntax(left, operatorToken, right)
+    }
+
+    return left
+}
+
+func (p *Parser) GetBinaryOperatorPrecedence(kind SyntaxKind) int {
+    switch kind {
+        case PlusToken: 
+            return 1
+        case MinusToken: 
+            return 1
+        case StarToken:
+            return 1
+        case SlashToken:
+            return 1
+
+        default:
+            return 0
+    }
 }
