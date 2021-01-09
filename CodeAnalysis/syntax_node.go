@@ -1,7 +1,11 @@
 package CodeAnalysis
 
+import (
+    "minsk/CodeAnalysis/SyntaxKind"
+)
+
 type SyntaxNode interface {
-    Kind() SyntaxKind
+    Kind() SyntaxKind.SyntaxKind
     Value()  interface{}
     GetChildren() []SyntaxNode 
 }

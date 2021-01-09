@@ -1,4 +1,4 @@
-package CodeAnalysis
+package SyntaxKind
 
 type SyntaxKind string
 
@@ -21,3 +21,18 @@ const (
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
 )
 
+func (kind SyntaxKind) GetBinaryOperatorPrecedence() int {
+    switch kind {
+        case PlusToken: 
+            return 1
+        case MinusToken: 
+            return 1
+        case StarToken:
+            return 2
+        case SlashToken:
+            return 2
+
+        default:
+            return 0
+    }
+}

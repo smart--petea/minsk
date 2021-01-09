@@ -4,6 +4,9 @@ import (
     "unicode"
     "strconv"
     "fmt"
+
+
+    "minsk/CodeAnalysis/SyntaxKind"
 )
 
 type Lexer struct {
@@ -36,7 +39,7 @@ func (l *Lexer) Next() {
 
 func (l *Lexer) Lex() *SyntaxToken {
     if l.Position >= len(l.Runes) {
-        return NewSyntaxToken(EndOfFileToken, l.Position, []rune{'\x00'}, nil)
+        return NewSyntaxToken(SyntaxKind.EndOfFileToken, l.Position, []rune{'\x00'}, nil)
     } 
 
     if unicode.IsDigit(l.Current()) {
@@ -53,7 +56,7 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.AddDiagnostic("The number %s isn't valid int32.", string(runes))
         }
 
-        return NewSyntaxToken(NumberToken, start, runes, val)
+        return NewSyntaxToken(SyntaxKind.NumberToken, start, runes, val)
     }
 
     if unicode.IsSpace(l.Current()) {
@@ -66,7 +69,7 @@ func (l *Lexer) Lex() *SyntaxToken {
         length := l.Position - start 
         runes := l.Runes[start: start + length]
 
-        return NewSyntaxToken(WhitespaceToken, start, runes, nil)
+        return NewSyntaxToken(SyntaxKind.WhitespaceToken, start, runes, nil)
     }
 
     position := l.Position
@@ -74,24 +77,24 @@ func (l *Lexer) Lex() *SyntaxToken {
     l.Next()
     switch current {
     case '+':
-        return NewSyntaxToken(PlusToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.PlusToken, position, []rune{current}, nil)
 
     case '-':
-        return NewSyntaxToken(MinusToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.MinusToken, position, []rune{current}, nil)
 
     case '*':
-        return NewSyntaxToken(StarToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.StarToken, position, []rune{current}, nil)
 
     case '/':
-        return NewSyntaxToken(SlashToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.SlashToken, position, []rune{current}, nil)
 
     case '(':
-        return NewSyntaxToken(OpenParenthesisToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.OpenParenthesisToken, position, []rune{current}, nil)
 
     case ')':
-        return NewSyntaxToken(CloseParenthesisToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, []rune{current}, nil)
     }
 
     l.AddDiagnostic("ERROR: bad character input: '%s'", string(current))
-    return NewSyntaxToken(BadToken, position, []rune{current}, nil)
+    return NewSyntaxToken(SyntaxKind.BadToken, position, []rune{current}, nil)
 }

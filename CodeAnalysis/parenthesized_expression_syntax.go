@@ -1,5 +1,9 @@
 package CodeAnalysis
 
+import (
+    "minsk/CodeAnalysis/SyntaxKind"
+)
+
 type ParenthesizedExpressionSyntax struct {
     OpenParenthesisToken *SyntaxToken
     Expression ExpressionSyntax
@@ -14,8 +18,8 @@ func NewParenthesizedExpressionSyntax(openParenthesisToken *SyntaxToken, express
     }
 }
 
-func (p *ParenthesizedExpressionSyntax) Kind() SyntaxKind {
-    return ParenthesizedExpression
+func (p *ParenthesizedExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
+    return SyntaxKind.ParenthesizedExpression
 }
 
 func (p *ParenthesizedExpressionSyntax) GetChildren() []SyntaxNode {

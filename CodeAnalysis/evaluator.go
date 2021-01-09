@@ -2,6 +2,8 @@ package CodeAnalysis
 
 import (
     "fmt"
+
+    "minsk/CodeAnalysis/SyntaxKind"
 )
 
 type Evaluator struct {
@@ -28,13 +30,13 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         right := e.evaluateExpression(b.Right)
 
         switch b.OperatorNode.Kind() {
-        case PlusToken:
+        case SyntaxKind.PlusToken:
             return left + right
-        case MinusToken:
+        case SyntaxKind.MinusToken:
             return left - right
-        case StarToken:
+        case SyntaxKind.StarToken:
             return left * right
-        case SlashToken:
+        case SyntaxKind.SlashToken:
             return left / right
         default:
             panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorNode.Kind()))
@@ -47,7 +49,7 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         return result
     }
 
-    if s, ok := root.(*SyntaxToken); ok && s.Kind() == NumberToken{
+    if s, ok := root.(*SyntaxToken); ok && s.Kind() == SyntaxKind.NumberToken{
         return s.Value().(int)
     }
 

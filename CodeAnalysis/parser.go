@@ -2,6 +2,8 @@ package CodeAnalysis
 
 import (
     "fmt"
+
+    "minsk/CodeAnalysis/SyntaxKind"
 )
 
 type Parser struct {
@@ -31,16 +33,16 @@ func NewParser(text string) *Parser {
     for {
         token = lexer.Lex()
 
-        if token.Kind() == EndOfFileToken {
+        if token.Kind() == SyntaxKind.EndOfFileToken {
             tokens = append(tokens, *token)
             break
         }
 
-        if token.Kind() == WhitespaceToken {
+        if token.Kind() == SyntaxKind.WhitespaceToken {
             continue
         }
 
-        if token.Kind() == BadToken {
+        if token.Kind() == SyntaxKind.BadToken {
             continue
         }
 
@@ -60,7 +62,7 @@ func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
 func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
     var rootExpression ExpressionSyntax = p.ParseExpression(0)
 
-    endOfFileToken := p.MatchToken(EndOfFileToken)
+    endOfFileToken := p.MatchToken(SyntaxKind.EndOfFileToken)
 
     return rootExpression, endOfFileToken
 }
@@ -74,7 +76,7 @@ func (p *Parser) NextToken() *SyntaxToken {
     return current
 }
 
-func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
+func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
     current := p.Current()
     if current == nil {
         return nil
@@ -90,15 +92,15 @@ func (p *Parser) MatchToken(kind SyntaxKind) *SyntaxToken {
 }
 
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
-    if p.Current().Kind() == OpenParenthesisToken {
+    if p.Current().Kind() == SyntaxKind.OpenParenthesisToken {
         left := p.NextToken()
         expression := p.ParseExpression(0)
-        right := p.MatchToken(CloseParenthesisToken)
+        right := p.MatchToken(SyntaxKind.CloseParenthesisToken)
 
         return NewParenthesizedExpressionSyntax(left, expression, right)
     }
 
-    numberToken := p.MatchToken(NumberToken)
+    numberToken := p.MatchToken(SyntaxKind.NumberToken)
 
     if numberToken == nil {
         return nil
@@ -111,7 +113,7 @@ func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
     left := p.ParsePrimaryExpression()
 
     for {
-        precedence := p.GetBinaryOperatorPrecedence(p.Current().Kind())
+        precedence := p.Current().Kind().GetBinaryOperatorPrecedence()
         if precedence == 0 || precedence <= parentPrecedence {
             break
         }
@@ -122,20 +124,4 @@ func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
     }
 
     return left
-}
-
-func (p *Parser) GetBinaryOperatorPrecedence(kind SyntaxKind) int {
-    switch kind {
-        case PlusToken: 
-            return 1
-        case MinusToken: 
-            return 1
-        case StarToken:
-            return 2
-        case SlashToken:
-            return 2
-
-        default:
-            return 0
-    }
 }

@@ -1,5 +1,9 @@
 package CodeAnalysis
 
+import (
+    "minsk/CodeAnalysis/SyntaxKind"
+)
+
 type BinaryExpressionSyntax struct {
     Left ExpressionSyntax
     Right ExpressionSyntax
@@ -18,8 +22,8 @@ func NewBinaryExpressionSyntax(left ExpressionSyntax, operatorNode SyntaxNode, r
     }
 }
 
-func (b *BinaryExpressionSyntax) Kind() SyntaxKind {
-    return BinaryExpression
+func (b *BinaryExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
+    return SyntaxKind.BinaryExpression
 }
 
 func (b *BinaryExpressionSyntax) GetChildren() []SyntaxNode {
