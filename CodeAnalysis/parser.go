@@ -131,9 +131,9 @@ func (p *Parser) GetBinaryOperatorPrecedence(kind SyntaxKind) int {
         case MinusToken: 
             return 1
         case StarToken:
-            return 1
+            return 2
         case SlashToken:
-            return 1
+            return 2
 
         default:
             return 0
