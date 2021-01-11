@@ -110,7 +110,17 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
 }
 
 func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
-    left := p.ParsePrimaryExpression()
+    var left ExpressionSyntax 
+
+    unaryOperatorPrecedence := p.Current().Kind().GetUnaryOperatorPrecedence()
+    if  unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence {
+        operatorToken := p.NextToken()
+        operand := p.ParseExpression(unaryOperatorPrecedence)
+
+        left = NewUnaryExpressionSyntax(operatorToken, operand)
+    } else {
+        left = p.ParsePrimaryExpression()
+    }
 
     for {
         precedence := p.Current().Kind().GetBinaryOperatorPrecedence()

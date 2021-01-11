@@ -22,16 +22,29 @@ const (
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
 )
 
-func (kind SyntaxKind) GetBinaryOperatorPrecedence() int {
+func (kind SyntaxKind) GetUnaryOperatorPrecedence() int {
     switch kind {
         case PlusToken: 
-            return 1
+            return 3
         case MinusToken: 
-            return 1
+            return 3
+
+        default:
+            return 0
+    }
+}
+
+func (kind SyntaxKind) GetBinaryOperatorPrecedence() int {
+    switch kind {
         case StarToken:
             return 2
         case SlashToken:
             return 2
+
+        case PlusToken: 
+            return 1
+        case MinusToken: 
+            return 1
 
         default:
             return 0
