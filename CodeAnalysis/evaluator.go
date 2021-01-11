@@ -25,6 +25,19 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         return n.LiteralToken.Value().(int)
     }
 
+    if u, ok := root.(*UnaryExpressionSyntax); ok {
+        operand := e.evaluateExpression(u.Operand)
+
+        switch u.OperatorNode.Kind() {
+        case SyntaxKind.PlusToken:
+            return operand
+        case SyntaxKind.MinusToken:
+            return -operand
+        default:
+            panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorNode.Kind()))
+        }
+    }
+
     if b, ok := root.(*BinaryExpressionSyntax); ok {
         left := e.evaluateExpression(b.Left)
         right := e.evaluateExpression(b.Right)

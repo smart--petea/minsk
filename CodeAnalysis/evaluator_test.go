@@ -2,37 +2,73 @@ package CodeAnalysis
 
 import (
     "testing"
+
+    "minsk/CodeAnalysis/SyntaxKind"
 )
 
-func TestEvaluate(t *testing.T) {
-    numberToken1 := NewSyntaxToken(NumberToken, 0, []rune{'5'}, 5)
-    n := NewNumberExpressionSyntax(numberToken1)
+func TestEvaluateUnary(t *testing.T) {
+    unaryTests := []struct{
+        OperatorToken *SyntaxToken
+        OperandToken *SyntaxToken
+        Expected int
+    }{
+        {
+            OperatorToken: NewSyntaxToken(SyntaxKind.PlusToken, 0, []rune{'+'}, nil),
+            OperandToken: NewSyntaxToken(SyntaxKind.NumberToken, 0, []rune{'5'}, 5),
+            Expected: 5,
+        },
+        {
+            OperatorToken: NewSyntaxToken(SyntaxKind.MinusToken, 0, []rune{'+'}, nil),
+            OperandToken: NewSyntaxToken(SyntaxKind.NumberToken, 0, []rune{'5'}, 5),
+            Expected: -5,
+        },
+    }
+
+    for _, unaryTest := range unaryTests {
+        unaryToken := NewUnaryExpressionSyntax(unaryTest.OperatorToken, unaryTest.OperandToken)
+        e := NewEvaluator(unaryToken)
+        output := e.Evaluate()
+
+        if output != unaryTest.Expected {
+            t.Errorf("%s %s->%d expected %d",
+                string(unaryTest.OperatorToken.Runes),
+                string(unaryTest.OperandToken.Runes),
+                output,
+                unaryTest.Expected,
+            )
+        }
+    }
+}
+
+func TestEvaluateBinary(t *testing.T) {
+    numberToken1 := NewSyntaxToken(SyntaxKind.NumberToken, 0, []rune{'5'}, 5)
+    n := NewLiteralExpressionSyntax(numberToken1)
     e := NewEvaluator(n)
     result := e.Evaluate()
     if result != 5 {
         t.Errorf("Result should be 5, got %+v", result)
     }
 
-    left := NewSyntaxToken(NumberToken, 0, []rune{'5'}, 5)
-    right := NewSyntaxToken(NumberToken, 0, []rune{'6'}, 6)
+    left := NewSyntaxToken(SyntaxKind.NumberToken, 0, []rune{'5'}, 5)
+    right := NewSyntaxToken(SyntaxKind.NumberToken, 0, []rune{'6'}, 6)
     binaryTests := []struct{
             Operator *SyntaxToken
             Expected int
         } {
             {
-                Operator: NewSyntaxToken(PlusToken, 0, []rune{'+'}, nil),
+                Operator: NewSyntaxToken(SyntaxKind.PlusToken, 0, []rune{'+'}, nil),
                 Expected: 11,
             },
             {
-                Operator: NewSyntaxToken(MinusToken, 0, []rune{'-'}, nil),
+                Operator: NewSyntaxToken(SyntaxKind.MinusToken, 0, []rune{'-'}, nil),
                 Expected: -1,
             },
             {
-                Operator: NewSyntaxToken(StarToken, 0, []rune{'-'}, nil),
+                Operator: NewSyntaxToken(SyntaxKind.StarToken, 0, []rune{'-'}, nil),
                 Expected: 30,
             },
             {
-                Operator: NewSyntaxToken(SlashToken, 0, []rune{'-'}, nil),
+                Operator: NewSyntaxToken(SyntaxKind.SlashToken, 0, []rune{'-'}, nil),
                 Expected: 5/6,
             },
         }
