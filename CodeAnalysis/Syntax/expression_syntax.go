@@ -1,4 +1,4 @@
-package CodeAnalysis
+package Syntax
 
 type ExpressionSyntax interface {
     SyntaxNode

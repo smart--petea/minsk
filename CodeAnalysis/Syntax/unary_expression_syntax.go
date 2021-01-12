@@ -1,7 +1,7 @@
-package CodeAnalysis
+package Syntax
 
 import (
-    "minsk/CodeAnalysis/SyntaxKind"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type UnaryExpressionSyntax struct {

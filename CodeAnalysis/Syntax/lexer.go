@@ -1,4 +1,4 @@
-package CodeAnalysis
+package Syntax
 
 import (
     "unicode"
@@ -6,7 +6,7 @@ import (
     "fmt"
 
 
-    "minsk/CodeAnalysis/SyntaxKind"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type Lexer struct {

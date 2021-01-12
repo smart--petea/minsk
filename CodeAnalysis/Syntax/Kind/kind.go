@@ -1,4 +1,4 @@
-package SyntaxKind
+package Kind
 
 type SyntaxKind string
 

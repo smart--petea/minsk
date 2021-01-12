@@ -3,14 +3,15 @@ package CodeAnalysis
 import (
     "fmt"
 
-    "minsk/CodeAnalysis/SyntaxKind"
+    Syntax "minsk/CodeAnalysis/Syntax"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type Evaluator struct {
-        Root ExpressionSyntax
+        Root Syntax.ExpressionSyntax
 }
 
-func NewEvaluator(root ExpressionSyntax) *Evaluator {
+func NewEvaluator(root Syntax.ExpressionSyntax) *Evaluator {
     return &Evaluator{
         Root: root,
     }
@@ -20,12 +21,12 @@ func (e *Evaluator) Evaluate() int {
     return e.evaluateExpression(e.Root)
 }
 
-func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
-    if n, ok := root.(*LiteralExpressionSyntax); ok {
+func (e *Evaluator) evaluateExpression(root Syntax.ExpressionSyntax) int {
+    if n, ok := root.(*Syntax.LiteralExpressionSyntax); ok {
         return n.LiteralToken.Value().(int)
     }
 
-    if u, ok := root.(*UnaryExpressionSyntax); ok {
+    if u, ok := root.(*Syntax.UnaryExpressionSyntax); ok {
         operand := e.evaluateExpression(u.Operand)
 
         switch u.OperatorNode.Kind() {
@@ -38,7 +39,7 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         }
     }
 
-    if b, ok := root.(*BinaryExpressionSyntax); ok {
+    if b, ok := root.(*Syntax.BinaryExpressionSyntax); ok {
         left := e.evaluateExpression(b.Left)
         right := e.evaluateExpression(b.Right)
 
@@ -56,13 +57,13 @@ func (e *Evaluator) evaluateExpression(root ExpressionSyntax) int {
         }
     }
 
-    if p, ok := root.(*ParenthesizedExpressionSyntax); ok {
+    if p, ok := root.(*Syntax.ParenthesizedExpressionSyntax); ok {
         result := e.evaluateExpression(p.Expression)
 
         return result
     }
 
-    if s, ok := root.(*SyntaxToken); ok && s.Kind() == SyntaxKind.NumberToken{
+    if s, ok := root.(*Syntax.SyntaxToken); ok && s.Kind() == SyntaxKind.NumberToken{
         return s.Value().(int)
     }
 

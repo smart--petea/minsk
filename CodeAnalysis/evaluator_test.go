@@ -3,7 +3,7 @@ package CodeAnalysis
 import (
     "testing"
 
-    "minsk/CodeAnalysis/SyntaxKind"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 func TestEvaluateUnary(t *testing.T) {

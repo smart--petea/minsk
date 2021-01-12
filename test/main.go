@@ -8,6 +8,7 @@ import (
     "strings"
 
     CA "minsk/CodeAnalysis"
+    Syntax "minsk/CodeAnalysis/Syntax"
     Console "minsk/Console"
 )
 
@@ -41,7 +42,7 @@ func main() {
             continue
         }
 
-        syntaxTree := CA.ParseSyntaxTree(line)
+        syntaxTree := Syntax.ParseSyntaxTree(line)
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
@@ -65,7 +66,7 @@ func main() {
     }
 }
 
-func PrettyPrint(node CA.SyntaxNode, indent string, isLast bool) {
+func PrettyPrint(node Syntax.SyntaxNode, indent string, isLast bool) {
     if fmt.Sprintf("%v", node) == "<nil>" {
         return
     }
