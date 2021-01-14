@@ -18,6 +18,8 @@ type BoundExpression interface {
     Type() Type
 }
 
+//todo move diagnostic in a separate class. should be nested also for lexer and parser
+
 type BoundUnaryExpression struct {
     Operand BoundExpression
     OperatorKind BoundUnaryOperatorKind
@@ -94,7 +96,13 @@ const (
     Division BoundBinaryOperatorKind = "Division"
 )
 
-type Binder struct {}
+type Binder struct {
+    Diagnostics []string
+}
+
+func (b *Binder) AddDiagnostic(format string, args ...interface{}) {
+    b.Diagnostics = append(b.Diagnostics, fmt.Sprintf(format, args...))
+}
 
 func (b *Binder) BindExpression(syntax ExpressionSyntax) BoundExpression {
     switch syntax.Kind() {
@@ -124,20 +132,31 @@ func (b *Binder) BindUnaryExpression(syntax UnaryExpressionSyntax) BoundExpressi
     boundOperand := b.BindExpression(syntax.Operand)
     boundOperatorKind := b.BinaryUnaryOperatorKind(syntax.OperatorToken.Kind, boundOperator.Type()) 
 
-    return NewBoundUnaryExpression(boundOperatorKind, boundOperand)
+    if boundOperatorKind == nil {
+        p.AddDiagnostic("Unary operator '%s' is not defined for type %v", string(syntax.OperatorToken.Runes), boundOperand.Type)
+        return boundOperand;
+    }
+
+    return NewBoundUnaryExpression(boundOperatorKind.Value(), boundOperand)
 }
 
 func (b *Binder) BindBinaryExpression(syntax BinaryExpressionSyntax) BoundExpression {
     boundLeft := b.BindExpression(syntax.Left)
-    boundOperatorKind := b.BinaryUnaryOperatorKind(syntax.OperatorToken.Kind) 
     boundRight := b.BindExpression(syntax.Right)
+    boundOperatorKind := b.BinaryUnaryOperatorKind(syntax.OperatorToken.Kind, boundLeft.Type(), boundRight.Type()) 
 
-    return NewBoundBinaryExpression(boundLeft, boundOperatorKind, boundRight)
+    if boundOperatorKind == nil {
+        p.AddDiagnostic("Binary operator '%s' is not defined for types %v and %v", string(syntax.OperatorToken.Runes), boundLeft.Type, boundRight.Type)
+        return boundLeft;
+    }
+
+    return NewBoundBinaryExpression(boundLeft, boundOperatorKind.Value(), boundRight)
 }
 
 func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind, operandType Type) BoundUnaryOperatorKind {
+
     //todo if not type of int return nil
-    if operandType 
+
     switch kind {
     case SyntaxKind.PlusToken:
         return Identity
@@ -148,7 +167,9 @@ func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind, operandType Type) BoundU
     }
 }
 
-func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind) BoundBinaryOperatorKind {
+func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind, leftType, rightType Type) BoundBinaryOperatorKind {
+    //if leftType is not int or rightType is not nil return nil
+
     switch kind {
     case SyntaxKind.PlusToken:
         return Addition

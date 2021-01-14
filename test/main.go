@@ -43,6 +43,10 @@ func main() {
         }
 
         syntaxTree := Syntax.ParseSyntaxTree(line)
+        binder := NewBinder()
+        boundExpression = binder.BindExpression(syntaxTree.Root)
+
+        diagnostics := append(syntaxTree.Diagnostics, ...binder.Diagnostics)
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
@@ -50,10 +54,10 @@ func main() {
             Console.ResetColour()
         } 
 
-        if len(syntaxTree.Diagnostics) > 0  {
+        if len(diagnostics) > 0  {
             Console.ForegroundColour(Console.COLOUR_RED)
 
-            for _, diagnostic := range syntaxTree.Diagnostics {
+            for _, diagnostic := range diagnostics {
                 fmt.Println(diagnostic)
             }
 

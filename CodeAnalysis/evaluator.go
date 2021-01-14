@@ -8,10 +8,10 @@ import (
 )
 
 type Evaluator struct {
-        Root Syntax.ExpressionSyntax
+        Root BoundExpression
 }
 
-func NewEvaluator(root Syntax.ExpressionSyntax) *Evaluator {
+func NewEvaluator(root BoundExpression) *Evaluator {
     return &Evaluator{
         Root: root,
     }
@@ -21,52 +21,45 @@ func (e *Evaluator) Evaluate() int {
     return e.evaluateExpression(e.Root)
 }
 
-func (e *Evaluator) evaluateExpression(root Syntax.ExpressionSyntax) int {
-    if n, ok := root.(*Syntax.LiteralExpressionSyntax); ok {
-        return n.LiteralToken.Value().(int)
+func (e *Evaluator) evaluateExpression(root BoundExpression) int {
+    if l, ok := root.(*BoundLiteralExpression); ok {
+        return l.Value().(int)
     }
 
-    if u, ok := root.(*Syntax.UnaryExpressionSyntax); ok {
+    if u, ok := root.(*BoundUnaryExpression); ok {
         operand := e.evaluateExpression(u.Operand)
 
-        switch u.OperatorNode.Kind() {
-        case SyntaxKind.PlusToken:
+        switch u.OperatorKind.Kind() {
+        case BoundUnaryOperatorKind.Identity:
             return operand
-        case SyntaxKind.MinusToken:
+        case BoundUnaryOperatorKind.Negation:
             return -operand
         default:
-            panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorNode.Kind()))
+            panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorKind.Kind()))
         }
     }
 
-    if b, ok := root.(*Syntax.BinaryExpressionSyntax); ok {
+    if b, ok := root.(*BoundBinaryExpression); ok {
         left := e.evaluateExpression(b.Left)
         right := e.evaluateExpression(b.Right)
 
-        switch b.OperatorNode.Kind() {
-        case SyntaxKind.PlusToken:
+        switch b.OperatorKind {
+        case BoundBinaryOperatorKind.Addition:
             return left + right
-        case SyntaxKind.MinusToken:
+        case BoundBinaryOperatorKind.Subtraction:
             return left - right
-        case SyntaxKind.StarToken:
+        case BoundBinaryOperatorKind.Multiplication:
             return left * right
-        case SyntaxKind.SlashToken:
+        case BoundBinaryOperatorKind.Division:
             return left / right
         default:
-            panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorNode.Kind()))
+            panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorKind))
         }
-    }
-
-    if p, ok := root.(*Syntax.ParenthesizedExpressionSyntax); ok {
-        result := e.evaluateExpression(p.Expression)
-
-        return result
     }
 
     if s, ok := root.(*Syntax.SyntaxToken); ok && s.Kind() == SyntaxKind.NumberToken{
         return s.Value().(int)
     }
-
 
     panic(fmt.Sprintf("Unexpected node %s", root.Kind()))
 }
