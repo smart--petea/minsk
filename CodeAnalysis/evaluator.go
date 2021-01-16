@@ -3,9 +3,9 @@ package CodeAnalysis
 import (
     "fmt"
 
-//    Syntax "minsk/CodeAnalysis/Syntax"
     Binding "minsk/CodeAnalysis/Binding"
- //   SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
+    "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
 )
 
 type Evaluator struct {
@@ -31,9 +31,9 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) int {
         operand := e.evaluateExpression(u.Operand)
 
         switch u.OperatorKind {
-        case Binding.Identity:
+        case BoundUnaryOperatorKind.Identity:
             return operand
-        case Binding.Negation:
+        case BoundUnaryOperatorKind.Negation:
             return -operand
         default:
             panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorKind))
@@ -45,13 +45,13 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) int {
         right := e.evaluateExpression(b.Right)
 
         switch b.OperatorKind {
-        case Binding.Addition:
+        case BoundBinaryOperatorKind.Addition:
             return left + right
-        case Binding.Subtraction:
+        case BoundBinaryOperatorKind.Subtraction:
             return left - right
-        case Binding.Multiplication:
+        case BoundBinaryOperatorKind.Multiplication:
             return left * right
-        case Binding.Division:
+        case BoundBinaryOperatorKind.Division:
             return left / right
         default:
             panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorKind))
