@@ -125,9 +125,16 @@ func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression 
         return b.BindBinaryExpression(syntax)
     case SyntaxKind.LiteralExpression:
         return b.BindLiteralExpression(syntax)
+    case SyntaxKind.ParenthesizedExpression:
+        return b.BindParenthesizedExpression(syntax)
     default:
         panic(fmt.Sprintf("Unexpected syntax %s", syntax.Kind()))
     }
+}
+
+func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+    pS := syntax.(*Syntax.ParenthesizedExpressionSyntax)
+    return b.BindExpression(pS.Expression)
 }
 
 func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
