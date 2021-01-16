@@ -1,15 +1,15 @@
 package Syntax
 
 import (
-    "fmt"
-
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/Util"
 )
 
 type Parser struct {
+    Util.Diagnostic
+
     Tokens []SyntaxToken
     Position int
-    Diagnostics []string
 }
 
 func (p *Parser) Peek(offset int) *SyntaxToken {
@@ -49,14 +49,12 @@ func NewParser(text string) *Parser {
         tokens = append(tokens, *token)
     }
 
-    return &Parser{
+    parser := &Parser{
         Tokens: tokens,
-        Diagnostics: lexer.Diagnostics,
     }
-}
 
-func (p *Parser) AddDiagnostic(format string, args ...interface{}) {
-    p.Diagnostics = append(p.Diagnostics, fmt.Sprintf(format, args...))
+    parser.LoadDiagnostics(lexer.GetDiagnostics())
+    return parser
 }
 
 func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {

@@ -3,24 +3,21 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
+
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Syntax"
+
+    "minsk/Util"
 
     "fmt"
 )
 
-//todo move diagnostic in a separate class. should be nested also for lexer and parser
-
 type Binder struct {
-    Diagnostics []string
+    Util.Diagnostic
 }
 
 func NewBinder() *Binder {
     return &Binder{}
-}
-
-func (b *Binder) AddDiagnostic(format string, args ...interface{}) {
-    b.Diagnostics = append(b.Diagnostics, fmt.Sprintf(format, args...))
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {

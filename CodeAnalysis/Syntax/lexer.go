@@ -3,20 +3,16 @@ package Syntax
 import (
     "unicode"
     "strconv"
-    "fmt"
-
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/Util"
 )
 
 type Lexer struct {
+    Util.Diagnostic
+
     Runes []rune
     Position int
-    Diagnostics []string
-}
-
-func (l *Lexer) AddDiagnostic(format string, args ...interface{}) {
-    l.Diagnostics = append(l.Diagnostics, fmt.Sprintf(format, args...))
 }
 
 func NewLexer(runes []rune) *Lexer {

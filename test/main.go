@@ -10,7 +10,7 @@ import (
     CA "minsk/CodeAnalysis"
     Syntax "minsk/CodeAnalysis/Syntax"
     Binding "minsk/CodeAnalysis/Binding"
-    Console "minsk/Console"
+    Console "minsk/Util/Console"
 )
 
 func main() {
