@@ -3,6 +3,7 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Binding/TypeCarrier"
 )
 
 type BoundBinaryExpression struct {
@@ -23,6 +24,6 @@ func (b *BoundBinaryExpression) Kind() BoundNodeKind.BoundNodeKind {
    return BoundNodeKind.BinaryExpression 
 }
 
-func (b *BoundBinaryExpression) GetTypeCarrier() TypeCarrier {
+func (b *BoundBinaryExpression) GetTypeCarrier() TypeCarrier.TypeCarrier {
     return b.Left.GetTypeCarrier()
 }

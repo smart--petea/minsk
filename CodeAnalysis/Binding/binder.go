@@ -3,6 +3,7 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
+    "minsk/CodeAnalysis/Binding/TypeCarrier"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Syntax"
@@ -58,7 +59,7 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
     boundOperatorKind := b.BindUnaryOperatorKind(unarySyntax.OperatorNode.Kind(), boundOperand.GetTypeCarrier()) 
 
     if boundOperatorKind == "" {
-        b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetTypeCarrier()) //todo look for access to runes
+        b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetTypeCarrier()) 
         return boundOperand;
     }
 
@@ -73,19 +74,18 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     boundOperatorKind := b.BindBinaryOperatorKind(binarySyntax.OperatorNode.Kind(), boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
 
     if boundOperatorKind == "" {
-        b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) //todo find access to runes
+        b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
         return boundLeft;
     }
 
     return NewBoundBinaryExpression(boundLeft, boundOperatorKind, boundRight)
 }
 
-func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier TypeCarrier) BoundUnaryOperatorKind.BoundUnaryOperatorKind {
-    if isInt(typeCarrier) == false {
+func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier TypeCarrier.TypeCarrier) BoundUnaryOperatorKind.BoundUnaryOperatorKind {
+    if TypeCarrier.IsInt(typeCarrier) == false {
         return ""
     } 
 
-    //todo move it in BoundUnaryOperatorKind
     switch kind {
     case SyntaxKind.PlusToken:
         return BoundUnaryOperatorKind.Identity
@@ -96,12 +96,11 @@ func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier T
     }
 }
 
-func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarrier, rightTypeCarrier TypeCarrier) BoundBinaryOperatorKind.BoundBinaryOperatorKind {
-    if isInt(leftTypeCarrier) == false || isInt(rightTypeCarrier) == false {
+func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarrier, rightTypeCarrier TypeCarrier.TypeCarrier) BoundBinaryOperatorKind.BoundBinaryOperatorKind {
+    if TypeCarrier.IsInt(leftTypeCarrier) == false || TypeCarrier.IsInt(rightTypeCarrier) == false {
         return ""
     } 
 
-    //todo move it in BoundBinaryOperatorKind
     switch kind {
     case SyntaxKind.PlusToken:
         return BoundBinaryOperatorKind.Addition
@@ -113,15 +112,5 @@ func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarr
         return BoundBinaryOperatorKind.Division
     default:
         panic(fmt.Sprintf("Unexpected binary operator %s", kind))
-    }
-}
-
-//todo move it in type_carrier
-func isInt(val interface{}) bool {
-    switch val.(type) {
-    case int, int32, int64:
-        return true
-    default:
-        return false
     }
 }
