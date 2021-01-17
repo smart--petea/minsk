@@ -5,6 +5,7 @@ import (
     "strconv"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/Util"
 )
 
@@ -66,6 +67,20 @@ func (l *Lexer) Lex() *SyntaxToken {
         runes := l.Runes[start: start + length]
 
         return NewSyntaxToken(SyntaxKind.WhitespaceToken, start, runes, nil)
+    }
+
+    if unicode.IsLetter(l.Current()) {
+        start := l.Position
+
+        for unicode.IsLetter(l.Current()) {
+            l.Next()
+        }
+
+        length := l.Position - start 
+        runes := l.Runes[start: start + length]
+        kind := SyntaxFacts.GetKeywordKind(string(runes))
+
+        return NewSyntaxToken(kind, start, runes, nil)
     }
 
     position := l.Position
