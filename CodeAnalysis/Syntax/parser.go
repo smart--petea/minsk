@@ -101,7 +101,14 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
 
     if p.Current().Kind() == SyntaxKind.FalseKeyword || p.Current().Kind() == SyntaxKind.TrueKeyword {
         value := p.Current().Kind() == SyntaxKind.TrueKeyword
-        return NewLiteralExpressionSyntax(p.Current(), value)
+        var boolToken *SyntaxToken
+        if value {
+            boolToken = p.MatchToken(SyntaxKind.TrueKeyword)
+        } else {
+            boolToken = p.MatchToken(SyntaxKind.FalseKeyword)
+        }
+
+        return NewLiteralExpressionSyntax(boolToken, value)
     }
 
     numberToken := p.MatchToken(SyntaxKind.NumberToken)

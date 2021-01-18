@@ -1,18 +1,26 @@
 package Syntax
 
+import (
+    "minsk/Util"
+)
+
 type SyntaxTree struct {
+    Util.Diagnostic
+
     Root ExpressionSyntax
     EndOfFileToken *SyntaxToken
-    Diagnostics []string
 }
 
 func ParseSyntaxTree(text string) *SyntaxTree {
     parser := NewParser(text)
     rootExpression, endOfFileToken := parser.Parse()
 
-    return &SyntaxTree {
+    syntaxTree := &SyntaxTree {
         Root: rootExpression,
         EndOfFileToken: endOfFileToken,
-        Diagnostics: parser.Diagnostics,
     }
+
+    syntaxTree.LoadDiagnostics(parser.GetDiagnostics())
+
+    return syntaxTree
 }

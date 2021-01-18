@@ -47,7 +47,7 @@ func main() {
         binder := Binding.NewBinder()
         boundExpression := binder.BindExpression(syntaxTree.Root)
 
-        diagnostics := append(syntaxTree.Diagnostics, binder.Diagnostics...)
+        diagnostics := append(syntaxTree.GetDiagnostics(), binder.GetDiagnostics()...)
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
