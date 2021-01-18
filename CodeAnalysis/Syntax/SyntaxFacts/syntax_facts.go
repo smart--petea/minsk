@@ -4,11 +4,11 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
-func GetUnaryOperatorPrecedence(kind SyntaxKind) int {
+func GetUnaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
     switch kind {
-        case PlusToken: 
+        case SyntaxKind.PlusToken: 
             return 3
-        case MinusToken: 
+        case SyntaxKind.MinusToken: 
             return 3
 
         default:
@@ -16,16 +16,16 @@ func GetUnaryOperatorPrecedence(kind SyntaxKind) int {
     }
 }
 
-func GetBinaryOperatorPrecedence(kind SyntaxKind) int {
+func GetBinaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
     switch kind {
-        case StarToken:
+        case SyntaxKind.StarToken:
             return 2
-        case SlashToken:
+        case SyntaxKind.SlashToken:
             return 2
 
-        case PlusToken: 
+        case SyntaxKind.PlusToken: 
             return 1
-        case MinusToken: 
+        case SyntaxKind.MinusToken: 
             return 1
 
         default:
@@ -33,7 +33,7 @@ func GetBinaryOperatorPrecedence(kind SyntaxKind) int {
     }
 }
 
-func GetKeywordKind(text string) SyntaxKind {
+func GetKeywordKind(text string) SyntaxKind.SyntaxKind {
     switch text {
     case "true":
         return SyntaxKind.TrueKeyword

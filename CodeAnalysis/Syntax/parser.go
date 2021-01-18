@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/Util"
 )
 
@@ -98,19 +99,24 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
         return NewParenthesizedExpressionSyntax(left, expression, right)
     }
 
+    if p.Current().Kind() == SyntaxKind.FalseKeyword || p.Current().Kind() == SyntaxKind.TrueKeyword {
+        value := p.Current().Kind() == SyntaxKind.TrueKeyword
+        return NewLiteralExpressionSyntax(p.Current(), value)
+    }
+
     numberToken := p.MatchToken(SyntaxKind.NumberToken)
 
     if numberToken == nil {
         return nil
     }
 
-    return NewLiteralExpressionSyntax(numberToken)
+    return NewLiteralExpressionSyntax(numberToken, numberToken.Value())
 }
 
 func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
     var left ExpressionSyntax 
 
-    unaryOperatorPrecedence := p.Current().Kind().GetUnaryOperatorPrecedence()
+    unaryOperatorPrecedence := SyntaxFacts.GetUnaryOperatorPrecedence(p.Current().Kind())
     if  unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence {
         operatorToken := p.NextToken()
         operand := p.ParseExpression(unaryOperatorPrecedence)
@@ -121,7 +127,7 @@ func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
     }
 
     for {
-        precedence := p.Current().Kind().GetBinaryOperatorPrecedence()
+        precedence := SyntaxFacts.GetBinaryOperatorPrecedence(p.Current().Kind())
         if precedence == 0 || precedence <= parentPrecedence {
             break
         }

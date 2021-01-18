@@ -6,10 +6,11 @@ import (
 
 type LiteralExpressionSyntax struct {
     LiteralToken *SyntaxToken
+    value interface{}
 }
 
 func (n *LiteralExpressionSyntax) Value() interface{} {
-    return nil
+    return n.value
 }
 
 func (n *LiteralExpressionSyntax) GetChildren() []SyntaxNode {
@@ -20,8 +21,9 @@ func (n *LiteralExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.LiteralExpression
 }
 
-func NewLiteralExpressionSyntax(literalToken *SyntaxToken) *LiteralExpressionSyntax {
+func NewLiteralExpressionSyntax(literalToken *SyntaxToken, value interface{}) *LiteralExpressionSyntax {
     return &LiteralExpressionSyntax{
         LiteralToken: literalToken,
+        value: value,
     }
 }
