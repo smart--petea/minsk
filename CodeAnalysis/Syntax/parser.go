@@ -91,27 +91,26 @@ func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
 }
 
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
-    if p.Current().Kind() == SyntaxKind.OpenParenthesisToken {
+    switch p.Current().Kind() {
+    case SyntaxKind.OpenParenthesisToken:
         left := p.NextToken()
         expression := p.ParseExpression(0)
         right := p.MatchToken(SyntaxKind.CloseParenthesisToken)
 
         return NewParenthesizedExpressionSyntax(left, expression, right)
-    }
 
-    if p.Current().Kind() == SyntaxKind.FalseKeyword || p.Current().Kind() == SyntaxKind.TrueKeyword {
+    case SyntaxKind.FalseKeyword,  SyntaxKind.TrueKeyword:
         value := p.Current().Kind() == SyntaxKind.TrueKeyword
-
         return NewLiteralExpressionSyntax(p.NextToken(), value)
+
+    default:
+        numberToken := p.MatchToken(SyntaxKind.NumberToken)
+        if numberToken == nil {
+            return nil
+        }
+
+        return NewLiteralExpressionSyntax(numberToken, numberToken.Value())
     }
-
-    numberToken := p.MatchToken(SyntaxKind.NumberToken)
-
-    if numberToken == nil {
-        return nil
-    }
-
-    return NewLiteralExpressionSyntax(numberToken, numberToken.Value())
 }
 
 func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {

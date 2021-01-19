@@ -46,9 +46,17 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
 
     var value int
 
-    if val, ok := literalSyntax.LiteralToken.Value().(int); ok {
-        value = val
+    switch literalSyntax.LiteralToken.Kind() {
+    case SyntaxKind.TrueKeyword:
+        value = 1
+    case SyntaxKind.FalseKeyword:
+        value = 0
+    default:
+        if val, ok := literalSyntax.Value().(int); ok {
+            value = val
+        }
     }
+
 
     return NewBoundLiteralExpression(value)
 }

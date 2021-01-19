@@ -38,7 +38,7 @@ func GetKeywordKind(text string) SyntaxKind.SyntaxKind {
     case "true":
         return SyntaxKind.TrueKeyword
     case "false":
-        return SyntaxKind.TrueKeyword
+        return SyntaxKind.FalseKeyword
     default:
         return SyntaxKind.IdentifierToken
     }
