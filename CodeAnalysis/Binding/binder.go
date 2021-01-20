@@ -44,13 +44,13 @@ func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) Bou
 func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     literalSyntax := syntax.(*Syntax.LiteralExpressionSyntax)
 
-    var value int
+    var value interface{}
 
     switch literalSyntax.LiteralToken.Kind() {
     case SyntaxKind.TrueKeyword:
-        value = 1
+        value = true
     case SyntaxKind.FalseKeyword:
-        value = 0
+        value = false
     default:
         if val, ok := literalSyntax.Value().(int); ok {
             value = val
@@ -121,7 +121,6 @@ func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarr
             return BoundBinaryOperatorKind.Division
         }
     } 
-
 
     if TypeCarrier.IsBool(leftTypeCarrier) || TypeCarrier.IsBool(rightTypeCarrier) {
         switch kind {
