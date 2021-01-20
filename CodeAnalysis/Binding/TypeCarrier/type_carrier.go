@@ -10,3 +10,12 @@ func IsInt(val TypeCarrier) bool {
         return false
     }
 }
+
+func IsBool(val TypeCarrier) bool {
+    switch val.(type) {
+    case bool:
+        return true
+    default:
+        return false
+    }
+}

@@ -11,8 +11,11 @@ const (
     SlashToken SyntaxKind = "SlashToken"
     OpenParenthesisToken SyntaxKind = "OpenParenthisToken"
     CloseParenthesisToken SyntaxKind = "CloseParenthisToken"
+    BangToken SyntaxKind = "BangToken"
     BadToken SyntaxKind = "BadToken"
     IdentifierToken SyntaxKind = "IdentifierToken"
+    AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
+    PipePipeToken SyntaxKind = "PipePipeToken"
 
     //Keywords
     TrueKeyword SyntaxKind = "TrueKeyword"

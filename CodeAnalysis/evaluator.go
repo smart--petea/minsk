@@ -28,31 +28,43 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
     }
 
     if u, ok := root.(*Binding.BoundUnaryExpression); ok {
-        operand := e.evaluateExpression(u.Operand).(int)
+        operand := e.evaluateExpression(u.Operand)
 
         switch u.OperatorKind {
         case BoundUnaryOperatorKind.Identity:
-            return operand
+            return operand.(int)
         case BoundUnaryOperatorKind.Negation:
-            return -operand
+            return -(operand.(int))
+        case BoundUnaryOperatorKind.LogicalNegation:
+            return !(operand.(bool))
         default:
             panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorKind))
         }
     }
 
     if b, ok := root.(*Binding.BoundBinaryExpression); ok {
-        left := e.evaluateExpression(b.Left).(int)
-        right := e.evaluateExpression(b.Right).(int)
+        left := e.evaluateExpression(b.Left)
+        right := e.evaluateExpression(b.Right)
 
         switch b.OperatorKind {
         case BoundBinaryOperatorKind.Addition:
-            return left + right
+            return left.(int) + right.(int)
+
         case BoundBinaryOperatorKind.Subtraction:
-            return left - right
+            return left.(int) - right.(int)
+
         case BoundBinaryOperatorKind.Multiplication:
-            return left * right
+            return left.(int) * right.(int)
+
         case BoundBinaryOperatorKind.Division:
-            return left / right
+            return left.(int) / right.(int)
+
+        case BoundBinaryOperatorKind.LogicalAnd:
+            return left.(bool) && right.(bool)
+
+        case BoundBinaryOperatorKind.LogicalOr:
+            return left.(bool) || right.(bool)
+
         default:
             panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorKind))
         }

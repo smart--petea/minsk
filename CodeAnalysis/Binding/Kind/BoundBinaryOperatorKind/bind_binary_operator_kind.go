@@ -7,4 +7,6 @@ const (
     Subtraction BoundBinaryOperatorKind = "Subtraction"
     Multiplication BoundBinaryOperatorKind = "Multiplication"
     Division BoundBinaryOperatorKind = "Division"
+    LogicalAnd BoundBinaryOperatorKind = "LogicalAnd"
+    LogicalOr BoundBinaryOperatorKind = "LogicalOr"
 )

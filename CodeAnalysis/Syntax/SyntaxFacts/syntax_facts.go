@@ -6,10 +6,8 @@ import (
 
 func GetUnaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
     switch kind {
-        case SyntaxKind.PlusToken: 
-            return 3
-        case SyntaxKind.MinusToken: 
-            return 3
+        case SyntaxKind.PlusToken, SyntaxKind.MinusToken, SyntaxKind.BangToken: 
+            return 5
 
         default:
             return 0
@@ -18,14 +16,16 @@ func GetUnaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
 
 func GetBinaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
     switch kind {
-        case SyntaxKind.StarToken:
-            return 2
-        case SyntaxKind.SlashToken:
+        case SyntaxKind.StarToken, SyntaxKind.SlashToken:
+            return 4
+
+        case SyntaxKind.PlusToken, SyntaxKind.MinusToken: 
+            return 3
+
+        case SyntaxKind.AmpersandAmpersandToken:
             return 2
 
-        case SyntaxKind.PlusToken: 
-            return 1
-        case SyntaxKind.MinusToken: 
+        case SyntaxKind.PipePipeToken: 
             return 1
 
         default:

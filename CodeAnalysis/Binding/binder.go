@@ -91,34 +91,46 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
 func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier TypeCarrier.TypeCarrier) BoundUnaryOperatorKind.BoundUnaryOperatorKind {
     if TypeCarrier.IsInt(typeCarrier) == false {
-        return ""
+        switch kind {
+        case SyntaxKind.PlusToken:
+            return BoundUnaryOperatorKind.Identity
+        case SyntaxKind.MinusToken:
+            return BoundUnaryOperatorKind.Negation
+        }
     } 
 
-    switch kind {
-    case SyntaxKind.PlusToken:
-        return BoundUnaryOperatorKind.Identity
-    case SyntaxKind.MinusToken:
-        return BoundUnaryOperatorKind.Negation
-    default:
-        panic(fmt.Sprintf("Unexpected unary operator %s", kind))
+    if TypeCarrier.IsBool(typeCarrier) {
+        switch kind {
+        case SyntaxKind.BangToken:
+            return BoundUnaryOperatorKind.LogicalNegation
+        }
     }
+    return ""
 }
 
 func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarrier, rightTypeCarrier TypeCarrier.TypeCarrier) BoundBinaryOperatorKind.BoundBinaryOperatorKind {
-    if TypeCarrier.IsInt(leftTypeCarrier) == false || TypeCarrier.IsInt(rightTypeCarrier) == false {
-        return ""
+    if TypeCarrier.IsInt(leftTypeCarrier) || TypeCarrier.IsInt(rightTypeCarrier) {
+        switch kind {
+        case SyntaxKind.PlusToken:
+            return BoundBinaryOperatorKind.Addition
+        case SyntaxKind.MinusToken:
+            return BoundBinaryOperatorKind.Subtraction
+        case SyntaxKind.StarToken:
+            return BoundBinaryOperatorKind.Multiplication
+        case SyntaxKind.SlashToken:
+            return BoundBinaryOperatorKind.Division
+        }
     } 
 
-    switch kind {
-    case SyntaxKind.PlusToken:
-        return BoundBinaryOperatorKind.Addition
-    case SyntaxKind.MinusToken:
-        return BoundBinaryOperatorKind.Subtraction
-    case SyntaxKind.StarToken:
-        return BoundBinaryOperatorKind.Multiplication
-    case SyntaxKind.SlashToken:
-        return BoundBinaryOperatorKind.Division
-    default:
-        panic(fmt.Sprintf("Unexpected binary operator %s", kind))
-    }
+
+    if TypeCarrier.IsBool(leftTypeCarrier) || TypeCarrier.IsBool(rightTypeCarrier) {
+        switch kind {
+        case SyntaxKind.AmpersandAmpersandToken:
+            return BoundBinaryOperatorKind.LogicalAnd
+        case SyntaxKind.PipePipeToken:
+            return BoundBinaryOperatorKind.LogicalOr
+        }
+    } 
+
+    return ""
 }

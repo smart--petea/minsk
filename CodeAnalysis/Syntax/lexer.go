@@ -23,11 +23,21 @@ func NewLexer(runes []rune) *Lexer {
 }
 
 func (l *Lexer) Current() rune {
-    if l.Position >= len(l.Runes) {
+    return l.Peek(0)
+}
+
+func (l *Lexer) Lookahead() rune {
+    return l.Peek(1)
+}
+
+func (l *Lexer) Peek(offset int) rune {
+    index := l.Position + offset
+
+    if index >= len(l.Runes) {
         return '\x00'
     }
 
-    return l.Runes[l.Position]
+    return l.Runes[index]
 }
 
 func (l *Lexer) Next() {
@@ -85,27 +95,51 @@ func (l *Lexer) Lex() *SyntaxToken {
 
     position := l.Position
     current := l.Current()
-    l.Next()
     switch current {
     case '+':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.PlusToken, position, []rune{current}, nil)
 
     case '-':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.MinusToken, position, []rune{current}, nil)
 
     case '*':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.StarToken, position, []rune{current}, nil)
 
     case '/':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.SlashToken, position, []rune{current}, nil)
 
     case '(':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.OpenParenthesisToken, position, []rune{current}, nil)
 
     case ')':
+        l.Next()
         return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, []rune{current}, nil)
+
+    case '!':
+        l.Next()
+        return NewSyntaxToken(SyntaxKind.BangToken, position, []rune{current}, nil)
+
+    case '&':
+        if l.Lookahead() == '&' {
+            l.Next()
+            l.Next()
+            return NewSyntaxToken(SyntaxKind.AmpersandAmpersandToken, position, []rune{current}, nil)
+        }
+
+    case '|':
+        if l.Lookahead() == '|' {
+            l.Next()
+            l.Next()
+            return NewSyntaxToken(SyntaxKind.PipePipeToken, position, []rune{current}, nil)
+        }
     }
 
+    l.Next()
     l.AddDiagnostic("ERROR: bad character input: '%s'", string(current))
     return NewSyntaxToken(SyntaxKind.BadToken, position, []rune{current}, nil)
 }
