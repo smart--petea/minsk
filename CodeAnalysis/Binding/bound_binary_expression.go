@@ -4,6 +4,8 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Binding/TypeCarrier"
+
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type BoundBinaryExpression struct {
