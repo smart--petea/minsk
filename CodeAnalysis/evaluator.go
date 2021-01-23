@@ -6,6 +6,7 @@ import (
     Binding "minsk/CodeAnalysis/Binding"
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
+    "minsk/CodeAnalysis/Binding/TypeCarrier"
 )
 
 type Evaluator struct {
@@ -66,10 +67,18 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
             return left.(bool) || right.(bool)
 
         case BoundBinaryOperatorKind.Equals:
-            return left.(bool) == right.(bool) || left.(int) == right.(int)
+            if TypeCarrier.IsBool(b.Left.GetTypeCarrier()) {
+                return left.(bool) == right.(bool)
+            } else {
+                return left.(int) == right.(int)
+            }
 
         case BoundBinaryOperatorKind.NotEquals:
-            return !(left.(bool) == right.(bool) || left.(int) == right.(int))
+            if TypeCarrier.IsBool(b.Left.GetTypeCarrier()) {
+                return left.(bool) != right.(bool)
+            } else {
+                return left.(int) != right.(int)
+            }
 
         default:
             panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
