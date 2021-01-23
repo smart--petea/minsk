@@ -16,6 +16,8 @@ const (
     IdentifierToken SyntaxKind = "IdentifierToken"
     AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
     PipePipeToken SyntaxKind = "PipePipeToken"
+    EqualsEqualsToken SyntaxKind = "EqualsEqualsToken"
+    BangEqualsToken SyntaxKind = "BangEqualsToken"
 
     //Keywords
     TrueKeyword SyntaxKind = "TrueKeyword"

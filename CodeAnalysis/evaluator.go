@@ -65,6 +65,12 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
         case BoundBinaryOperatorKind.LogicalOr:
             return left.(bool) || right.(bool)
 
+        case BoundBinaryOperatorKind.Equals:
+            return left.(bool) == right.(bool) || left.(int) == right.(int)
+
+        case BoundBinaryOperatorKind.NotEquals:
+            return !(left.(bool) == right.(bool) || left.(int) == right.(int))
+
         default:
             panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
         }

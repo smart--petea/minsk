@@ -120,10 +120,6 @@ func (l *Lexer) Lex() *SyntaxToken {
         l.Next()
         return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, []rune{current}, nil)
 
-    case '!':
-        l.Next()
-        return NewSyntaxToken(SyntaxKind.BangToken, position, []rune{current}, nil)
-
     case '&':
         if l.Lookahead() == '&' {
             l.Next()
@@ -137,6 +133,24 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.Next()
             return NewSyntaxToken(SyntaxKind.PipePipeToken, position, []rune{current}, nil)
         }
+
+    case '=':
+        if l.Lookahead() == '=' {
+            l.Next()
+            l.Next()
+            return NewSyntaxToken(SyntaxKind.EqualsEqualsToken, position, []rune{current}, nil)
+        }
+
+    case '!':
+        if l.Lookahead() == '=' {
+            l.Next()
+            l.Next()
+            return NewSyntaxToken(SyntaxKind.BangEqualsToken, position, []rune{current}, nil)
+        }
+
+        l.Next()
+        return NewSyntaxToken(SyntaxKind.BangToken, position, []rune{current}, nil)
+
     }
 
     l.Next()

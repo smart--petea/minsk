@@ -37,8 +37,13 @@ var _operators = []*BoundBinaryOperator{
     NewBoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
     NewBoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
 
+    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Bool()),
+    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Bool()),
+
     NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
     NewBoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
+    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
+    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
 }
 
 func Bind(syntaxKind SyntaxKind.SyntaxKind, leftTypeCarrier TypeCarrier.TypeCarrier, rightTypeCarrier TypeCarrier.TypeCarrier) *BoundBinaryOperator {

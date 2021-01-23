@@ -9,4 +9,6 @@ const (
     Division BoundBinaryOperatorKind = "Division"
     LogicalAnd BoundBinaryOperatorKind = "LogicalAnd"
     LogicalOr BoundBinaryOperatorKind = "LogicalOr"
+    Equals BoundBinaryOperatorKind = "Equals"
+    NotEquals BoundBinaryOperatorKind = "NotEquals"
 )
