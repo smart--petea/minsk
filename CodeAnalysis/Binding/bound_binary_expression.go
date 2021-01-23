@@ -1,23 +1,23 @@
 package Binding
 
 import (
-    "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
+    "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Binding/TypeCarrier"
 
-    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    //SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type BoundBinaryExpression struct {
     Left BoundExpression
-    OperatorKind BoundBinaryOperatorKind.BoundBinaryOperatorKind
+    Op *BoundBinaryOperator.BoundBinaryOperator
     Right BoundExpression
 }
 
-func NewBoundBinaryExpression(left BoundExpression, operatorKind BoundBinaryOperatorKind.BoundBinaryOperatorKind, right BoundExpression) *BoundBinaryExpression {
+func NewBoundBinaryExpression(left BoundExpression, op *BoundBinaryOperator.BoundBinaryOperator, right BoundExpression) *BoundBinaryExpression {
     return &BoundBinaryExpression{
         Left: left,
-        OperatorKind: operatorKind,
+        Op: op,
         Right: right,
     }
 }

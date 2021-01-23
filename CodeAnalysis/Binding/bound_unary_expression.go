@@ -1,20 +1,20 @@
 package Binding
 
 import (
-    "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
+    "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Binding/TypeCarrier"
 )
 
 type BoundUnaryExpression struct {
     Operand BoundExpression
-    OperatorKind BoundUnaryOperatorKind.BoundUnaryOperatorKind
+    Op *BoundUnaryOperator.BoundUnaryOperator
 }
 
-func NewBoundUnaryExpression(operatorKind BoundUnaryOperatorKind.BoundUnaryOperatorKind, operand BoundExpression) *BoundUnaryExpression {
+func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand BoundExpression) *BoundUnaryExpression {
     return &BoundUnaryExpression{
         Operand: operand,
-        OperatorKind: operatorKind,
+        Op: op,
     }
 }
 

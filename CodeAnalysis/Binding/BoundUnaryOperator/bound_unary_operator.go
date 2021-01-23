@@ -1,8 +1,7 @@
 package BoundUnaryOperator
 
 import (
-    "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/TypeCarrier"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
@@ -18,8 +17,8 @@ type BoundUnaryOperator struct {
 func NewBoundUnaryOperator(
         syntaxKind SyntaxKind.SyntaxKind,
         kind BoundUnaryOperatorKind.BoundUnaryOperatorKind,
-        operandType TypeCarrier.TypeCarrier,
-        resultType TypeCarrier.TypeCarrier,
+        operandTypeCarrier TypeCarrier.TypeCarrier,
+        resultTypeCarrier TypeCarrier.TypeCarrier,
     ) *BoundUnaryOperator {
         return &BoundUnaryOperator{
             SyntaxKind: syntaxKind,
@@ -30,12 +29,12 @@ func NewBoundUnaryOperator(
 }
 
 var _operators = []*BoundUnaryOperator{
-    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegotiation, TypeCarrier.Bool(), TypeCarrier.Bool()),
+    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeCarrier.Bool(), TypeCarrier.Bool()),
     NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, TypeCarrier.Int(), TypeCarrier.Int()),
     NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, TypeCarrier.Int(), TypeCarrier.Int()),
 }
 
-func Bind(syntaxKind SyntaxKind, operandTypeCarrier TypeCarrier.TypeCarrier) BoundUnaryOperator {
+func Bind(syntaxKind SyntaxKind.SyntaxKind, operandTypeCarrier TypeCarrier.TypeCarrier) *BoundUnaryOperator {
     for _, op := range _operators {
         if op.SyntaxKind == syntaxKind && TypeCarrier.Same(op.OperandTypeCarrier, operandTypeCarrier) {
             return op

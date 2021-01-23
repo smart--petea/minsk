@@ -4,6 +4,8 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/TypeCarrier"
+    "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
+    "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Syntax"
@@ -64,14 +66,14 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
 func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     unarySyntax := syntax.(*Syntax.UnaryExpressionSyntax)
     boundOperand := b.BindExpression(unarySyntax.Operand)
-    boundOperatorKind := b.BindUnaryOperatorKind(unarySyntax.OperatorNode.Kind(), boundOperand.GetTypeCarrier()) 
+    boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetTypeCarrier()) 
 
-    if boundOperatorKind == "" {
+    if boundOperator == nil {
         b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetTypeCarrier()) 
         return boundOperand;
     }
 
-    return NewBoundUnaryExpression(boundOperatorKind, boundOperand)
+    return NewBoundUnaryExpression(boundOperator, boundOperand)
 }
 
 func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
@@ -79,14 +81,14 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
     boundLeft := b.BindExpression(binarySyntax.Left)
     boundRight := b.BindExpression(binarySyntax.Right)
-    boundOperatorKind := b.BindBinaryOperatorKind(binarySyntax.OperatorNode.Kind(), boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
+    boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
 
-    if boundOperatorKind == "" {
+    if boundOperator == nil {
         b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
         return boundLeft;
     }
 
-    return NewBoundBinaryExpression(boundLeft, boundOperatorKind, boundRight)
+    return NewBoundBinaryExpression(boundLeft, boundOperator, boundRight)
 }
 
 func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier TypeCarrier.TypeCarrier) BoundUnaryOperatorKind.BoundUnaryOperatorKind {

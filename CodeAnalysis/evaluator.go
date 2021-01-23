@@ -30,7 +30,7 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
     if u, ok := root.(*Binding.BoundUnaryExpression); ok {
         operand := e.evaluateExpression(u.Operand)
 
-        switch u.OperatorKind {
+        switch u.Op.Kind {
         case BoundUnaryOperatorKind.Identity:
             return operand.(int)
         case BoundUnaryOperatorKind.Negation:
@@ -38,7 +38,7 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
         case BoundUnaryOperatorKind.LogicalNegation:
             return !(operand.(bool))
         default:
-            panic(fmt.Sprintf("Unexpected unary operator %s", u.OperatorKind))
+            panic(fmt.Sprintf("Unexpected unary operator %s", u.Op.Kind))
         }
     }
 
@@ -46,7 +46,7 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
         left := e.evaluateExpression(b.Left)
         right := e.evaluateExpression(b.Right)
 
-        switch b.OperatorKind {
+        switch b.Op.Kind {
         case BoundBinaryOperatorKind.Addition:
             return left.(int) + right.(int)
 
@@ -66,15 +66,9 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
             return left.(bool) || right.(bool)
 
         default:
-            panic(fmt.Sprintf("Unexpected binary operator %s", b.OperatorKind))
+            panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
         }
     }
-
-    /*todo
-    if s, ok := root.(*Syntax.SyntaxToken); ok && s.Kind() == SyntaxKind.NumberToken{
-        return s.Value().(int)
-    }
-    */
 
     panic(fmt.Sprintf("Unexpected node %s", root.Kind()))
 }

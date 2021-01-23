@@ -13,8 +13,8 @@ func Int() TypeCarrier {
 }
 
 func Same(leftTypeCarrier TypeCarrier, rightTypeCarrier TypeCarrier) bool {
-    return (IsBool(leftTypeCarrier) && IsBool(rightTypeCarrier))
-        || (IsInt(leftTypeCarrier) && IsInt(rightTypeCarrier))
+    return (IsBool(leftTypeCarrier) && IsBool(rightTypeCarrier)) ||
+        (IsInt(leftTypeCarrier) && IsInt(rightTypeCarrier))
 }
 
 func IsInt(val TypeCarrier) bool {
