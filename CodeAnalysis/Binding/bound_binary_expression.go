@@ -25,5 +25,5 @@ func (b *BoundBinaryExpression) Kind() BoundNodeKind.BoundNodeKind {
 }
 
 func (b *BoundBinaryExpression) GetTypeCarrier() TypeCarrier.TypeCarrier {
-    return b.Left.GetTypeCarrier()
+    return b.Op.ResultTypeCarrier
 }

@@ -19,7 +19,7 @@ func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand 
 }
 
 func (b *BoundUnaryExpression) GetTypeCarrier() TypeCarrier.TypeCarrier {
-    return b.Operand.GetTypeCarrier()
+    return b.Op.ResultTypeCarrier
 }
 
 func (b *BoundUnaryExpression) Kind() BoundNodeKind.BoundNodeKind {
