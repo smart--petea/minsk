@@ -1,9 +1,6 @@
 package Binding
 
 import (
-    "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
 
@@ -89,49 +86,4 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     }
 
     return NewBoundBinaryExpression(boundLeft, boundOperator, boundRight)
-}
-
-func (b *Binder) BindUnaryOperatorKind(kind SyntaxKind.SyntaxKind, typeCarrier TypeCarrier.TypeCarrier) BoundUnaryOperatorKind.BoundUnaryOperatorKind {
-    if TypeCarrier.IsInt(typeCarrier) == false {
-        switch kind {
-        case SyntaxKind.PlusToken:
-            return BoundUnaryOperatorKind.Identity
-        case SyntaxKind.MinusToken:
-            return BoundUnaryOperatorKind.Negation
-        }
-    } 
-
-    if TypeCarrier.IsBool(typeCarrier) {
-        switch kind {
-        case SyntaxKind.BangToken:
-            return BoundUnaryOperatorKind.LogicalNegation
-        }
-    }
-    return ""
-}
-
-func (b *Binder) BindBinaryOperatorKind(kind SyntaxKind.SyntaxKind, leftTypeCarrier, rightTypeCarrier TypeCarrier.TypeCarrier) BoundBinaryOperatorKind.BoundBinaryOperatorKind {
-    if TypeCarrier.IsInt(leftTypeCarrier) || TypeCarrier.IsInt(rightTypeCarrier) {
-        switch kind {
-        case SyntaxKind.PlusToken:
-            return BoundBinaryOperatorKind.Addition
-        case SyntaxKind.MinusToken:
-            return BoundBinaryOperatorKind.Subtraction
-        case SyntaxKind.StarToken:
-            return BoundBinaryOperatorKind.Multiplication
-        case SyntaxKind.SlashToken:
-            return BoundBinaryOperatorKind.Division
-        }
-    } 
-
-    if TypeCarrier.IsBool(leftTypeCarrier) || TypeCarrier.IsBool(rightTypeCarrier) {
-        switch kind {
-        case SyntaxKind.AmpersandAmpersandToken:
-            return BoundBinaryOperatorKind.LogicalAnd
-        case SyntaxKind.PipePipeToken:
-            return BoundBinaryOperatorKind.LogicalOr
-        }
-    } 
-
-    return ""
 }
