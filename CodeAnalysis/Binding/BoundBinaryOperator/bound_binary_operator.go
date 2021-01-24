@@ -5,6 +5,7 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 
     "reflect"
+    "fmt"
 )
 
 type BoundBinaryOperator struct {
@@ -37,7 +38,7 @@ var _operators = []*BoundBinaryOperator{
     NewBoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, reflect.Int, reflect.Int, reflect.Int),
     NewBoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, reflect.Int, reflect.Int, reflect.Int),
 
-    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Int, reflect.Int, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, reflect.Int, reflect.Int, reflect.Bool),
 
     NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, reflect.Bool, reflect.Bool, reflect.Bool),
