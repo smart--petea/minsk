@@ -5,7 +5,6 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 
     "reflect"
-    "fmt"
 )
 
 type BoundBinaryOperator struct {

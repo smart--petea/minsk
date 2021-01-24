@@ -9,7 +9,6 @@ import (
 
     CA "minsk/CodeAnalysis"
     Syntax "minsk/CodeAnalysis/Syntax"
-    Binding "minsk/CodeAnalysis/Binding"
     Console "minsk/Util/Console"
 )
 
@@ -44,10 +43,8 @@ func main() {
         }
 
         syntaxTree := Syntax.ParseSyntaxTree(line)
-        binder := Binding.NewBinder()
-        boundExpression := binder.BindExpression(syntaxTree.Root)
-
-        diagnostics := append(syntaxTree.GetDiagnostics(), binder.GetDiagnostics()...)
+        compilation := CA.NewCompilation(syntaxTree)
+        result := compilation.Evaluate()
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
@@ -55,19 +52,16 @@ func main() {
             Console.ResetColour()
         } 
 
-        if len(diagnostics) > 0  {
+        if len(result.Diagnostics) == 0  {
+            fmt.Println(result.Value)
+        } else {
             Console.ForegroundColour(Console.COLOUR_RED)
-
-            for _, diagnostic := range diagnostics {
+            for _, diagnostic := range result.Diagnostics {
                 fmt.Println(diagnostic)
             }
 
             Console.ResetColour()
-        } else {
-            e := CA.NewEvaluator(boundExpression)
-            result := e.Evaluate()
-            fmt.Println(result)
-        }
+        } 
     }
 }
 
