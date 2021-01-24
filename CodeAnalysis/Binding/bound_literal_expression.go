@@ -2,7 +2,8 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
+
+    "reflect"
 )
 
 type BoundLiteralExpression struct {
@@ -19,6 +20,6 @@ func (b *BoundLiteralExpression) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.LiteralExpression
 }
 
-func (b *BoundLiteralExpression) GetTypeCarrier() TypeCarrier.TypeCarrier {
-    return TypeCarrier.TypeCarrier(b.Value)
+func (b *BoundLiteralExpression) GetType() reflect.Kind {
+    return reflect.TypeOf(b.Value).Kind()
 }

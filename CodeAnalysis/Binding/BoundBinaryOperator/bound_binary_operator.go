@@ -2,55 +2,53 @@ package BoundBinaryOperator
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
-
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+
+    "reflect"
 )
 
 type BoundBinaryOperator struct {
         SyntaxKind SyntaxKind.SyntaxKind
         Kind BoundBinaryOperatorKind.BoundBinaryOperatorKind
-        LeftTypeCarrier TypeCarrier.TypeCarrier
-        RightTypeCarrier TypeCarrier.TypeCarrier
-        ResultTypeCarrier TypeCarrier.TypeCarrier
+        LeftType reflect.Kind
+        RightType reflect.Kind
+        ResultType reflect.Kind
 }
 
 func NewBoundBinaryOperator(
         syntaxKind SyntaxKind.SyntaxKind,
         kind BoundBinaryOperatorKind.BoundBinaryOperatorKind,
-        leftTypeCarrier TypeCarrier.TypeCarrier,
-        rightTypeCarrier TypeCarrier.TypeCarrier,
-        resultTypeCarrier TypeCarrier.TypeCarrier,
+        leftType reflect.Kind,
+        rightType reflect.Kind,
+        resultType reflect.Kind,
     ) *BoundBinaryOperator {
         return &BoundBinaryOperator{
             SyntaxKind: syntaxKind,
             Kind: kind,
-            LeftTypeCarrier: leftTypeCarrier,
-            RightTypeCarrier: rightTypeCarrier,
-            ResultTypeCarrier: resultTypeCarrier,
+            LeftType: leftType,
+            RightType: rightType,
+            ResultType: resultType,
         }
 }
 
 var _operators = []*BoundBinaryOperator{
-    NewBoundBinaryOperator(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
-    NewBoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
-    NewBoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
-    NewBoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Int()),
+    NewBoundBinaryOperator(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, reflect.Int, reflect.Int, reflect.Int),
 
-    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Bool()),
-    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeCarrier.Int(), TypeCarrier.Int(), TypeCarrier.Bool()),
+    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, reflect.Int, reflect.Int, reflect.Bool),
 
-    NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
-    NewBoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
-    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
-    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, TypeCarrier.Bool(), TypeCarrier.Bool(), TypeCarrier.Bool()),
+    NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, reflect.Bool, reflect.Bool, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, reflect.Bool, reflect.Bool, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Bool, reflect.Bool, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, reflect.Bool, reflect.Bool, reflect.Bool),
 }
 
-func Bind(syntaxKind SyntaxKind.SyntaxKind, leftTypeCarrier TypeCarrier.TypeCarrier, rightTypeCarrier TypeCarrier.TypeCarrier) *BoundBinaryOperator {
+func Bind(syntaxKind SyntaxKind.SyntaxKind, leftType reflect.Kind, rightType reflect.Kind) *BoundBinaryOperator {
     for _, op := range _operators {
-        if op.SyntaxKind == syntaxKind &&
-            TypeCarrier.Same(op.LeftTypeCarrier, leftTypeCarrier) &&
-            TypeCarrier.Same(op.RightTypeCarrier, rightTypeCarrier) {
+        if op.SyntaxKind == syntaxKind && leftType == op.LeftType && rightType == op.RightType {
             return op
         }
     }

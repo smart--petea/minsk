@@ -6,7 +6,8 @@ import (
     Binding "minsk/CodeAnalysis/Binding"
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
+
+    "reflect"
 )
 
 type Evaluator struct {
@@ -67,14 +68,14 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
             return left.(bool) || right.(bool)
 
         case BoundBinaryOperatorKind.Equals:
-            if TypeCarrier.IsBool(b.Left.GetTypeCarrier()) {
+            if b.Left.GetType() == reflect.Bool {
                 return left.(bool) == right.(bool)
             } else {
                 return left.(int) == right.(int)
             }
 
         case BoundBinaryOperatorKind.NotEquals:
-            if TypeCarrier.IsBool(b.Left.GetTypeCarrier()) {
+            if b.Left.GetType() == reflect.Bool {
                 return left.(bool) != right.(bool)
             } else {
                 return left.(int) != right.(int)

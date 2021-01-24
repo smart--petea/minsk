@@ -3,7 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
+
+    "reflect"
 )
 
 type BoundUnaryExpression struct {
@@ -18,8 +19,8 @@ func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand 
     }
 }
 
-func (b *BoundUnaryExpression) GetTypeCarrier() TypeCarrier.TypeCarrier {
-    return b.Op.ResultTypeCarrier
+func (b *BoundUnaryExpression) GetType() reflect.Kind {
+    return b.Op.ResultType
 }
 
 func (b *BoundUnaryExpression) Kind() BoundNodeKind.BoundNodeKind {

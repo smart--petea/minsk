@@ -1,11 +1,11 @@
 package Binding
 
 import (
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
+    "reflect"
 )
 
 type BoundExpression interface {
     BoundNode
 
-    GetTypeCarrier() TypeCarrier.TypeCarrier
+    GetType() reflect.Kind
 }

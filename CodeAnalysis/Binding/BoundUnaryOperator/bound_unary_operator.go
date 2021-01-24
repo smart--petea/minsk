@@ -2,41 +2,41 @@ package BoundUnaryOperator
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
-    "minsk/CodeAnalysis/Binding/TypeCarrier"
-
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+
+    "reflect"
 )
 
 type BoundUnaryOperator struct {
         SyntaxKind SyntaxKind.SyntaxKind
         Kind BoundUnaryOperatorKind.BoundUnaryOperatorKind
-        OperandTypeCarrier TypeCarrier.TypeCarrier
-        ResultTypeCarrier TypeCarrier.TypeCarrier
+        OperandType reflect.Kind
+        ResultType reflect.Kind
 }
 
 func NewBoundUnaryOperator(
         syntaxKind SyntaxKind.SyntaxKind,
         kind BoundUnaryOperatorKind.BoundUnaryOperatorKind,
-        operandTypeCarrier TypeCarrier.TypeCarrier,
-        resultTypeCarrier TypeCarrier.TypeCarrier,
+        operandType reflect.Kind,
+        resultType reflect.Kind,
     ) *BoundUnaryOperator {
         return &BoundUnaryOperator{
             SyntaxKind: syntaxKind,
             Kind: kind,
-            OperandTypeCarrier: operandTypeCarrier,
-            ResultTypeCarrier: resultTypeCarrier,
+            OperandType: operandType,
+            ResultType: resultType,
         }
 }
 
 var _operators = []*BoundUnaryOperator{
-    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, TypeCarrier.Bool(), TypeCarrier.Bool()),
-    NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, TypeCarrier.Int(), TypeCarrier.Int()),
-    NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, TypeCarrier.Int(), TypeCarrier.Int()),
+    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, reflect.Bool, reflect.Bool),
+    NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, reflect.Int, reflect.Int),
+    NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, reflect.Int, reflect.Int),
 }
 
-func Bind(syntaxKind SyntaxKind.SyntaxKind, operandTypeCarrier TypeCarrier.TypeCarrier) *BoundUnaryOperator {
+func Bind(syntaxKind SyntaxKind.SyntaxKind, operandType reflect.Kind) *BoundUnaryOperator {
     for _, op := range _operators {
-        if op.SyntaxKind == syntaxKind && TypeCarrier.Same(op.OperandTypeCarrier, operandTypeCarrier) {
+        if op.SyntaxKind == syntaxKind && op.OperandType == operandType {
             return op
         }
     }

@@ -63,10 +63,10 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
 func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     unarySyntax := syntax.(*Syntax.UnaryExpressionSyntax)
     boundOperand := b.BindExpression(unarySyntax.Operand)
-    boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetTypeCarrier()) 
+    boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetType()) 
 
     if boundOperator == nil {
-        b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetTypeCarrier()) 
+        b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetType()) 
         return boundOperand;
     }
 
@@ -78,10 +78,10 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
     boundLeft := b.BindExpression(binarySyntax.Left)
     boundRight := b.BindExpression(binarySyntax.Right)
-    boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
+    boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetType(), boundRight.GetType()) 
 
     if boundOperator == nil {
-        b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetTypeCarrier(), boundRight.GetTypeCarrier()) 
+        b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetType(), boundRight.GetType()) 
         return boundLeft;
     }
 
