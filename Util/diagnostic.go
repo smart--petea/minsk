@@ -4,6 +4,7 @@ import (
     "fmt"
 )
 
+/*
 type Diagnostic struct {
     Diagnostics []string
 }
@@ -18,4 +19,21 @@ func (d *Diagnostic) LoadDiagnostics(diagnostics []string) {
 
 func (d *Diagnostic) GetDiagnostics() []string {
     return d.Diagnostics
+}
+*/
+
+type Diagnostic struct {
+    Span *TextSpan
+    Message string
+}
+
+func NewDiagnostic(span *TextSpan, message string) *Diagnostic {
+    return &Diagnostic{
+        Span: span, 
+        Message: message,
+    }
+}
+
+func (d *Diagnostic) String() string {
+    return d.Message
 }

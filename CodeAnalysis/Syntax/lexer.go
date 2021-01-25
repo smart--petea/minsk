@@ -10,7 +10,7 @@ import (
 )
 
 type Lexer struct {
-    Util.Diagnostic
+    Util.DiagnosticBag 
 
     Runes []rune
     Position int
@@ -60,7 +60,7 @@ func (l *Lexer) Lex() *SyntaxToken {
         runes := l.Runes[start: start + length]
         val, err := strconv.Atoi(string(runes))
         if err != nil {
-            l.AddDiagnostic("The number %s isn't valid int32.", string(runes))
+            l.ReportInvalidNumber(NewTextSpan(start, length), runes, reflect.Int))
         }
 
         return NewSyntaxToken(SyntaxKind.NumberToken, start, runes, val)
@@ -154,6 +154,7 @@ func (l *Lexer) Lex() *SyntaxToken {
     }
 
     l.Next()
-    l.AddDiagnostic("ERROR: bad character input: '%s'", string(current))
+
+    l.ReportBadCharacter(position, current)
     return NewSyntaxToken(SyntaxKind.BadToken, position, []rune{current}, nil)
 }

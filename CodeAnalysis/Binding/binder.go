@@ -13,7 +13,7 @@ import (
 )
 
 type Binder struct {
-    Util.Diagnostic
+    Util.DiagnosticBag
 }
 
 func NewBinder() *Binder {
@@ -66,7 +66,7 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
     boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetType()) 
 
     if boundOperator == nil {
-        b.AddDiagnostic("Unary operator '%+v' is not defined for type %T", unarySyntax.OperatorNode, boundOperand.GetType()) 
+        b.ReportUndefinedUnaryOperator(unarySyntax.OperatorNode.Span(), unarySyntax.OperatorNode.Runes, boundOperand.GetType())
         return boundOperand;
     }
 
@@ -81,7 +81,8 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetType(), boundRight.GetType()) 
 
     if boundOperator == nil {
-        b.AddDiagnostic("Binary operator '%+v' is not defined for types %T and %T", binarySyntax.OperatorNode, boundLeft.GetType(), boundRight.GetType()) 
+        b.ReportUndefinedBinaryOperator(binarySyntax.OperatorNode.Span(), binarySyntax.OperatorNode.Runes, boundLeft.GetType(), boundRight.GetType())
+
         return boundLeft;
     }
 

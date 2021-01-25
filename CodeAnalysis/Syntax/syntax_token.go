@@ -2,6 +2,8 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+
+    "minsk/Util"
 )
 
 type SyntaxToken struct {
@@ -30,4 +32,8 @@ func NewSyntaxToken(kind SyntaxKind.SyntaxKind, position int, runes []rune, valu
         Runes: runes,
         value: value,
     }
+}
+
+func (st *SyntaxToken) Span() *Util.TextSpan {
+    return Util.NewTextSpan(st.Position, len(st.Runes)) 
 }

@@ -1,11 +1,15 @@
 package CodeAnalysis
 
+import (
+    "minsk/Util"
+)
+
 type EvaluationResult struct {
-    Diagnostics []string
+    Diagnostics []Util.Diagnostic
     Value interface{}
 }
 
-func NewEvaluationResult(diagnostics []string, value interface{}) *EvaluationResult {
+func NewEvaluationResult(diagnostics []Util.Diagnostic, value interface{}) *EvaluationResult {
     return &EvaluationResult{
         Diagnostics: diagnostics,
         Value: value,

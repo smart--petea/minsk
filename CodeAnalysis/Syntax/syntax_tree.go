@@ -5,7 +5,7 @@ import (
 )
 
 type SyntaxTree struct {
-    Util.Diagnostic
+    Util.DiagnosticBag
 
     Root ExpressionSyntax
     EndOfFileToken *SyntaxToken

@@ -7,7 +7,7 @@ import (
 )
 
 type Parser struct {
-    Util.Diagnostic
+    Util.DiagnosticBag 
 
     Tokens []SyntaxToken
     Position int
@@ -54,7 +54,7 @@ func NewParser(text string) *Parser {
         Tokens: tokens,
     }
 
-    parser.LoadDiagnostics(lexer.GetDiagnostics())
+    parser.AddDiagnosticsRange(lexer.GetDiagnostics())
     return parser
 }
 
@@ -85,7 +85,7 @@ func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
         return p.NextToken()
     }
 
-    p.AddDiagnostic("ERROR: Unexpected token <%s>, expected <%s>", current.Kind(), kind)
+    p.ReportUnexpectedToken(current.Span(), current.Kind(), kind)
 
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
