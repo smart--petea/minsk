@@ -66,7 +66,8 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
     boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetType()) 
 
     if boundOperator == nil {
-        b.ReportUndefinedUnaryOperator(unarySyntax.OperatorNode.Span(), unarySyntax.OperatorNode.Runes, boundOperand.GetType())
+        syntaxToken := unarySyntax.OperatorNode.(*Syntax.SyntaxToken)
+        b.ReportUndefinedUnaryOperator(syntaxToken.Span(), syntaxToken.Runes, boundOperand.GetType())
         return boundOperand;
     }
 
@@ -81,7 +82,8 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetType(), boundRight.GetType()) 
 
     if boundOperator == nil {
-        b.ReportUndefinedBinaryOperator(binarySyntax.OperatorNode.Span(), binarySyntax.OperatorNode.Runes, boundLeft.GetType(), boundRight.GetType())
+        syntaxToken := binarySyntax.OperatorNode.(*Syntax.SyntaxToken)
+        b.ReportUndefinedBinaryOperator(syntaxToken.Span(), syntaxToken.Runes, boundLeft.GetType(), boundRight.GetType())
 
         return boundLeft;
     }

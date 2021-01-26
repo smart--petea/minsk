@@ -3,6 +3,7 @@ package Syntax
 import (
     "unicode"
     "strconv"
+    "reflect"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
@@ -60,7 +61,7 @@ func (l *Lexer) Lex() *SyntaxToken {
         runes := l.Runes[start: start + length]
         val, err := strconv.Atoi(string(runes))
         if err != nil {
-            l.ReportInvalidNumber(NewTextSpan(start, length), runes, reflect.Int))
+            l.ReportInvalidNumber(Util.NewTextSpan(start, length), runes, reflect.Int)
         }
 
         return NewSyntaxToken(SyntaxKind.NumberToken, start, runes, val)

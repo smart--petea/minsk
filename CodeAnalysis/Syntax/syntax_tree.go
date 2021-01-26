@@ -20,7 +20,7 @@ func ParseSyntaxTree(text string) *SyntaxTree {
         EndOfFileToken: endOfFileToken,
     }
 
-    syntaxTree.LoadDiagnostics(parser.GetDiagnostics())
+    syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())
 
     return syntaxTree
 }

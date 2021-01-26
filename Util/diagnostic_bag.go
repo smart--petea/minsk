@@ -2,20 +2,12 @@ package Util
 
 import (
     "fmt"
+    "reflect"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
-/* todo
-type Diagnostic struct {
-    Diagnostics []string
-}
-
-func (d *Diagnostic) AddDiagnostic(format string, args ...interface{}) {
-    d.Diagnostics = append(d.Diagnostics, fmt.Sprintf(format, args...))
-}
-*/
-
 type DiagnosticBag struct {
-    diagnostics []Diagnostic
+    diagnostics []*Diagnostic
 }
 
 func (db *DiagnosticBag) report(span *TextSpan, message string) {
@@ -37,15 +29,15 @@ func (db *DiagnosticBag) ReportBadCharacter(position int, character rune) {
     db.report(span, message)
 }
 
-func (db *DiagnosticBag) GetDiagnostics() []Diagnostic {
+func (db *DiagnosticBag) GetDiagnostics() []*Diagnostic {
     return db.diagnostics
 }
 
-func (db *DiagnosticBag) AddDiagnosticsRange(diagnostics []Diagnostic) {
-    db.diagnostics = append(d.diagnostics, diagnostics...)
+func (db *DiagnosticBag) AddDiagnosticsRange(diagnostics []*Diagnostic) {
+    db.diagnostics = append(db.diagnostics, diagnostics...)
 }
 
-func (db *DiagnosticBag) ReportUnexpectedToken(span *TextSpan, actualKind SyntaxKind, expectedKind SyntaxKind) {
+func (db *DiagnosticBag) ReportUnexpectedToken(span *TextSpan, actualKind SyntaxKind.SyntaxKind, expectedKind SyntaxKind.SyntaxKind) {
     message := fmt.Sprintf("Unexpected token <%s>, expected <%s>.", actualKind, expectedKind)
 
     db.report(span, message)

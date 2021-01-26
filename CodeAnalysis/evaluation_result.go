@@ -5,11 +5,11 @@ import (
 )
 
 type EvaluationResult struct {
-    Diagnostics []Util.Diagnostic
+    Diagnostics []*Util.Diagnostic
     Value interface{}
 }
 
-func NewEvaluationResult(diagnostics []Util.Diagnostic, value interface{}) *EvaluationResult {
+func NewEvaluationResult(diagnostics []*Util.Diagnostic, value interface{}) *EvaluationResult {
     return &EvaluationResult{
         Diagnostics: diagnostics,
         Value: value,
