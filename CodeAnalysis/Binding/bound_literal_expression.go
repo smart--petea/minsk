@@ -2,7 +2,6 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
-
     "reflect"
 )
 

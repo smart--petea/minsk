@@ -3,6 +3,7 @@ package CodeAnalysis
 import (
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Binding"
+    "minsk/Util"
 )
 
 type Compilation struct {
@@ -16,17 +17,18 @@ func NewCompilation(syntax *Syntax.SyntaxTree) *Compilation {
 }
 
 func (c *Compilation) Evaluate() *EvaluationResult {
+    if len(c.Syntax.GetDiagnostics()) > 0 {
+        return NewEvaluationResult(c.Syntax.GetDiagnostics(), nil)
+    }
+
     binder := Binding.NewBinder()
     boundExpression := binder.BindExpression(c.Syntax.Root)
-
-
-    diagnostics := append(c.Syntax.GetDiagnostics(), binder.GetDiagnostics()...)
-    if len(diagnostics) > 0 {
-        return NewEvaluationResult(diagnostics, nil)
+    if len(binder.GetDiagnostics()) > 0 {
+        return NewEvaluationResult(binder.GetDiagnostics(), nil)
     }
 
     evaluator := NewEvaluator(boundExpression)
     value := evaluator.Evaluate()
-    return NewEvaluationResult(diagnostics, value)
+    return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }
 

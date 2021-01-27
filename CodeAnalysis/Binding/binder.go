@@ -50,12 +50,13 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
         value = true
     case SyntaxKind.FalseKeyword:
         value = false
+    case SyntaxKind.IdentifierToken:
+        value = string(literalSyntax.LiteralToken.Runes)
     default:
         if val, ok := literalSyntax.Value().(int); ok {
             value = val
         }
     }
-
 
     return NewBoundLiteralExpression(value)
 }

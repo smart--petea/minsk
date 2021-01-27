@@ -55,12 +55,28 @@ func main() {
         if len(result.Diagnostics) == 0  {
             fmt.Println(result.Value)
         } else {
-            Console.ForegroundColour(Console.COLOUR_RED)
-            for _, diagnostic := range result.Diagnostics {
-                fmt.Println(diagnostic)
-            }
 
-            Console.ResetColour()
+            for _, diagnostic := range result.Diagnostics {
+                Console.ForegroundColour(Console.COLOUR_RED)
+                fmt.Println(diagnostic)
+                Console.ResetColour()
+
+                span := diagnostic.Span
+                prefix := line[:span.Start]
+                errorStr := line[span.Start: span.End()]
+                suffix := line[span.End():]
+
+                fmt.Printf("    ")
+                fmt.Printf("%s", prefix)
+
+                Console.ForegroundColour(Console.COLOUR_RED)
+                fmt.Print(errorStr)
+                Console.ResetColour()
+
+                fmt.Print(suffix)
+
+                fmt.Println()
+            }
         } 
     }
 }
