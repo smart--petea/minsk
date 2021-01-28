@@ -17,6 +17,7 @@ const (
     AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
     PipePipeToken SyntaxKind = "PipePipeToken"
     EqualsEqualsToken SyntaxKind = "EqualsEqualsToken"
+    EqualsToken SyntaxKind = "EqualsEqualsToken"
     BangEqualsToken SyntaxKind = "BangEqualsToken"
 
     //Keywords
@@ -24,8 +25,10 @@ const (
     FalseKeyword SyntaxKind = "FalseKeyword"
 
     //expressions
+    AssignmentExpression SyntaxKind = "AssignmentExpression" 
     BinaryExpression SyntaxKind = "BinaryExpression" 
-    UnaryExpression SyntaxKind = "UnaryExpression" 
     LiteralExpression SyntaxKind = "LiteralExpression" 
+    NameExpression SyntaxKind = "NameExpression" 
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
+    UnaryExpression SyntaxKind = "UnaryExpression" 
 )

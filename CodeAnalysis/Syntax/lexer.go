@@ -140,6 +140,9 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.Next()
             l.Next()
             return NewSyntaxToken(SyntaxKind.EqualsEqualsToken, position, l.Runes[position:l.Position], nil)
+        } else {
+            l.Next()
+            return NewSyntaxToken(SyntaxKind.EqualsToken, position, l.Runes[position:l.Position], nil)
         }
 
     case '!':

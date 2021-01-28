@@ -22,17 +22,37 @@ func NewBinder() *Binder {
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     switch syntax.Kind() {
-    case SyntaxKind.UnaryExpression:
-        return b.BindUnaryExpression(syntax)
-    case SyntaxKind.BinaryExpression:
-        return b.BindBinaryExpression(syntax)
-    case SyntaxKind.LiteralExpression:
-        return b.BindLiteralExpression(syntax)
     case SyntaxKind.ParenthesizedExpression:
         return b.BindParenthesizedExpression(syntax)
+
+    case SyntaxKind.LiteralExpression:
+        return b.BindLiteralExpression(syntax)
+
+    case SyntaxKind.NameExpression:
+        return b.BindNameExpression(syntax)
+
+    case SyntaxKind.AssignmentExpression:
+        return b.BindAssignmentExpression(syntax)
+
+    case SyntaxKind.UnaryExpression:
+        return b.BindUnaryExpression(syntax)
+
+    case SyntaxKind.BinaryExpression:
+        return b.BindBinaryExpression(syntax)
+
     default:
         panic(fmt.Sprintf("Unexpected syntax %s", syntax.Kind()))
     }
+}
+
+func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+    pS := syntax.(*Syntax.AssignmentExpressionSyntax)
+    return b.BindExpression(pS.Expression)
+}
+
+func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+    pS := syntax.(*Syntax.NameExpressionSyntax)
+    return b.BindExpression(pS.Expression)
 }
 
 func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {

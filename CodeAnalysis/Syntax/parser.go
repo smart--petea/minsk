@@ -103,6 +103,11 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
         value := p.Current().Kind() == SyntaxKind.TrueKeyword
         return NewLiteralExpressionSyntax(p.NextToken(), value)
 
+    case SyntaxKind.IdentifierToken:
+        identifierToken := p.NextToken()
+
+        return NewNameExpressionSyntax(identifierToken)
+
     default:
         numberToken := p.MatchToken(SyntaxKind.NumberToken)
         if numberToken == nil {
@@ -113,13 +118,30 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     }
 }
 
-func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
+func (p *Parser) ParseExpression() ExpressionSyntax
+{
+    return p.ParseAssignmentExpression()
+}
+
+func (p *Parser) ParseAssignmentExpression() ExpressionSyntax {
+    if p.Peek(0).Kind() == SyntaxKind.IdentifierToken && p.Peek(1).Kind() == SyntaxKind.EqualsToken {
+        identifierToken = p.NextToken()
+        operatorToken = p.NextToken()
+        right := p.ParseAssignmentExpression()
+
+        return NewParseAssignmentExpression(identifierToken, operatorToken, right)
+    }
+
+    return NewParseBinaryExpression(0)
+}
+
+func (p *Parser) ParseBinaryExpression(parentPrecedence int) ExpressionSyntax {
     var left ExpressionSyntax 
 
     unaryOperatorPrecedence := SyntaxFacts.GetUnaryOperatorPrecedence(p.Current().Kind())
     if  unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence {
         operatorToken := p.NextToken()
-        operand := p.ParseExpression(unaryOperatorPrecedence)
+        operand := p.ParseBinaryExpression(unaryOperatorPrecedence)
 
         left = NewUnaryExpressionSyntax(operatorToken, operand)
     } else {
@@ -133,7 +155,7 @@ func (p *Parser) ParseExpression(parentPrecedence int) ExpressionSyntax {
         }
 
         operatorToken := p.NextToken()
-        right := p.ParseExpression(precedence)
+        right := p.ParseBinaryExpression(precedence)
         left = NewBinaryExpressionSyntax(left, operatorToken, right)
     }
 
