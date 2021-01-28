@@ -99,63 +99,63 @@ func (l *Lexer) Lex() *SyntaxToken {
     switch current {
     case '+':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.PlusToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.PlusToken, position, l.Runes[position:l.Position], nil)
 
     case '-':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.MinusToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.MinusToken, position, l.Runes[position:l.Position], nil)
 
     case '*':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.StarToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.StarToken, position, l.Runes[position:l.Position], nil)
 
     case '/':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.SlashToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.SlashToken, position, l.Runes[position:l.Position], nil)
 
     case '(':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.OpenParenthesisToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.OpenParenthesisToken, position, l.Runes[position:l.Position], nil)
 
     case ')':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, l.Runes[position:l.Position], nil)
 
     case '&':
         if l.Lookahead() == '&' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.AmpersandAmpersandToken, position, []rune{current}, nil)
+            return NewSyntaxToken(SyntaxKind.AmpersandAmpersandToken, position, l.Runes[position:l.Position], nil)
         }
 
     case '|':
         if l.Lookahead() == '|' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.PipePipeToken, position, []rune{current}, nil)
+            return NewSyntaxToken(SyntaxKind.PipePipeToken, position, l.Runes[position:l.Position], nil)
         }
 
     case '=':
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.EqualsEqualsToken, position, []rune{current}, nil)
+            return NewSyntaxToken(SyntaxKind.EqualsEqualsToken, position, l.Runes[position:l.Position], nil)
         }
 
     case '!':
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.BangEqualsToken, position, []rune{current}, nil)
+            return NewSyntaxToken(SyntaxKind.BangEqualsToken, position, l.Runes[position:l.Position], nil)
         }
 
         l.Next()
-        return NewSyntaxToken(SyntaxKind.BangToken, position, []rune{current}, nil)
+        return NewSyntaxToken(SyntaxKind.BangToken, position, l.Runes[position:l.Position], nil)
 
     }
 
     l.Next()
 
     l.ReportBadCharacter(position, current)
-    return NewSyntaxToken(SyntaxKind.BadToken, position, []rune{current}, nil)
+    return NewSyntaxToken(SyntaxKind.BadToken, position, l.Runes[position:l.Position], nil)
 }

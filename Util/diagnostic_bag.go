@@ -44,19 +44,13 @@ func (db *DiagnosticBag) ReportUnexpectedToken(span *TextSpan, actualKind Syntax
 }
 
 func (db *DiagnosticBag) ReportUndefinedUnaryOperator(span *TextSpan, operatorText []rune, operandType reflect.Kind) {
-    message := fmt.Sprintf("Unary operator '%+v' is not defined for type %T", string(operatorText), operandType)
+    message := fmt.Sprintf("Unary operator '%+v' is not defined for type %s", string(operatorText), operandType)
 
     db.report(span, message)
 }
 
 func (db *DiagnosticBag) ReportUndefinedBinaryOperator(span *TextSpan, operatorRunes []rune, leftType reflect.Kind, rightType reflect.Kind) {
-    message := fmt.Sprintf("Binary operator '%+v' is not defined for types %T and %T", string(operatorRunes), leftType, rightType)
+    message := fmt.Sprintf("Binary operator '%+v' is not defined for types %s and %s", string(operatorRunes), leftType, rightType)
 
     db.report(span, message)
 }
-
-/*
-func (db *diagnosticBag) GetEnumerator() []Diagnostic {
-    return db.diagnostics
-}
-*/
