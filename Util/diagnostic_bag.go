@@ -54,3 +54,9 @@ func (db *DiagnosticBag) ReportUndefinedBinaryOperator(span *TextSpan, operatorR
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportUndefinedName(span *TextSpan, name string) {
+    message := fmt.Sprintf("Variable %s doesn't exist", name)
+
+    db.report(span, message)
+}

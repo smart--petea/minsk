@@ -5,14 +5,14 @@ import (
 )
 
 type NameExpressionSyntax struct {
-    IdentifierToken SyntaxToken
+    IdentifierToken *SyntaxToken
 }
 
 func (b *NameExpressionSyntax) Value() interface{} {
     return nil
 }
 
-func NewNameExpressionSyntax(identifierToken SyntaxToken) *NameExpressionSyntax {
+func NewNameExpressionSyntax(identifierToken *SyntaxToken) *NameExpressionSyntax {
     return &NameExpressionSyntax{
         IdentifierToken: identifierToken,
     }
@@ -22,6 +22,8 @@ func (n *NameExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.NameExpression 
 }
 
-func (n *BinaryExpressionSyntax) GetChildren() []SyntaxNode {
-    return n.IdentifierToken
+func (n *NameExpressionSyntax) GetChildren() []SyntaxNode {
+    return []SyntaxNode{
+        n.IdentifierToken,
+    }
 }

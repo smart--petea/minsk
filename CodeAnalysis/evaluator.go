@@ -12,11 +12,13 @@ import (
 
 type Evaluator struct {
         Root Binding.BoundExpression
+        _variables map[string]interface{}
 }
 
-func NewEvaluator(root Binding.BoundExpression) *Evaluator {
+func NewEvaluator(root Binding.BoundExpression, variables map[string]interface{}) *Evaluator {
     return &Evaluator{
         Root: root,
+        _variables: variables,
     }
 }
 
@@ -27,6 +29,16 @@ func (e *Evaluator) Evaluate() interface{} {
 func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{} {
     if l, ok := root.(*Binding.BoundLiteralExpression); ok {
         return l.Value
+    }
+
+    if v, ok := root.(*Binding.BoundVariableExpression); ok {
+        return e._variables[v.Name]
+    }
+
+    if a, ok := root.(*Binding.BoundAssignmentExpression); ok {
+        value := e.evaluateExpression(a.Expression)
+        e._variables[a.Name] = value
+        return value
     }
 
     if u, ok := root.(*Binding.BoundUnaryExpression); ok {

@@ -59,7 +59,7 @@ func NewParser(text string) *Parser {
 }
 
 func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
-    var rootExpression ExpressionSyntax = p.ParseExpression(0)
+    var rootExpression ExpressionSyntax = p.ParseExpression()
 
     endOfFileToken := p.MatchToken(SyntaxKind.EndOfFileToken)
 
@@ -94,7 +94,7 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     switch p.Current().Kind() {
     case SyntaxKind.OpenParenthesisToken:
         left := p.NextToken()
-        expression := p.ParseExpression(0)
+        expression := p.ParseExpression()
         right := p.MatchToken(SyntaxKind.CloseParenthesisToken)
 
         return NewParenthesizedExpressionSyntax(left, expression, right)
@@ -118,21 +118,20 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     }
 }
 
-func (p *Parser) ParseExpression() ExpressionSyntax
-{
+func (p *Parser) ParseExpression() ExpressionSyntax {
     return p.ParseAssignmentExpression()
 }
 
 func (p *Parser) ParseAssignmentExpression() ExpressionSyntax {
     if p.Peek(0).Kind() == SyntaxKind.IdentifierToken && p.Peek(1).Kind() == SyntaxKind.EqualsToken {
-        identifierToken = p.NextToken()
-        operatorToken = p.NextToken()
+        identifierToken := p.NextToken()
+        operatorToken := p.NextToken()
         right := p.ParseAssignmentExpression()
 
-        return NewParseAssignmentExpression(identifierToken, operatorToken, right)
+        return NewAssignmentExpressionSyntax(identifierToken, operatorToken, right)
     }
 
-    return NewParseBinaryExpression(0)
+    return p.ParseBinaryExpression(0)
 }
 
 func (p *Parser) ParseBinaryExpression(parentPrecedence int) ExpressionSyntax {

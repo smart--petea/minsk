@@ -10,14 +10,18 @@ import (
     "minsk/Util"
 
     "fmt"
+    "reflect"
 )
 
 type Binder struct {
     Util.DiagnosticBag
+    _variables map[string]interface{}
 }
 
-func NewBinder() *Binder {
-    return &Binder{}
+func NewBinder(variables map[string]interface{}) *Binder {
+    return &Binder{
+        _variables: variables,
+    }
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
@@ -46,13 +50,23 @@ func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression 
 }
 
 func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    pS := syntax.(*Syntax.AssignmentExpressionSyntax)
-    return b.BindExpression(pS.Expression)
+    assignmentExpressionSyntax := syntax.(*Syntax.AssignmentExpressionSyntax)
+
+    name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
+    boundExpression := b.BindExpression(assignmentExpressionSyntax)
+    return NewBoundAssignmentExpression(name, boundExpression)
 }
 
 func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    pS := syntax.(*Syntax.NameExpressionSyntax)
-    return b.BindExpression(pS.Expression)
+    nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
+    name := string(nameExpressionSyntax.IdentifierToken.Runes)
+
+    if _, ok := b._variables[name]; !ok {
+        b.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span(), name)
+        return NewBoundLiteralExpression(0)
+    }
+
+    return NewBoundVariableExpression(name, reflect.Int)
 }
 
 func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
