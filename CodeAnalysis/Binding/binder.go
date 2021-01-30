@@ -54,6 +54,20 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
 
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
+
+    var defaultValue interface{}
+    switch boundExpression.GetType() {
+    case reflect.Int:
+        defaultValue = 0
+    case reflect.Bool:
+        defaultValue = false
+    }
+
+    if defaultValue == nil {
+        panic(fmt.Sprintf("Unsuported variable type: %s", boundExpression.GetType()))
+    }
+
+    b._variables[name] = defaultValue
     return NewBoundAssignmentExpression(name, boundExpression)
 }
 
@@ -61,12 +75,14 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
-    if _, ok := b._variables[name]; !ok {
+    var value interface{}
+    var ok bool
+    if value, ok = b._variables[name]; !ok {
         b.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span(), name)
         return NewBoundLiteralExpression(0)
     }
 
-    return NewBoundVariableExpression(name, reflect.Int)
+    return NewBoundVariableExpression(name, reflect.TypeOf(value).Kind())
 }
 
 func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
