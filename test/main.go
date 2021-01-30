@@ -15,6 +15,7 @@ import (
 func main() {
     reader := bufio.NewReader(os.Stdin)
     var showTree bool
+    variables := make(map[string]interface{})
 
     for {
         fmt.Print("> ")
@@ -44,7 +45,7 @@ func main() {
 
         syntaxTree := Syntax.ParseSyntaxTree(line)
         compilation := CA.NewCompilation(syntaxTree)
-        result := compilation.Evaluate()
+        result := compilation.Evaluate(variables)
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
