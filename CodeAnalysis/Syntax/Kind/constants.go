@@ -17,7 +17,7 @@ const (
     AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
     PipePipeToken SyntaxKind = "PipePipeToken"
     EqualsEqualsToken SyntaxKind = "EqualsEqualsToken"
-    EqualsToken SyntaxKind = "EqualsEqualsToken"
+    EqualsToken SyntaxKind = "EqualsToken"
     BangEqualsToken SyntaxKind = "BangEqualsToken"
 
     //Keywords

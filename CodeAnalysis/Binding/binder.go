@@ -53,7 +53,7 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     assignmentExpressionSyntax := syntax.(*Syntax.AssignmentExpressionSyntax)
 
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
-    boundExpression := b.BindExpression(assignmentExpressionSyntax)
+    boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
     return NewBoundAssignmentExpression(name, boundExpression)
 }
 
