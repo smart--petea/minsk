@@ -1,24 +1,23 @@
 package Binding
 
 import (
-    "reflect"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
+    "reflect"
 )
 
 type BoundVariableExpression struct {
-    Name string
-    Type reflect.Kind
+    Variable *Util.VariableSymbol
 }
 
-func NewBoundVariableExpression(name string, variableType reflect.Kind) *BoundVariableExpression {
+func NewBoundVariableExpression(variable *Util.VariableSymbol) *BoundVariableExpression {
     return &BoundVariableExpression{
-        Name: name,
-        Type: variableType,
+        Variable: variable,
     }
 }
 
 func (b *BoundVariableExpression) GetType() reflect.Kind {
-    return b.Type
+    return b.Variable.Type
 }
 
 func (b *BoundVariableExpression) Kind() BoundNodeKind.BoundNodeKind {

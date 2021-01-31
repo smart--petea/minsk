@@ -6,16 +6,17 @@ import (
     Binding "minsk/CodeAnalysis/Binding"
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
+    "minsk/Util"
 
     "reflect"
 )
 
 type Evaluator struct {
         Root Binding.BoundExpression
-        _variables map[string]interface{}
+        _variables map[*Util.VariableSymbol]interface{}
 }
 
-func NewEvaluator(root Binding.BoundExpression, variables map[string]interface{}) *Evaluator {
+func NewEvaluator(root Binding.BoundExpression, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
     return &Evaluator{
         Root: root,
         _variables: variables,
@@ -32,12 +33,12 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
     }
 
     if v, ok := root.(*Binding.BoundVariableExpression); ok {
-        return e._variables[v.Name]
+        return e._variables[v.Variable]
     }
 
     if a, ok := root.(*Binding.BoundAssignmentExpression); ok {
         value := e.evaluateExpression(a.Expression)
-        e._variables[a.Name] = value
+        e._variables[a.Variable] = value
         return value
     }
 

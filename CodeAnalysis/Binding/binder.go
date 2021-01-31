@@ -10,15 +10,14 @@ import (
     "minsk/Util"
 
     "fmt"
-    "reflect"
 )
 
 type Binder struct {
     Util.DiagnosticBag
-    _variables map[string]interface{}
+    _variables map[*Util.VariableSymbol]interface{}
 }
 
-func NewBinder(variables map[string]interface{}) *Binder {
+func NewBinder(variables map[*Util.VariableSymbol]interface{}) *Binder {
     return &Binder{
         _variables: variables,
     }
@@ -55,34 +54,32 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
 
-    var defaultValue interface{}
-    switch boundExpression.GetType() {
-    case reflect.Int:
-        defaultValue = 0
-    case reflect.Bool:
-        defaultValue = false
+    var variable *Util.VariableSymbol
+    for variable, _ = range b._variables {
+        if variable.Name == name {
+            delete(b._variables, variable)
+            break
+        }
     }
 
-    if defaultValue == nil {
-        panic(fmt.Sprintf("Unsuported variable type: %s", boundExpression.GetType()))
-    }
+    variable = Util.NewVariableSymbol(name, boundExpression.GetType())
+    b._variables[variable] = nil
 
-    b._variables[name] = defaultValue
-    return NewBoundAssignmentExpression(name, boundExpression)
+    return NewBoundAssignmentExpression(variable, boundExpression)
 }
 
 func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
-    var value interface{}
-    var ok bool
-    if value, ok = b._variables[name]; !ok {
-        b.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span(), name)
-        return NewBoundLiteralExpression(0)
+    for variable, _ := range b._variables {
+        if variable.Name == name {
+            return NewBoundVariableExpression(variable)
+        }
     }
 
-    return NewBoundVariableExpression(name, reflect.TypeOf(value).Kind())
+    b.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span(), name)
+    return NewBoundLiteralExpression(0)
 }
 
 func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {

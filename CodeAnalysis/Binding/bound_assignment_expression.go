@@ -3,16 +3,17 @@ package Binding
 import (
     "reflect"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundAssignmentExpression struct {
-    Name string
+    Variable *Util.VariableSymbol
     Expression BoundExpression
 }
 
-func NewBoundAssignmentExpression(name string, expression BoundExpression) *BoundAssignmentExpression {
+func NewBoundAssignmentExpression(variable *Util.VariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
     return &BoundAssignmentExpression{
-        Name: name,
+        Variable: variable,
         Expression: expression,
     }
 }

@@ -8,14 +8,15 @@ import (
     "strings"
 
     CA "minsk/CodeAnalysis"
-    Syntax "minsk/CodeAnalysis/Syntax"
-    Console "minsk/Util/Console"
+    "minsk/CodeAnalysis/Syntax"
+    "minsk/Util/Console"
+    "minsk/Util"
 )
 
 func main() {
     reader := bufio.NewReader(os.Stdin)
     var showTree bool
-    variables := make(map[string]interface{})
+    variables := make(map[*Util.VariableSymbol]interface{})
 
     for {
         fmt.Print("> ")

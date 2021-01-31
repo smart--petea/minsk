@@ -16,7 +16,7 @@ func NewCompilation(syntax *Syntax.SyntaxTree) *Compilation {
     }
 }
 
-func (c *Compilation) Evaluate(variables map[string]interface{}) *EvaluationResult {
+func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *EvaluationResult {
     if len(c.Syntax.GetDiagnostics()) > 0 {
         return NewEvaluationResult(c.Syntax.GetDiagnostics(), nil)
     }
