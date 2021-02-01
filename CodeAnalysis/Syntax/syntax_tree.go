@@ -1,6 +1,7 @@
 package Syntax
 
 import (
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/Util"
 )
 
@@ -23,4 +24,19 @@ func ParseSyntaxTree(text string) *SyntaxTree {
     syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())
 
     return syntaxTree
+}
+
+func ParseTokens(text string) (tokens []*SyntaxToken) {
+    lexer := NewLexer([]rune(text))
+
+    for {
+        token := lexer.Lex()
+        if token.Kind() == SyntaxKind.EndOfFileToken {
+            break
+        }
+
+        tokens = append(tokens, token)
+    }
+
+    return tokens
 }
