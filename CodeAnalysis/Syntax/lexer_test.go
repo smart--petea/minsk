@@ -10,14 +10,30 @@ func TestLexerLexesToken(t *testing.T) {
         kind SyntaxKind.SyntaxKind
         text string
     } {
-        {
-            kind: SyntaxKind.IdentifierToken, 
-            text: "a",
-        },
-        {
-            kind: SyntaxKind.IdentifierToken, 
-            text: "abc",
-        },
+
+        {kind: SyntaxKind.PlusToken, text: "+"},
+        {kind: SyntaxKind.MinusToken, text: "-"},
+        {kind: SyntaxKind.StarToken, text: "*"},
+        {kind: SyntaxKind.SlashToken, text: "/"},
+        {kind: SyntaxKind.BangToken, text: "!"},
+        {kind: SyntaxKind.EqualsToken, text: "="},
+        {kind: SyntaxKind.AmpersandAmpersandToken, text: "&&"},
+        {kind: SyntaxKind.PipePipeToken, text: "||"},
+        {kind: SyntaxKind.EqualsEqualsToken, text: "=="},
+        {kind: SyntaxKind.BangEqualsToken, text: "!="},
+        {kind: SyntaxKind.OpenParenthesisToken, text: "("},
+        {kind: SyntaxKind.CloseParenthesisToken, text: ")"},
+        {kind: SyntaxKind.FalseKeyword, text: "false"},
+        {kind: SyntaxKind.TrueKeyword, text: "true"},
+
+        {kind: SyntaxKind.WhitespaceToken, text: " "},
+        {kind: SyntaxKind.WhitespaceToken, text: "  "},
+        {kind: SyntaxKind.WhitespaceToken, text: "\r"},
+        {kind: SyntaxKind.WhitespaceToken, text: "\n\r"},
+        {kind: SyntaxKind.NumberToken, text: "1"},
+        {kind: SyntaxKind.NumberToken, text: "123"},
+        {kind: SyntaxKind.IdentifierToken, text: "a"},
+        {kind: SyntaxKind.IdentifierToken, text: "abc"},
     }
 
     for _, tokenData := range tokensData {
