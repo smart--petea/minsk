@@ -1,9 +1,9 @@
-package SyntaxFacts
+package Syntax
 
 import (
     "testing"
+    "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
-//    "minsk/CodeAnalysis/Syntax"
 )
 
 func TestSyntaxFactGetTextRoundTrips(t *testing.T) {
@@ -36,20 +36,20 @@ func TestSyntaxFactGetTextRoundTrips(t *testing.T) {
     }
 
     for _, kind := range kinds {
-        text := GetText(kind)
+        text := SyntaxFacts.GetText(kind)
         if text == "" {
             continue
         }
 
-        tokens := Syntax.ParseTokens(text)
+        tokens := ParseTokens(text)
 
         if len(tokens) != 1 {
             t.Errorf("len(%+v)=%d expected=1", tokens, len(tokens))
         }
 
         token := tokens[0]
-        if token.Kind != kind {
-            t.Errorf("kind=%+v, expected=%+v", token.Kind, kind)
+        if token.Kind() != kind {
+            t.Errorf("kind=%+v, expected=%+v", token.Kind(), kind)
         }
 
         if text != string(token.Runes) {
