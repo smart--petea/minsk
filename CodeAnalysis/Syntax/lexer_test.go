@@ -6,7 +6,17 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
-var tokensData = []struct{
+var separatorsSource = []struct{
+    kind SyntaxKind.SyntaxKind
+    text string
+} {
+    {kind: SyntaxKind.WhitespaceToken, text: " "},
+    {kind: SyntaxKind.WhitespaceToken, text: "  "},
+    {kind: SyntaxKind.WhitespaceToken, text: "\r"},
+    {kind: SyntaxKind.WhitespaceToken, text: "\n\r"},
+}
+
+var tokensSource = []struct{
     kind SyntaxKind.SyntaxKind
     text string
 } {
@@ -25,10 +35,6 @@ var tokensData = []struct{
     {kind: SyntaxKind.FalseKeyword, text: "false"},
     {kind: SyntaxKind.TrueKeyword, text: "true"},
 
-    //{kind: SyntaxKind.WhitespaceToken, text: " "},
-    //{kind: SyntaxKind.WhitespaceToken, text: "  "},
-    //{kind: SyntaxKind.WhitespaceToken, text: "\r"},
-    //{kind: SyntaxKind.WhitespaceToken, text: "\n\r"},
     {kind: SyntaxKind.NumberToken, text: "1"},
     {kind: SyntaxKind.NumberToken, text: "123"},
     {kind: SyntaxKind.IdentifierToken, text: "a"},
@@ -36,6 +42,8 @@ var tokensData = []struct{
 }
 
 func TestLexerLexesToken(t *testing.T) {
+    tokensData := append(tokensSource, separatorsSource...)
+
     for _, tokenData := range tokensData {
         tokens := ParseTokens(tokenData.text)
 
@@ -54,6 +62,8 @@ func TestLexerLexesToken(t *testing.T) {
 }
 
 func TestLexerTokenPairs(t *testing.T) {
+    tokensData := tokensSource
+
     for _, tokenData0 := range tokensData {
         for _, tokenData1 := range tokensData {
             if requiresSeparator(tokenData0.kind, tokenData1.kind) {
@@ -78,6 +88,48 @@ func TestLexerTokenPairs(t *testing.T) {
             }
             if string(tokens[1].Runes) != tokenData1.text {
                 t.Errorf("1. runes=%s, expected=%s", string(tokens[1].Runes), tokenData1.text)
+            }
+        }
+    }
+}
+
+func TestLexerTokenPairsWithSeparators(t *testing.T) {
+    tokensData := tokensSource
+
+    for _, tokenData0 := range tokensData {
+        for _, tokenData2 := range tokensData {
+            if requiresSeparator(tokenData0.kind, tokenData2.kind) {
+                continue
+            }
+
+            for _, separatorData := range separatorsSource {
+                text := tokenData0.text + separatorData.text + tokenData2.text
+                tokens := ParseTokens(text)
+
+                if len(tokens) != 3 {
+                    t.Errorf("len(%+v) expected=3", tokens)
+                }
+
+                if tokens[0].kind != tokenData0.kind {
+                    t.Errorf("0. kind=%s, expected=%s", tokens[0].kind, tokenData0.kind)
+                }
+                if string(tokens[0].Runes) != tokenData0.text {
+                    t.Errorf("0. runes=%s, expected=%s", string(tokens[0].Runes), tokenData0.text)
+                }
+
+                if tokens[1].kind != separatorData.kind {
+                    t.Errorf("1. kind=%s, expected=%s", tokens[1].kind, separatorData.kind)
+                }
+                if string(tokens[1].Runes) != separatorData.text {
+                    t.Errorf("1. runes=%s, expected=%s", string(tokens[1].Runes), separatorData.text)
+                }
+
+                if tokens[2].kind != tokenData2.kind {
+                    t.Errorf("2. kind=%s, expected=%s", tokens[2].kind, tokenData2.kind)
+                }
+                if string(tokens[2].Runes) != tokenData2.text {
+                    t.Errorf("2. runes=%s, expected=%s", string(tokens[2].Runes), tokenData2.text)
+                }
             }
         }
     }
