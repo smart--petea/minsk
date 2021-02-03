@@ -32,3 +32,33 @@ const (
     ParenthesizedExpression SyntaxKind = "ParenthesizedExpression"
     UnaryExpression SyntaxKind = "UnaryExpression" 
 )
+
+func GetValues() []SyntaxKind {
+    return []SyntaxKind{
+        NumberToken,
+        WhitespaceToken,
+        PlusToken,
+        EndOfFileToken,
+        MinusToken,
+        StarToken,
+        SlashToken, 
+        OpenParenthesisToken,
+        CloseParenthesisToken,
+        BangToken,
+        BadToken,
+        IdentifierToken,
+        AmpersandAmpersandToken,
+        PipePipeToken,
+        EqualsEqualsToken,
+        EqualsToken,
+        BangEqualsToken,
+        TrueKeyword,
+        FalseKeyword,
+        AssignmentExpression, 
+        BinaryExpression, 
+        LiteralExpression, 
+        NameExpression, 
+        ParenthesizedExpression,
+        UnaryExpression, 
+    }
+}
