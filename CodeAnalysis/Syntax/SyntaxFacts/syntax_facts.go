@@ -82,18 +82,22 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
     }
 }
 
-func GetUnaryOperatorKinds() kinds []SyntaxKind.SyntaxKind {
+func GetUnaryOperatorKinds() (kinds []SyntaxKind.SyntaxKind) {
     for _, kind := range SyntaxKind.GetValues() {
         if GetUnaryOperatorPrecedence(kind) > 0 {
-            kinds := append(kinds, kind)
+            kinds = append(kinds, kind)
         }
     }
+
+    return
 }
 
-func GetBinaryOperatorKinds() kinds []SyntaxKind.SyntaxKind {
+func GetBinaryOperatorKinds() (kinds []SyntaxKind.SyntaxKind) {
     for _, kind := range SyntaxKind.GetValues() {
         if GetBinaryOperatorPrecedence(kind) > 0 {
-            kinds := append(kinds, kind)
+            kinds = append(kinds, kind)
         }
     }
+
+    return
 }
