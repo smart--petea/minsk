@@ -14,6 +14,7 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
             op1Text := SyntaxFacts.GetText(op1)
             op2Text := SyntaxFacts.GetText(op2)
             text := fmt.Sprintf("a %s b %s c", op1Text, op2Text) 
+            expression := Syntax.ParseSyntaxTree(line).Root
 
             if op1Precedence >= op2Precedence {
                 //     op2
@@ -21,12 +22,30 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
                 //   op1  c
                 //  /  \   
                 // a    b
+                e := NewAssertingEnumerator(expression)
+                e.AssertNode(SyntaxKind.BinaryExpression)
+                    e.AssertNode(SyntaxKind.BinaryExpression)
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentiferToken, "a")
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentiferToken, "b")
+                    e.AssertNode(SyntaxKind.NameExpression)
+                        e.AssertToken(SyntaxKind.IdentiferToken, "c")
             } else {
                 //   op1
                 //  /  \
                 // a   op2
                 //    /  \
                 //   b    c
+                e := NewAssertingEnumerator(expression)
+                e.AssertNode(SyntaxKind.BinaryExpression)
+                    e.AssertNode(SyntaxKind.NameExpression)
+                        e.AssertToken(SyntaxKind.IdentiferToken, "a")
+                    e.AssertNode(SyntaxKind.BinaryExpression)
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentiferToken, "b")
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentiferToken, "c")
             }
         }
     }
