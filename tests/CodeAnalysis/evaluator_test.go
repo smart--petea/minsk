@@ -1,4 +1,4 @@
-package CodeAnalysis
+package CodeAnalysisTest
 
 import (
     "testing"

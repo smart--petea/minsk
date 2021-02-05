@@ -1,8 +1,9 @@
-package Syntax
+package SyntaxTest
 
 import (
     "testing"
     "minsk/CodeAnalysis/Syntax/SyntaxFacts"
+    "minsk/CodeAnalysis/Syntax"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
@@ -41,7 +42,7 @@ func TestSyntaxFactGetTextRoundTrips(t *testing.T) {
             continue
         }
 
-        tokens := ParseTokens(text)
+        tokens := Syntax.ParseTokens(text)
 
         if len(tokens) != 1 {
             t.Errorf("len(%+v)=%d expected=1", tokens, len(tokens))

@@ -1,8 +1,9 @@
-package Syntax
+package SyntaxTest
 
 import (
     "testing"
     "minsk/CodeAnalysis/Syntax/SyntaxFacts"
+    "minsk/CodeAnalysis/Syntax"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "fmt"
 )
@@ -15,7 +16,7 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
             op1Text := SyntaxFacts.GetText(op1)
             op2Text := SyntaxFacts.GetText(op2)
             text := fmt.Sprintf("a %s b %s c", op1Text, op2Text) 
-            expression := ParseSyntaxTree(text).Root
+            expression := Syntax.ParseSyntaxTree(text).Root
 
             if op1Precedence >= op2Precedence {
                 //     op2
@@ -56,60 +57,9 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
     }
 }
 
-type AssertingEnumerator struct {
-    enumerator <-chan SyntaxNode
-    t *testing.T
-}
 
-func NewAssertingEnumerator(node SyntaxNode, t *testing.T) *AssertingEnumerator {
-    return &AssertingEnumerator{
-        enumerator: flatten(node),
-        t: t,
-    }
-}
-
-func (ae *AssertingEnumerator) AssertToken(kind SyntaxKind.SyntaxKind, text string) {
-    if current, isOpen := <- ae.enumerator; isOpen {
-        fmt.Printf("AssertToken %+v %+v\n", current, current.Kind())
-        var token *SyntaxToken
-        var ok bool
-        if token, ok = current.(*SyntaxToken); !ok {
-            ae.t.Errorf("current should be a SyntaxToken")
-        }
-
-        if token.Kind() != kind {
-            ae.t.Errorf("current.Kind=%s, expected=%s", string(token.Kind()), string(kind))
-        }
-
-        if string(token.Runes) != text {
-            ae.t.Errorf("current.Text=%s, expected=%s", string(token.Runes), text)
-        }
-
-        return
-    }
-
-    ae.t.Errorf("no next token")
-}
-
-func (ae *AssertingEnumerator) AssertNode(kind SyntaxKind.SyntaxKind) {
-    if current, isChanOpen := <- ae.enumerator; isChanOpen {
-        fmt.Printf("AssertNode %+v %+v\n", current, current.Kind())
-        if _, ok := current.(*SyntaxToken); ok {
-            ae.t.Errorf("current should not be a SyntaxToken")
-        }
-
-        if current.Kind() != kind {
-            ae.t.Errorf("current.Kind=%s, expected=%s", string(current.Kind()), string(kind))
-        }
-
-        return
-    }
-
-    ae.t.Errorf("no next token")
-}
-
-func flatten(node SyntaxNode) <-chan SyntaxNode {
-    out := make(chan SyntaxNode)
+func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
+    out := make(chan Syntax.SyntaxNode)
 
     var stack syntaxNodeStack
     stack.Push(node)
@@ -129,23 +79,4 @@ func flatten(node SyntaxNode) <-chan SyntaxNode {
     }()
 
     return out
-}
-
-type syntaxNodeStack struct {
-    stack []SyntaxNode
-}
-
-func (stack *syntaxNodeStack) Count() int {
-    return len(stack.stack)
-}
-
-func (stack *syntaxNodeStack) Push(node SyntaxNode) {
-    stack.stack = append(stack.stack, node)
-}
-
-func (stack *syntaxNodeStack) Pop() SyntaxNode {
-    node := stack.stack[len(stack.stack) - 1]
-    stack.stack = stack.stack[:len(stack.stack) - 1]
-
-    return node
 }
