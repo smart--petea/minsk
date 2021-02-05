@@ -28,8 +28,10 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
                     e.AssertNode(SyntaxKind.BinaryExpression)
                         e.AssertNode(SyntaxKind.NameExpression)
                             e.AssertToken(SyntaxKind.IdentifierToken, "a")
+                        e.AssertToken(op1, op1Text)
                         e.AssertNode(SyntaxKind.NameExpression)
                             e.AssertToken(SyntaxKind.IdentifierToken, "b")
+                    e.AssertToken(op2, op2Text)
                     e.AssertNode(SyntaxKind.NameExpression)
                         e.AssertToken(SyntaxKind.IdentifierToken, "c")
             } else {
@@ -42,9 +44,11 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
                 e.AssertNode(SyntaxKind.BinaryExpression)
                     e.AssertNode(SyntaxKind.NameExpression)
                         e.AssertToken(SyntaxKind.IdentifierToken, "a")
+                    e.AssertToken(op1, op1Text)
                     e.AssertNode(SyntaxKind.BinaryExpression)
                         e.AssertNode(SyntaxKind.NameExpression)
                             e.AssertToken(SyntaxKind.IdentifierToken, "b")
+                        e.AssertToken(op2, op2Text)
                         e.AssertNode(SyntaxKind.NameExpression)
                             e.AssertToken(SyntaxKind.IdentifierToken, "c")
             }
@@ -53,23 +57,9 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
 }
 
 type AssertingEnumerator struct {
-    //todo C# IDisposable. pay some heed to io.Close
     enumerator <-chan SyntaxNode
     t *testing.T
 }
-
-/* todo
-public void Dispose()
-{
-    select {
-    case current <- ae.enumerator:
-        t.Errorf("it should be no next token")
-    default:
-    }
-
-    enumerator.Dispose()
-}
-*/
 
 func NewAssertingEnumerator(node SyntaxNode, t *testing.T) *AssertingEnumerator {
     return &AssertingEnumerator{
