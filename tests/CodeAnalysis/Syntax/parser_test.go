@@ -57,6 +57,51 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
     }
 }
 
+func TestParserUnaryExpressionHonorsPrecedences(t *testing.T) {
+    for _, unary := range SyntaxFacts.GetUnaryOperatorKinds() {
+        for _, binary := range SyntaxFacts.GetBinaryOperatorKinds() {
+            unaryPrecedence := SyntaxFacts.GetUnaryOperatorPrecedence(unary)
+            binaryPrecedence := SyntaxFacts.GetBinaryOperatorPrecedence(binary)
+            unaryText := SyntaxFacts.GetText(unary)
+            binaryText := SyntaxFacts.GetText(binary)
+            text := fmt.Sprintf("%s a %s b", unaryText, binaryText) 
+            expression := Syntax.ParseSyntaxTree(text).Root
+
+            if unaryPrecedence >= binaryPrecedence {
+                //   binary  
+                //   /    \   
+                // unary   b
+                //  |
+                //  a
+                e := NewAssertingEnumerator(expression, t)
+                e.AssertNode(SyntaxKind.BinaryExpression)
+                    e.AssertNode(SyntaxKind.UnaryExpression)
+                        e.AssertToken(unary, unaryText)
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentifierToken, "a")
+                    e.AssertToken(binary, binaryText)
+                    e.AssertNode(SyntaxKind.NameExpression)
+                        e.AssertToken(SyntaxKind.IdentifierToken, "b")
+            } else {
+                //   unary
+                //     |
+                //  binary
+                //  /    \
+                // a      b
+
+                e := NewAssertingEnumerator(expression, t)
+                e.AssertNode(SyntaxKind.UnaryExpression)
+                    e.AssertToken(unary, unaryText)
+                    e.AssertNode(SyntaxKind.BinaryExpression)
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentifierToken, "a")
+                        e.AssertToken(binary, binaryText)
+                        e.AssertNode(SyntaxKind.NameExpression)
+                            e.AssertToken(SyntaxKind.IdentifierToken, "b")
+            }
+        }
+    }
+}
 
 func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
     out := make(chan Syntax.SyntaxNode)
