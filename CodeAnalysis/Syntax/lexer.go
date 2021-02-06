@@ -15,6 +15,9 @@ type Lexer struct {
 
     Runes []rune
     Position int
+    start int
+    kind SyntaxKind.SyntaxKind
+    value interface{}
 }
 
 func NewLexer(runes []rune) *Lexer {
@@ -46,119 +49,128 @@ func (l *Lexer) Next() {
 }
 
 func (l *Lexer) Lex() *SyntaxToken {
-    if l.Position >= len(l.Runes) {
-        return NewSyntaxToken(SyntaxKind.EndOfFileToken, l.Position, []rune{'\x00'}, nil)
-    } 
+    l.start = l.Position
+    l.kind = SyntaxKind.BadToken
+    l.value = nil
 
-    if unicode.IsDigit(l.Current()) {
-        start := l.Position
-
-        for unicode.IsDigit(l.Current()) {
-            l.Next()
-        }
-
-        length := l.Position - start 
-        runes := l.Runes[start: start + length]
-        val, err := strconv.Atoi(string(runes))
-        if err != nil {
-            l.ReportInvalidNumber(Util.NewTextSpan(start, length), runes, reflect.Int)
-        }
-
-        return NewSyntaxToken(SyntaxKind.NumberToken, start, runes, val)
-    }
-
-    if unicode.IsSpace(l.Current()) {
-        start := l.Position
-
-        for unicode.IsSpace(l.Current()) {
-            l.Next()
-        }
-
-        length := l.Position - start 
-        runes := l.Runes[start: start + length]
-
-        return NewSyntaxToken(SyntaxKind.WhitespaceToken, start, runes, nil)
-    }
-
-    if unicode.IsLetter(l.Current()) {
-        start := l.Position
-
-        for unicode.IsLetter(l.Current()) {
-            l.Next()
-        }
-
-        length := l.Position - start 
-        runes := l.Runes[start: start + length]
-        kind := SyntaxFacts.GetKeywordKind(string(runes))
-
-        return NewSyntaxToken(kind, start, runes, nil)
-    }
-
-    position := l.Position
     current := l.Current()
     switch current {
+    case '\x00':
+        l.kind = SyntaxKind.EndOfFileToken
+
     case '+':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.PlusToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.PlusToken
 
     case '-':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.MinusToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.MinusToken
 
     case '*':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.StarToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.StarToken
 
     case '/':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.SlashToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.SlashToken
 
     case '(':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.OpenParenthesisToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.OpenParenthesisToken
 
     case ')':
         l.Next()
-        return NewSyntaxToken(SyntaxKind.CloseParenthesisToken, position, l.Runes[position:l.Position], nil)
+        l.kind = SyntaxKind.CloseParenthesisToken
 
     case '&':
         if l.Lookahead() == '&' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.AmpersandAmpersandToken, position, l.Runes[position:l.Position], nil)
+            l.kind = SyntaxKind.AmpersandAmpersandToken
         }
 
     case '|':
         if l.Lookahead() == '|' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.PipePipeToken, position, l.Runes[position:l.Position], nil)
+            l.kind = SyntaxKind.PipePipeToken
         }
 
     case '=':
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.EqualsEqualsToken, position, l.Runes[position:l.Position], nil)
+            l.kind = SyntaxKind.EqualsEqualsToken
         } else {
             l.Next()
-            return NewSyntaxToken(SyntaxKind.EqualsToken, position, l.Runes[position:l.Position], nil)
+            l.kind = SyntaxKind.EqualsToken
         }
 
     case '!':
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            return NewSyntaxToken(SyntaxKind.BangEqualsToken, position, l.Runes[position:l.Position], nil)
+            l.kind = SyntaxKind.BangEqualsToken
+        } else {
+            l.Next()
+            l.kind = SyntaxKind.BangToken
         }
+    case '0','1','2','3','4','5','6','7','8','9':
+            l.ReadNumberToken() 
+    case ' ','\t','\n','\r':
+            l.ReadWhiteSpace()
 
-        l.Next()
-        return NewSyntaxToken(SyntaxKind.BangToken, position, l.Runes[position:l.Position], nil)
-
+    default:
+        if unicode.IsLetter(current) {
+            l.ReadIdentifierOrKeyword()
+        } else if unicode.IsSpace(current) {
+            l.ReadWhiteSpace()
+        } else {
+            l.Next()
+            l.ReportBadCharacter(l.start, current)
+        }
     }
 
-    l.Next()
+    var runes []rune
+    text := SyntaxFacts.GetText(l.kind)
+    if text == "" {
+        runes = l.Runes[l.start:l.Position]
+    } else {
+        runes = []rune(text)
+    }
 
-    l.ReportBadCharacter(position, current)
-    return NewSyntaxToken(SyntaxKind.BadToken, position, l.Runes[position:l.Position], nil)
+    return NewSyntaxToken(l.kind, l.start, runes, l.value)
+}
+
+func (l *Lexer) ReadNumberToken() {
+    for unicode.IsDigit(l.Current()) {
+        l.Next()
+    }
+
+    length := l.Position - l.start 
+    runes := l.Runes[l.start: l.start + length]
+    value, err := strconv.Atoi(string(runes))
+    if err != nil {
+        l.ReportInvalidNumber(Util.NewTextSpan(l.start, length), runes, reflect.Int)
+    }
+
+    l.value = value
+    l.kind = SyntaxKind.NumberToken
+}
+
+func (l *Lexer) ReadWhiteSpace() {
+    for unicode.IsSpace(l.Current()) {
+        l.Next()
+    }
+
+    l.kind = SyntaxKind.WhitespaceToken
+}
+
+func (l *Lexer) ReadIdentifierOrKeyword() {
+    for unicode.IsLetter(l.Current()) {
+        l.Next()
+    }
+
+    runes := l.Runes[l.start: l.Position]
+    l.kind = SyntaxFacts.GetKeywordKind(string(runes))
 }
