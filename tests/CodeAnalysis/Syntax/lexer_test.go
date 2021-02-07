@@ -7,43 +7,67 @@ import (
     "minsk/CodeAnalysis/Syntax"
 )
 
-var separatorsSource = []struct{
+type testToken struct {
     kind SyntaxKind.SyntaxKind
     text string
-} {
-    {kind: SyntaxKind.WhitespaceToken, text: " "},
-    {kind: SyntaxKind.WhitespaceToken, text: "  "},
-    {kind: SyntaxKind.WhitespaceToken, text: "\r"},
-    {kind: SyntaxKind.WhitespaceToken, text: "\n\r"},
 }
 
-var tokensSource = []struct{
-    kind SyntaxKind.SyntaxKind
-    text string
-} {
-    {kind: SyntaxKind.PlusToken, text: "+"},
-    {kind: SyntaxKind.MinusToken, text: "-"},
-    {kind: SyntaxKind.StarToken, text: "*"},
-    {kind: SyntaxKind.SlashToken, text: "/"},
-    {kind: SyntaxKind.BangToken, text: "!"},
-    {kind: SyntaxKind.EqualsToken, text: "="},
-    {kind: SyntaxKind.AmpersandAmpersandToken, text: "&&"},
-    {kind: SyntaxKind.PipePipeToken, text: "||"},
-    {kind: SyntaxKind.EqualsEqualsToken, text: "=="},
-    {kind: SyntaxKind.BangEqualsToken, text: "!="},
-    {kind: SyntaxKind.OpenParenthesisToken, text: "("},
-    {kind: SyntaxKind.CloseParenthesisToken, text: ")"},
-    {kind: SyntaxKind.FalseKeyword, text: "false"},
-    {kind: SyntaxKind.TrueKeyword, text: "true"},
+func getSeparators() []testToken {
+    return []testToken {
+        {kind: SyntaxKind.WhitespaceToken, text: " "},
+        {kind: SyntaxKind.WhitespaceToken, text: "  "},
+        {kind: SyntaxKind.WhitespaceToken, text: "\r"},
+        {kind: SyntaxKind.WhitespaceToken, text: "\n\r"},
+    }
+}
 
-    {kind: SyntaxKind.NumberToken, text: "1"},
-    {kind: SyntaxKind.NumberToken, text: "123"},
-    {kind: SyntaxKind.IdentifierToken, text: "a"},
-    {kind: SyntaxKind.IdentifierToken, text: "abc"},
+func getTokens() []testToken {
+    return []testToken{
+        {kind: SyntaxKind.PlusToken, text: "+"},
+        {kind: SyntaxKind.MinusToken, text: "-"},
+        {kind: SyntaxKind.StarToken, text: "*"},
+        {kind: SyntaxKind.SlashToken, text: "/"},
+        {kind: SyntaxKind.BangToken, text: "!"},
+        {kind: SyntaxKind.EqualsToken, text: "="},
+        {kind: SyntaxKind.AmpersandAmpersandToken, text: "&&"},
+        {kind: SyntaxKind.PipePipeToken, text: "||"},
+        {kind: SyntaxKind.EqualsEqualsToken, text: "=="},
+        {kind: SyntaxKind.BangEqualsToken, text: "!="},
+        {kind: SyntaxKind.OpenParenthesisToken, text: "("},
+        {kind: SyntaxKind.CloseParenthesisToken, text: ")"},
+        {kind: SyntaxKind.FalseKeyword, text: "false"},
+        {kind: SyntaxKind.TrueKeyword, text: "true"},
+
+        {kind: SyntaxKind.NumberToken, text: "1"},
+        {kind: SyntaxKind.NumberToken, text: "123"},
+        {kind: SyntaxKind.IdentifierToken, text: "a"},
+        {kind: SyntaxKind.IdentifierToken, text: "abc"},
+    }
+}
+
+func TestLexerAllTokens(t *testing.T) {
+    var tokenKinds SyntaxKind.SyntaxKindSlice
+    for _, kind := range SyntaxKind.GetValues() {
+        if strings.HasSuffix(string(kind), "Keyword") || strings.HasSuffix(string(kind), "Token") {
+            tokenKinds = append(tokenKinds, kind)
+        }
+    }
+
+    var testedTokenKinds SyntaxKind.SyntaxKindSlice
+    for _, testtoken := range append(getTokens(), getSeparators()...) {
+        testedTokenKinds = append(testedTokenKinds, testtoken.kind)
+    }
+
+    testedTokenKinds = append(testedTokenKinds, SyntaxKind.BadToken, SyntaxKind.EndOfFileToken)
+    untestedTokenKinds := tokenKinds.Unique().ExceptWith(testedTokenKinds)
+
+    if len(untestedTokenKinds) != 0 {
+        t.Errorf("(%+v) - untested token kinds", untestedTokenKinds)
+    }
 }
 
 func TestLexerLexesToken(t *testing.T) {
-    tokensData := append(tokensSource, separatorsSource...)
+    tokensData := append(getTokens(), getSeparators()...)
 
     for _, tokenData := range tokensData {
         tokens := Syntax.ParseTokens(tokenData.text)
@@ -63,7 +87,7 @@ func TestLexerLexesToken(t *testing.T) {
 }
 
 func TestLexerTokenPairs(t *testing.T) {
-    tokensData := tokensSource
+    tokensData := getTokens()
 
     for _, tokenData0 := range tokensData {
         for _, tokenData1 := range tokensData {
@@ -95,15 +119,13 @@ func TestLexerTokenPairs(t *testing.T) {
 }
 
 func TestLexerTokenPairsWithSeparators(t *testing.T) {
-    tokensData := tokensSource
-
-    for _, tokenData0 := range tokensData {
-        for _, tokenData2 := range tokensData {
+    for _, tokenData0 := range getTokens() {
+        for _, tokenData2 := range getTokens() {
             if requiresSeparator(tokenData0.kind, tokenData2.kind) {
                 continue
             }
 
-            for _, separatorData := range separatorsSource {
+            for _, separatorData := range getSeparators() {
                 text := tokenData0.text + separatorData.text + tokenData2.text
                 tokens := Syntax.ParseTokens(text)
 
