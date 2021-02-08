@@ -93,29 +93,51 @@ func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
 func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     switch p.Current().Kind() {
     case SyntaxKind.OpenParenthesisToken:
-        left := p.NextToken()
-        expression := p.ParseExpression()
-        right := p.MatchToken(SyntaxKind.CloseParenthesisToken)
-
-        return NewParenthesizedExpressionSyntax(left, expression, right)
-
+        return p.ParseParenthesizedExpression()
     case SyntaxKind.FalseKeyword,  SyntaxKind.TrueKeyword:
-        value := p.Current().Kind() == SyntaxKind.TrueKeyword
-        return NewLiteralExpressionSyntax(p.NextToken(), value)
-
+        return p.ParseBooleanLiteral()
+    case SyntaxKind.NumberToken:
+        return p.ParseNumberLiteral()
     case SyntaxKind.IdentifierToken:
-        identifierToken := p.NextToken()
-
-        return NewNameExpressionSyntax(identifierToken)
-
+        return p.ParseNameExpression()
     default:
-        numberToken := p.MatchToken(SyntaxKind.NumberToken)
-        if numberToken == nil {
-            return nil
-        }
-
-        return NewLiteralExpressionSyntax(numberToken, numberToken.Value())
+        return p.ParseNameExpression()
     }
+}
+
+func (p *Parser) ParseNumberLiteral() ExpressionSyntax {
+    numberToken := p.MatchToken(SyntaxKind.NumberToken)
+    if numberToken == nil {
+        return nil
+    }
+
+    return NewLiteralExpressionSyntax(numberToken, numberToken.Value())
+}
+
+func (p *Parser) ParseParenthesizedExpression() ExpressionSyntax {
+    left := p.MatchToken(SyntaxKind.OpenParenthesisToken)
+    expression := p.ParseExpression()
+    right := p.MatchToken(SyntaxKind.CloseParenthesisToken)
+
+    return NewParenthesizedExpressionSyntax(left, expression, right)
+}
+
+func (p *Parser) ParseBooleanLiteral() ExpressionSyntax {
+    isTrue := p.Current().Kind() == SyntaxKind.TrueKeyword
+
+    var keywordToken *SyntaxToken
+    if isTrue {
+        keywordToken = p.MatchToken(SyntaxKind.TrueKeyword)
+    } else {
+        keywordToken = p.MatchToken(SyntaxKind.FalseKeyword)
+    }
+
+    return NewLiteralExpressionSyntax(keywordToken, isTrue)
+}
+
+func (p *Parser) ParseNameExpression() ExpressionSyntax {
+    identifierToken := p.MatchToken(SyntaxKind.IdentifierToken)
+    return NewNameExpressionSyntax(identifierToken)
 }
 
 func (p *Parser) ParseExpression() ExpressionSyntax {
