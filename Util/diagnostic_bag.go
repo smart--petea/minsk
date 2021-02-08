@@ -30,7 +30,9 @@ func (db *DiagnosticBag) ReportBadCharacter(position int, character rune) {
 }
 
 func (db *DiagnosticBag) GetDiagnostics() []*Diagnostic {
-    return db.diagnostics
+    cp := make([]*Diagnostic, len(db.diagnostics))
+    copy(cp, db.diagnostics)
+    return cp 
 }
 
 func (db *DiagnosticBag) AddDiagnosticsRange(diagnostics []*Diagnostic) {
