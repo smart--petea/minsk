@@ -5,6 +5,7 @@ import (
 )
 
 type ParenthesizedExpressionSyntax struct {
+    *syntaxNodeChildren
     OpenParenthesisToken *SyntaxToken
     Expression ExpressionSyntax
     CloseParenthesisToken *SyntaxToken
@@ -12,6 +13,7 @@ type ParenthesizedExpressionSyntax struct {
 
 func NewParenthesizedExpressionSyntax(openParenthesisToken *SyntaxToken, expression ExpressionSyntax, closeParenthesisToken *SyntaxToken)  *ParenthesizedExpressionSyntax {
     return &ParenthesizedExpressionSyntax{
+        syntaxNodeChildren: newSyntaxNodeChildren(openParenthesisToken, expression, closeParenthesisToken),
         OpenParenthesisToken: openParenthesisToken,
         Expression: expression,
         CloseParenthesisToken: closeParenthesisToken,
@@ -20,14 +22,6 @@ func NewParenthesizedExpressionSyntax(openParenthesisToken *SyntaxToken, express
 
 func (p *ParenthesizedExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.ParenthesizedExpression
-}
-
-func (p *ParenthesizedExpressionSyntax) GetChildren() []SyntaxNode {
-    return []SyntaxNode{
-        p.OpenParenthesisToken,
-        p.Expression,
-        p.CloseParenthesisToken,
-    }
 }
 
 func (p *ParenthesizedExpressionSyntax) Value() interface{} {

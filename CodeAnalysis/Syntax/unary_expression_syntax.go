@@ -5,6 +5,7 @@ import (
 )
 
 type UnaryExpressionSyntax struct {
+    *syntaxNodeChildren
     OperatorNode SyntaxNode
     Operand ExpressionSyntax
 }
@@ -15,6 +16,7 @@ func (u *UnaryExpressionSyntax) Value() interface{} {
 
 func NewUnaryExpressionSyntax(operatorNode SyntaxNode, operand ExpressionSyntax) *UnaryExpressionSyntax {
     return &UnaryExpressionSyntax{
+        syntaxNodeChildren: newSyntaxNodeChildren(operatorNode, operand),
         OperatorNode: operatorNode,
         Operand: operand,
     }
@@ -22,11 +24,4 @@ func NewUnaryExpressionSyntax(operatorNode SyntaxNode, operand ExpressionSyntax)
 
 func (u *UnaryExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.UnaryExpression
-}
-
-func (u *UnaryExpressionSyntax) GetChildren() []SyntaxNode {
-    return []SyntaxNode{
-        u.OperatorNode,
-        u.Operand,
-    }
 }

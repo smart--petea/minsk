@@ -7,6 +7,7 @@ import (
 )
 
 type SyntaxToken struct {
+    *syntaxNodeChildren
     kind SyntaxKind.SyntaxKind
     Position int
     Runes []rune
@@ -21,12 +22,9 @@ func (s *SyntaxToken) Value() interface{} {
     return s.value
 }
 
-func (s *SyntaxToken) GetChildren() []SyntaxNode {
-    return nil
-}
-
 func NewSyntaxToken(kind SyntaxKind.SyntaxKind, position int, runes []rune, value interface{}) *SyntaxToken {
     return &SyntaxToken{
+        syntaxNodeChildren: newSyntaxNodeChildren(),
         kind: kind,
         Position: position,
         Runes: runes,

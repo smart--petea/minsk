@@ -5,6 +5,7 @@ import (
 )
 
 type BinaryExpressionSyntax struct {
+    *syntaxNodeChildren
     Left ExpressionSyntax
     Right ExpressionSyntax
     OperatorNode SyntaxNode
@@ -16,6 +17,7 @@ func (b *BinaryExpressionSyntax) Value() interface{} {
 
 func NewBinaryExpressionSyntax(left ExpressionSyntax, operatorNode SyntaxNode, right ExpressionSyntax) *BinaryExpressionSyntax {
     return &BinaryExpressionSyntax{
+        syntaxNodeChildren: newSyntaxNodeChildren(left, operatorNode, right),
         Left: left,
         Right: right,
         OperatorNode: operatorNode,
@@ -24,12 +26,4 @@ func NewBinaryExpressionSyntax(left ExpressionSyntax, operatorNode SyntaxNode, r
 
 func (b *BinaryExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.BinaryExpression
-}
-
-func (b *BinaryExpressionSyntax) GetChildren() []SyntaxNode {
-    return []SyntaxNode{
-        b.Left,
-        b.OperatorNode,
-        b.Right,
-    }
 }
