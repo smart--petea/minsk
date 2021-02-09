@@ -7,5 +7,5 @@ import (
 type SyntaxNode interface {
     Kind() SyntaxKind.SyntaxKind
     Value()  interface{}
-    GetChildren() []SyntaxNode 
+    GetChildren() <-chan SyntaxNode 
 }

@@ -109,9 +109,16 @@ func PrettyPrint(node Syntax.SyntaxNode, indent string, isLast bool) {
         indent = indent + "│   "
     }
 
+    var nextChild, prevChild Syntax.SyntaxNode
+    var ok bool
     children := node.GetChildren()
-    lenChildren := len(children) - 1
-    for i, child := range children {
-        PrettyPrint(child, indent, i == lenChildren)
+    prevChild, ok = <-children 
+    for ok {
+        nextChild, ok = <-children
+        if ok {
+            PrettyPrint(prevChild, indent, false)
+            prevChild = nextChild
+        }
     }
+    PrettyPrint(prevChild, indent, true)
 }
