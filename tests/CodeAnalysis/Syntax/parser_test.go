@@ -114,7 +114,11 @@ func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
             n := stack.Pop()
             out<-n
 
-            children := n.GetChildren()
+            var children []Syntax.SyntaxNode
+            for child := range n.GetChildren() {
+                children = append(children, child)
+            }
+
             for i := len(children)-1; i >= 0; i = i - 1 {
                 stack.Push(children[i])
             }
