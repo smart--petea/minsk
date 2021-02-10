@@ -78,7 +78,8 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
         }
     }
 
-    b.ReportUndefinedName(nameExpressionSyntax.IdentifierToken.Span(), name)
+    span := Syntax.SyntaxNodeToTextSpan(nameExpressionSyntax.IdentifierToken)
+    b.ReportUndefinedName(span, name)
     return NewBoundLiteralExpression(0)
 }
 
@@ -115,7 +116,8 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
 
     if boundOperator == nil {
         syntaxToken := unarySyntax.OperatorNode.(*Syntax.SyntaxToken)
-        b.ReportUndefinedUnaryOperator(syntaxToken.Span(), syntaxToken.Runes, boundOperand.GetType())
+        span := Syntax.SyntaxNodeToTextSpan(syntaxToken)
+        b.ReportUndefinedUnaryOperator(span, syntaxToken.Runes, boundOperand.GetType())
         return boundOperand;
     }
 
@@ -131,7 +133,8 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
     if boundOperator == nil {
         syntaxToken := binarySyntax.OperatorNode.(*Syntax.SyntaxToken)
-        b.ReportUndefinedBinaryOperator(syntaxToken.Span(), syntaxToken.Runes, boundLeft.GetType(), boundRight.GetType())
+        span := Syntax.SyntaxNodeToTextSpan(syntaxToken)
+        b.ReportUndefinedBinaryOperator(span, syntaxToken.Runes, boundLeft.GetType(), boundRight.GetType())
 
         return boundLeft;
     }

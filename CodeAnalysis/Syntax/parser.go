@@ -85,7 +85,7 @@ func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
         return p.NextToken()
     }
 
-    p.ReportUnexpectedToken(current.Span(), current.Kind(), kind)
+    p.ReportUnexpectedToken(SyntaxNodeToTextSpan(current), current.Kind(), kind)
 
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
