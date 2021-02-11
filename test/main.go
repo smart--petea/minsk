@@ -50,7 +50,7 @@ func main() {
 
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
-            PrettyPrint(syntaxTree.Root, "", true)
+            Syntax.WriteTo(os.Stdout, syntaxTree.Root)
             Console.ResetColour()
         } 
 
@@ -81,44 +81,4 @@ func main() {
             }
         } 
     }
-}
-
-func PrettyPrint(node Syntax.SyntaxNode, indent string, isLast bool) {
-    if fmt.Sprintf("%v", node) == "<nil>" {
-        return
-    }
-
-    var marker string
-    if isLast {
-        marker = "└─"
-    } else {
-        marker = "├─"
-    }
-
-    fmt.Printf("%s%s%s", indent, marker, node.Kind())
-
-    if node.Value() != nil {
-        fmt.Print(" ")
-        fmt.Print(node.Value())
-    }
-    fmt.Printf("\n")
-
-    if isLast {
-        indent = indent + "    "
-    } else {
-        indent = indent + "│   "
-    }
-
-    var nextChild, prevChild Syntax.SyntaxNode
-    var ok bool
-    children := node.GetChildren()
-    prevChild, ok = <-children 
-    for ok {
-        nextChild, ok = <-children
-        if ok {
-            PrettyPrint(prevChild, indent, false)
-            prevChild = nextChild
-        }
-    }
-    PrettyPrint(prevChild, indent, true)
 }
