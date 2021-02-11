@@ -3,7 +3,7 @@ package Syntax
 import (
     "io"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
-    "minsk/Util"
+    "minsk/CodeAnalysis/Text"
     "fmt"
     "strings"
 )
@@ -14,9 +14,9 @@ type SyntaxNode interface {
     GetChildren() <-chan SyntaxNode 
 }
 
-func SyntaxNodeToTextSpan(sn SyntaxNode) *Util.TextSpan {
+func SyntaxNodeToTextSpan(sn SyntaxNode) *Text.TextSpan {
     if syntaxToken, ok := sn.(*SyntaxToken); ok {
-        return Util.NewTextSpan(syntaxToken.Position, len(syntaxToken.Runes)) 
+        return Text.NewTextSpan(syntaxToken.Position, len(syntaxToken.Runes)) 
     }
 
     children := sn.GetChildren()
@@ -26,7 +26,7 @@ func SyntaxNodeToTextSpan(sn SyntaxNode) *Util.TextSpan {
 
     start := SyntaxNodeToTextSpan(first).Start
     end := SyntaxNodeToTextSpan(last).End()
-    return Util.NewTextSpan(start, end) 
+    return Text.NewTextSpan(start, end) 
 }
 
 func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast bool) {

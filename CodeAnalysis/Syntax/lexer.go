@@ -7,6 +7,7 @@ import (
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util"
 )
 
@@ -151,7 +152,7 @@ func (l *Lexer) ReadNumberToken() {
     runes := l.Runes[l.start: l.start + length]
     value, err := strconv.Atoi(string(runes))
     if err != nil {
-        l.ReportInvalidNumber(Util.NewTextSpan(l.start, length), runes, reflect.Int)
+        l.ReportInvalidNumber(Text.NewTextSpan(l.start, length), runes, reflect.Int)
     }
 
     l.value = value

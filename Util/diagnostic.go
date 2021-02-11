@@ -1,11 +1,15 @@
 package Util
 
+import (
+    "minsk/CodeAnalysis/Text"
+)
+
 type Diagnostic struct {
-    Span *TextSpan
+    Span *Text.TextSpan
     Message string
 }
 
-func NewDiagnostic(span *TextSpan, message string) *Diagnostic {
+func NewDiagnostic(span *Text.TextSpan, message string) *Diagnostic {
     return &Diagnostic{
         Span: span, 
         Message: message,

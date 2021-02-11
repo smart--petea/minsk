@@ -1,4 +1,4 @@
-package Util
+package Text
 
 type TextSpan struct {
     Start int
