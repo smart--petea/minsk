@@ -19,11 +19,12 @@ type Lexer struct {
     start int
     kind SyntaxKind.SyntaxKind
     value interface{}
+    text  *SourceText
 }
 
-func NewLexer(runes []rune) *Lexer {
+func NewLexer(text *SourceText) *Lexer {
     return &Lexer{
-        Runes: runes,
+        Text: text,
     }
 }
 

@@ -16,6 +16,12 @@ func NewTextLine(text *SourceText, start, length, lengthIncludingLineBreak) *Tex
     }
 }
 
+func (tl *TextLine) String() string {
+    start := tl.Start
+    end := tl.Start + tl.Length
+    return tl.Text.String()[start:end]
+}
+
 func (tl *TextLine) End() int {
     return tl.Start + tl.Length
 }

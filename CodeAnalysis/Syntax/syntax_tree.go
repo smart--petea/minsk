@@ -13,7 +13,9 @@ type SyntaxTree struct {
 }
 
 func ParseSyntaxTree(text string) *SyntaxTree {
-    parser := NewParser(text)
+    sourceText := SourceTextFrom(text)
+
+    parser := NewParser(sourceText)
     rootExpression, endOfFileToken := parser.Parse()
 
     syntaxTree := &SyntaxTree {

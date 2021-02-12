@@ -26,8 +26,8 @@ func (p *Parser) Current() *SyntaxToken {
     return p.Peek(0)
 }
 
-func NewParser(text string) *Parser {
-    lexer := NewLexer([]rune(text))
+func NewParser(text SourceText) *Parser {
+    lexer := NewLexer(text)
     var token *SyntaxToken
     var tokens []SyntaxToken
 
