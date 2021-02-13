@@ -14,17 +14,16 @@ import (
 type Lexer struct {
     Util.DiagnosticBag 
 
-    Runes []rune
     Position int
     start int
     kind SyntaxKind.SyntaxKind
     value interface{}
-    text  *SourceText
+    text  *Text.SourceText
 }
 
-func NewLexer(text *SourceText) *Lexer {
+func NewLexer(text *Text.SourceText) *Lexer {
     return &Lexer{
-        Text: text,
+        text: text,
     }
 }
 
@@ -39,11 +38,11 @@ func (l *Lexer) Lookahead() rune {
 func (l *Lexer) Peek(offset int) rune {
     index := l.Position + offset
 
-    if index >= len(l.Runes) {
+    if index >= l.text.Length() {
         return '\x00'
     }
 
-    return l.Runes[index]
+    return l.text.GetRune(index)
 }
 
 func (l *Lexer) Next() {
@@ -136,7 +135,7 @@ func (l *Lexer) Lex() *SyntaxToken {
     var runes []rune
     text := SyntaxFacts.GetText(l.kind)
     if text == "" {
-        runes = l.Runes[l.start:l.Position]
+        runes = l.text.GetRunes(l.start,l.Position)
     } else {
         runes = []rune(text)
     }
@@ -150,7 +149,7 @@ func (l *Lexer) ReadNumberToken() {
     }
 
     length := l.Position - l.start 
-    runes := l.Runes[l.start: l.start + length]
+    runes := l.text.GetRunes(l.start, l.start + length)
     value, err := strconv.Atoi(string(runes))
     if err != nil {
         l.ReportInvalidNumber(Text.NewTextSpan(l.start, length), runes, reflect.Int)
@@ -173,6 +172,6 @@ func (l *Lexer) ReadIdentifierOrKeyword() {
         l.Next()
     }
 
-    runes := l.Runes[l.start: l.Position]
+    runes := l.text.GetRunes(l.start, l.Position)
     l.kind = SyntaxFacts.GetKeywordKind(string(runes))
 }

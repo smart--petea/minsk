@@ -3,6 +3,7 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util"
 )
 
@@ -26,7 +27,7 @@ func (p *Parser) Current() *SyntaxToken {
     return p.Peek(0)
 }
 
-func NewParser(text SourceText) *Parser {
+func NewParser(text *Text.SourceText) *Parser {
     lexer := NewLexer(text)
     var token *SyntaxToken
     var tokens []SyntaxToken

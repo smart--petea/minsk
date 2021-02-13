@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util"
 )
 
@@ -13,7 +14,7 @@ type SyntaxTree struct {
 }
 
 func ParseSyntaxTree(text string) *SyntaxTree {
-    sourceText := SourceTextFrom(text)
+    sourceText := Text.SourceTextFrom(text)
 
     parser := NewParser(sourceText)
     rootExpression, endOfFileToken := parser.Parse()
@@ -29,7 +30,8 @@ func ParseSyntaxTree(text string) *SyntaxTree {
 }
 
 func ParseTokens(text string) (tokens []*SyntaxToken) {
-    lexer := NewLexer([]rune(text))
+    sourceText := Text.SourceTextFrom(text)
+    lexer := NewLexer(sourceText)
 
     for {
         token := lexer.Lex()

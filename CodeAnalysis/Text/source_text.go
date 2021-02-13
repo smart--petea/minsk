@@ -1,21 +1,26 @@
 package Text
 
 type SourceText struct{
-    Lines []*TextLine
-    Text string
+    lines []*TextLine
+    text string
     runes []rune
 }
 
 func newSourceText(text string) *SourceText {
-    return &SourceText{
-        lines: ParseLines(text),
-        Text: text,
-        runes: []rune(text)
+    sourceText := &SourceText{
+        runes: []rune(text),
     }
+    sourceText.lines = ParseLines(sourceText)
+
+    return sourceText
 }
 
 func (st *SourceText) GetRune(index int) rune {
     return st.runes[index]
+}
+
+func (st *SourceText) GetRunes(left, right int) []rune {
+    return st.runes[left:right]
 }
 
 func (st *SourceText) Length() int {
@@ -26,16 +31,19 @@ func SourceTextFrom(text string) *SourceText {
     return newSourceText(text)
 }
 
-func ParseLines(sourceText *SourceText, text string) []*TextLine {
+func ParseLines(sourceText *SourceText) []*TextLine {
     var result []*TextLine
 
     var position, lineStart int
-    for position < len(text) {
-        lineBreakWidth := GetLineBreakWidth(text, position)
+    for position < len(sourceText.runes) {
+        lineBreakWidth := GetLineBreakWidth(sourceText.runes, position)
         if lineBreakWidth == 0 {
             position += 1
         } else {
-            AddLine(&result, sourceText, position, lineStart, lineBreakWidth)
+            lineLength := position - lineStart
+            lineLengthIncludingLineBreak := lineLength + lineBreakWidth
+            line := NewTextLine(sourceText, lineStart, lineLength, lineLengthIncludingLineBreak)
+            result = append(result, line)
 
             position += lineBreakWidth
             lineStart = position
@@ -43,7 +51,9 @@ func ParseLines(sourceText *SourceText, text string) []*TextLine {
     }
 
     if position > lineStart {
-        AddLine(&result, sourceText, position, lineStart, 0)
+        lineLength := position - lineStart
+        line := NewTextLine(sourceText, lineStart, lineLength, 0)
+        result = append(result, line)
     }
 
     return result
@@ -51,11 +61,11 @@ func ParseLines(sourceText *SourceText, text string) []*TextLine {
 
 func (st *SourceText) GetLineIndex(position int) int {
     lower := 0;
-    upper := len(st.Text) - 1
+    upper := len(st.text) - 1
 
     for lower <= upper {
         index := lower + (upper - lower) / 2
-        start := st.Lines[index].Start
+        start := st.lines[index].Start
 
         if position == start {
             return index
@@ -72,23 +82,15 @@ func (st *SourceText) GetLineIndex(position int) int {
 }
 
 func (st *SourceText) String() string {
-    return st.Text
+    return st.text
 }
 
-func AddLine(result *[]*TextLine, sourceText *SourceText, position, lineStart, lineBreakWidth int) {
-    lineLength = position - lineStart
-    lineLengthIncludingLineBreak = lineLength + lineBreakWidth
-    line := NewTextLine(sourceText, lineStart, lineLength, lineLengthIncludingLineBreak)
+func GetLineBreakWidth(runes []rune, i int) int {
+    c := runes[i]
 
-    (*result) = append((*result), line)
-}
-
-func GetLineBreakWidth(text string, i int) int {
-    c := text[i]
-
-    l := '\0'
-    if (i + 1) > len(text) {
-        l := text[i+1]
+    l := '\x00'
+    if (i + 1) > len(runes) {
+        l = runes[i+1]
     }
 
     if c == '\r' && l == '\n' {

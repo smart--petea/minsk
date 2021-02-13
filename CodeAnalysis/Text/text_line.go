@@ -7,7 +7,7 @@ type TextLine struct {
         LengthIncludingLineBreak int
 }
 
-func NewTextLine(text *SourceText, start, length, lengthIncludingLineBreak) *TextLine {
+func NewTextLine(text *SourceText, start, length, lengthIncludingLineBreak int) *TextLine {
     return &TextLine{
         Text: text, 
         Start: start, 
