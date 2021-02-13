@@ -11,6 +11,7 @@ type SyntaxTree struct {
 
     Root ExpressionSyntax
     EndOfFileToken *SyntaxToken
+    Text *Text.SourceText
 }
 
 func ParseSyntaxTree(text string) *SyntaxTree {
@@ -22,6 +23,7 @@ func ParseSyntaxTree(text string) *SyntaxTree {
     syntaxTree := &SyntaxTree {
         Root: rootExpression,
         EndOfFileToken: endOfFileToken,
+        Text: sourceText,
     }
 
     syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())

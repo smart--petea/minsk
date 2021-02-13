@@ -1,7 +1,7 @@
 package Text
 
 type SourceText struct{
-    lines []*TextLine
+    Lines []*TextLine
     text string
     runes []rune
 }
@@ -10,7 +10,7 @@ func newSourceText(text string) *SourceText {
     sourceText := &SourceText{
         runes: []rune(text),
     }
-    sourceText.lines = ParseLines(sourceText)
+    sourceText.Lines = ParseLines(sourceText)
 
     return sourceText
 }
@@ -61,17 +61,16 @@ func ParseLines(sourceText *SourceText) []*TextLine {
 
 func (st *SourceText) GetLineIndex(position int) int {
     lower := 0;
-    upper := len(st.text) - 1
+    upper := len(st.Lines) - 1
 
     for lower <= upper {
         index := lower + (upper - lower) / 2
-        start := st.lines[index].Start
 
-        if position == start {
+        if position >= st.Lines[index].Start && position < st.Lines[index].End() {
             return index
         }
 
-        if start > position {
+        if st.Lines[index].Start > position {
             upper = index - 1
         } else {
             lower = index + 1

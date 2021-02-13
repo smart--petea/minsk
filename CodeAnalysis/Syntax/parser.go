@@ -12,6 +12,7 @@ type Parser struct {
 
     Tokens []SyntaxToken
     Position int
+    Text *Text.SourceText
 }
 
 func (p *Parser) Peek(offset int) *SyntaxToken {
@@ -52,6 +53,7 @@ func NewParser(text *Text.SourceText) *Parser {
     }
 
     parser := &Parser{
+        Text: text,
         Tokens: tokens,
     }
 

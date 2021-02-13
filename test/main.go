@@ -57,9 +57,15 @@ func main() {
         if len(result.Diagnostics) == 0  {
             fmt.Println(result.Value)
         } else {
+            text := syntaxTree.Text
 
             for _, diagnostic := range result.Diagnostics {
+                lineIndex := text.GetLineIndex(diagnostic.Span.Start)
+                lineNumber := lineIndex + 1
+                character := diagnostic.Span.Start - text.Lines[lineIndex].Start + 1
+
                 Console.ForegroundColour(Console.COLOUR_RED)
+                fmt.Printf("(%d, %d): ", lineNumber, character)
                 fmt.Println(diagnostic)
                 Console.ResetColour()
 
