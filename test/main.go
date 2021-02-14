@@ -9,6 +9,7 @@ import (
 
     CA "minsk/CodeAnalysis"
     "minsk/CodeAnalysis/Syntax"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util/Console"
     "minsk/Util"
 )
@@ -17,34 +18,49 @@ func main() {
     reader := bufio.NewReader(os.Stdin)
     var showTree bool
     variables := make(map[*Util.VariableSymbol]interface{})
+    var textBuilder strings.Builder
 
     for {
-        fmt.Print("> ")
-        line, err := reader.ReadString('\n')
+        if textBuilder.Len() == 0 {
+            fmt.Print("> ")
+        } else {
+            fmt.Print("| ")
+        }
+
+        input, err := reader.ReadString('\n')
         if err != nil {
             log.Fatal(err)
         }
+        isBlank := len(strings.TrimSpace(input)) == 0
 
-        line = strings.TrimSpace(line)
-        if len(line) == 0 {
-            os.Exit(0)
-        }
-
-        if line == "#showTree" {
-            showTree = !showTree
-            if showTree {
-                fmt.Println("Showing parse trees.")
-            } else {
-                fmt.Println("Not showing parse trees")
+        if textBuilder.Len() == 0 {
+            if isBlank {
+                break
             }
 
-            continue
-        } else if line == "#cls" {
-            Console.Clear()
+            if strings.TrimSpace(input) == "#showTree" {
+                showTree = !showTree
+                if showTree {
+                    fmt.Println("Showing parse trees.")
+                } else {
+                    fmt.Println("Not showing parse trees")
+                }
+
+                continue
+            } else if strings.TrimSpace(input) == "#cls" {
+                Console.Clear()
+                continue
+            }
+        }
+
+        textBuilder.WriteString(input)
+        text := textBuilder.String()
+
+        syntaxTree := Syntax.ParseSyntaxTree(text)
+        if !isBlank && len(syntaxTree.GetDiagnostics()) > 0 {
             continue
         }
 
-        syntaxTree := Syntax.ParseSyntaxTree(line)
         compilation := CA.NewCompilation(syntaxTree)
         result := compilation.Evaluate(variables)
 
@@ -57,22 +73,23 @@ func main() {
         if len(result.Diagnostics) == 0  {
             fmt.Println(result.Value)
         } else {
-            text := syntaxTree.Text
-
             for _, diagnostic := range result.Diagnostics {
-                lineIndex := text.GetLineIndex(diagnostic.Span.Start)
+                lineIndex := syntaxTree.Text.GetLineIndex(diagnostic.Span.Start)
                 lineNumber := lineIndex + 1
-                character := diagnostic.Span.Start - text.Lines[lineIndex].Start + 1
+                line := syntaxTree.Text.Lines[lineIndex]
+                character := diagnostic.Span.Start - line.Start + 1
 
                 Console.ForegroundColour(Console.COLOUR_RED)
                 fmt.Printf("(%d, %d): ", lineNumber, character)
                 fmt.Println(diagnostic)
                 Console.ResetColour()
 
-                span := diagnostic.Span
-                prefix := line[:span.Start]
-                errorStr := line[span.Start: span.End()]
-                suffix := line[span.End():]
+                prefixSpan := Text.NewTextSpan(line.Start,diagnostic.Span.Start - line.Start)
+                suffixSpan := Text.NewTextSpan(diagnostic.Span.End(),line.End() - diagnostic.Span.End())
+
+                prefix := syntaxTree.Text.StringBySpan(prefixSpan)
+                errorStr := syntaxTree.Text.StringBySpan(diagnostic.Span)
+                suffix := syntaxTree.Text.StringBySpan(suffixSpan)
 
                 fmt.Printf("    ")
                 fmt.Printf("%s", prefix)
@@ -85,6 +102,8 @@ func main() {
 
                 fmt.Println()
             }
-        } 
+        }
+
+        textBuilder.Reset()
     }
 }

@@ -2,7 +2,6 @@ package Text
 
 type SourceText struct{
     Lines []*TextLine
-    text string
     runes []rune
 }
 
@@ -81,7 +80,7 @@ func (st *SourceText) GetLineIndex(position int) int {
 }
 
 func (st *SourceText) String() string {
-    return st.text
+    return string(st.runes)
 }
 
 func GetLineBreakWidth(runes []rune, i int) int {
@@ -101,4 +100,8 @@ func GetLineBreakWidth(runes []rune, i int) int {
     }
 
     return 0
+}
+
+func (st *SourceText) StringBySpan(span *TextSpan) string {
+    return st.String()[span.Start:span.End()]
 }
