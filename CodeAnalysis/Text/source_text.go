@@ -49,7 +49,7 @@ func ParseLines(sourceText *SourceText) []*TextLine {
         }
     }
 
-    if position > lineStart {
+    if position >= lineStart {
         lineLength := position - lineStart
         line := NewTextLine(sourceText, lineStart, lineLength, 0)
         result = append(result, line)
