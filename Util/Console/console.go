@@ -8,8 +8,12 @@ type Colour string
 
 const (
     COLOUR_DARK_RED Colour = "[31m"
-    COLOUR_WHITE Colour = "[37m"
     COLOUR_RED Colour = "[31m"
+    COLOUR_GREEN Colour = "[32m"
+    COLOUR_BLUE Colour = "[34m"
+    COLOUR_MAGENTA Colour = "[35m"
+    COLOUR_CYAN Colour = "[36m"
+    COLOUR_WHITE Colour = "[37m"
     COLOUR_GRAY Colour = "[90m"
 )
 

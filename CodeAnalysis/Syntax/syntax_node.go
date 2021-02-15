@@ -2,10 +2,13 @@ package Syntax
 
 import (
     "io"
-    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
-    "minsk/CodeAnalysis/Text"
+    "os"
     "fmt"
     "strings"
+
+    "minsk/Util/Console"
+    "minsk/CodeAnalysis/Text"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type SyntaxNode interface {
@@ -30,6 +33,7 @@ func SyntaxNodeToTextSpan(sn SyntaxNode) *Text.TextSpan {
 }
 
 func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast bool) {
+    isToConsole := (writer == os.Stdout)
     if fmt.Sprintf("%v", node) == "<nil>" {
         return
     }
@@ -41,10 +45,27 @@ func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast 
         marker = "├─"
     }
 
-    s := fmt.Sprintf("%s%s%s", indent, marker, node.Kind())
-    writer.WriteString(s)
+    writer.WriteString(indent)
 
-    if node.Value() != nil {
+    if isToConsole {
+        Console.ForegroundColour(Console.COLOUR_GRAY)
+        writer.WriteString(marker)
+        Console.ResetColour()
+    }
+
+    _, isSyntaxToken := node.(*SyntaxToken) 
+    if isToConsole {
+        if isSyntaxToken {
+            Console.ForegroundColour(Console.COLOUR_BLUE)
+        } else {
+            Console.ForegroundColour(Console.COLOUR_CYAN)
+        }
+    }
+
+    kindS := fmt.Sprintf("%s", node.Kind())
+    writer.WriteString(kindS)
+
+    if isSyntaxToken && node.Value() != nil {
         var s string
         switch val := node.Value().(type) {
         case int:
@@ -54,6 +75,9 @@ func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast 
         }
 
         writer.WriteString(s)
+    }
+    if isToConsole {
+        Console.ResetColour()
     }
     writer.WriteString("\n")
 

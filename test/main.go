@@ -21,11 +21,13 @@ func main() {
     var textBuilder strings.Builder
 
     for {
+        Console.ForegroundColour(Console.COLOUR_GREEN)
         if textBuilder.Len() == 0 {
-            fmt.Print("> ")
+            fmt.Print("» ")
         } else {
-            fmt.Print("| ")
+            fmt.Print("· ")
         }
+        Console.ResetColour()
 
         input, err := reader.ReadString('\n')
         if err != nil {
@@ -71,7 +73,9 @@ func main() {
         } 
 
         if len(result.Diagnostics) == 0  {
+            Console.ForegroundColour(Console.COLOUR_MAGENTA)
             fmt.Println(result.Value)
+            Console.ResetColour()
         } else {
             for _, diagnostic := range result.Diagnostics {
                 lineIndex := syntaxTree.Text.GetLineIndex(diagnostic.Span.Start)
