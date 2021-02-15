@@ -87,7 +87,7 @@ func GetLineBreakWidth(runes []rune, i int) int {
     c := runes[i]
 
     l := '\x00'
-    if (i + 1) > len(runes) {
+    if (i + 1) < len(runes) {
         l = runes[i+1]
     }
 
