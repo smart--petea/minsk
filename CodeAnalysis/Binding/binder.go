@@ -15,11 +15,12 @@ import (
 type Binder struct {
     Util.DiagnosticBag
     _variables map[*Util.VariableSymbol]interface{}
+    scope *BoundScope
 }
 
-func NewBinder(variables map[*Util.VariableSymbol]interface{}) *Binder {
+func NewBinder(parent *BoundScope) *Binder {
     return &Binder{
-        _variables: variables,
+        scope: NewBoundScope(parent),
     }
 }
 

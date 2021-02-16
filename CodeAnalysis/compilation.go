@@ -7,27 +7,26 @@ import (
 )
 
 type Compilation struct {
-   Syntax *Syntax.SyntaxTree
+   SyntaxTree *Syntax.SyntaxTree
 }
 
-func NewCompilation(syntax *Syntax.SyntaxTree) *Compilation {
+func NewCompilation(syntaxTree *Syntax.SyntaxTree) *Compilation {
     return &Compilation{
-        Syntax: syntax,
+        SyntaxTree: syntaxTree,
     }
 }
 
 func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *EvaluationResult {
-    if len(c.Syntax.GetDiagnostics()) > 0 {
-        return NewEvaluationResult(c.Syntax.GetDiagnostics(), nil)
+    if len(c.SyntaxTree.GetDiagnostics()) > 0 {
+        return NewEvaluationResult(c.SyntaxTree.GetDiagnostics(), nil)
     }
 
-    binder := Binding.NewBinder(variables)
-    boundExpression := binder.BindExpression(c.Syntax.Root.Expression)
-    if len(binder.GetDiagnostics()) > 0 {
-        return NewEvaluationResult(binder.GetDiagnostics(), nil)
+    globalScope := Binding.BoundGlobalScopeFromCompilationUnitSyntax(c.SyntaxTree.Root)
+    if len(globalScope.GetDiagnostics()) > 0 {
+        return NewEvaluationResult(globalScope.GetDiagnostics(), nil)
     }
 
-    evaluator := NewEvaluator(boundExpression, variables)
+    evaluator := NewEvaluator(globalScope.Expression, variables)
     value := evaluator.Evaluate()
     return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }
