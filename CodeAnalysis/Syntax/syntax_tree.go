@@ -9,26 +9,26 @@ import (
 type SyntaxTree struct {
     Util.DiagnosticBag
 
-    Root ExpressionSyntax
-    EndOfFileToken *SyntaxToken
+    Root *CompilationUnitSyntax
     Text *Text.SourceText
+}
+
+func newSyntaxTree(sourceText *Text.SourceText) *SyntaxTree {
+    parser := NewParser(sourceText)
+    root := parser.ParseCompilationUnit()
+
+    syntaxTree := &SyntaxTree {
+        Root: root,
+        Text: sourceText,
+    }
+    syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())
+
+    return syntaxTree
 }
 
 func ParseSyntaxTree(text string) *SyntaxTree {
     sourceText := Text.SourceTextFrom(text)
-
-    parser := NewParser(sourceText)
-    rootExpression, endOfFileToken := parser.Parse()
-
-    syntaxTree := &SyntaxTree {
-        Root: rootExpression,
-        EndOfFileToken: endOfFileToken,
-        Text: sourceText,
-    }
-
-    syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())
-
-    return syntaxTree
+    return newSyntaxTree(sourceText)
 }
 
 func ParseTokens(text string) (tokens []*SyntaxToken) {

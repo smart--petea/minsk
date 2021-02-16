@@ -49,9 +49,9 @@ func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast 
 
     if isToConsole {
         Console.ForegroundColour(Console.COLOUR_GRAY)
-        writer.WriteString(marker)
-        Console.ResetColour()
     }
+    writer.WriteString(marker)
+    Console.ResetColour()
 
     _, isSyntaxToken := node.(*SyntaxToken) 
     if isToConsole {

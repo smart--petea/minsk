@@ -22,7 +22,7 @@ func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *
     }
 
     binder := Binding.NewBinder(variables)
-    boundExpression := binder.BindExpression(c.Syntax.Root)
+    boundExpression := binder.BindExpression(c.Syntax.Root.Expression)
     if len(binder.GetDiagnostics()) > 0 {
         return NewEvaluationResult(binder.GetDiagnostics(), nil)
     }

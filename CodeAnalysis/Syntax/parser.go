@@ -61,12 +61,11 @@ func NewParser(text *Text.SourceText) *Parser {
     return parser
 }
 
-func (p *Parser) Parse() (ExpressionSyntax, *SyntaxToken) {
-    var rootExpression ExpressionSyntax = p.ParseExpression()
-
+func (p *Parser) ParseCompilationUnit() *CompilationUnitSyntax {
+    expression  := p.ParseExpression()
     endOfFileToken := p.MatchToken(SyntaxKind.EndOfFileToken)
 
-    return rootExpression, endOfFileToken
+    return NewCompilationUnitSyntax(expression, endOfFileToken)
 }
 
 func (p *Parser) NextToken() *SyntaxToken {

@@ -24,6 +24,9 @@ const (
     TrueKeyword SyntaxKind = "TrueKeyword"
     FalseKeyword SyntaxKind = "FalseKeyword"
 
+    //Nodes
+    CompilationUnit SyntaxKind = "CompilationUnit"
+
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 
     BinaryExpression SyntaxKind = "BinaryExpression" 
