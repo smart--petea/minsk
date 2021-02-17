@@ -13,8 +13,8 @@ import (
 )
 
 type Binder struct {
-    Util.DiagnosticBag
-    _variables map[*Util.VariableSymbol]interface{}
+    Util.DiagnosticBag 
+
     scope *BoundScope
 }
 
@@ -55,16 +55,11 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
 
-    var variable *Util.VariableSymbol
-    for variable, _ = range b._variables {
-        if variable.Name == name {
-            delete(b._variables, variable)
-            break
-        }
+    variable := Util.NewVariableSymbol(name, boundExpression.GetType())
+    if b.scope.TryDeclare(variable) == false {
+        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.IdentifierToken)
+        b.ReportVariableAlreadyDeclared(span, name)
     }
-
-    variable = Util.NewVariableSymbol(name, boundExpression.GetType())
-    b._variables[variable] = nil
 
     return NewBoundAssignmentExpression(variable, boundExpression)
 }
@@ -73,10 +68,9 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
-    for variable, _ := range b._variables {
-        if variable.Name == name {
-            return NewBoundVariableExpression(variable)
-        }
+    var variable *Util.VariableSymbol
+    if b.scope.TryLookup(name, &variable) {
+        return NewBoundVariableExpression(variable)
     }
 
     span := Syntax.SyntaxNodeToTextSpan(nameExpressionSyntax.IdentifierToken)
