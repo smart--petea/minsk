@@ -4,7 +4,6 @@ import (
     "testing"
     "minsk/CodeAnalysis/Syntax"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
-    "fmt"
 )
 
 type AssertingEnumerator struct {
@@ -21,7 +20,6 @@ func NewAssertingEnumerator(node Syntax.SyntaxNode, t *testing.T) *AssertingEnum
 
 func (ae *AssertingEnumerator) AssertToken(kind SyntaxKind.SyntaxKind, text string) {
     if current, isOpen := <- ae.enumerator; isOpen {
-        fmt.Printf("AssertToken %+v %+v\n", current, current.Kind())
         var token *Syntax.SyntaxToken
         var ok bool
         if token, ok = current.(*Syntax.SyntaxToken); !ok {
@@ -44,7 +42,6 @@ func (ae *AssertingEnumerator) AssertToken(kind SyntaxKind.SyntaxKind, text stri
 
 func (ae *AssertingEnumerator) AssertNode(kind SyntaxKind.SyntaxKind) {
     if current, isChanOpen := <- ae.enumerator; isChanOpen {
-        fmt.Printf("AssertNode %+v %+v\n", current, current.Kind())
         if _, ok := current.(*Syntax.SyntaxToken); ok {
             ae.t.Errorf("current should not be a SyntaxToken")
         }

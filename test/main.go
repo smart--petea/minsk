@@ -19,6 +19,7 @@ func main() {
     var showTree bool
     variables := make(map[*Util.VariableSymbol]interface{})
     var textBuilder strings.Builder
+    var previous *CA.Compilation
 
     for {
         Console.ForegroundColour(Console.COLOUR_GREEN)
@@ -63,7 +64,13 @@ func main() {
             continue
         }
 
-        compilation := CA.NewCompilation(syntaxTree)
+        var compilation *CA.Compilation
+        if previous == nil {
+            compilation = CA.NewCompilation(syntaxTree)
+        } else {
+            compilation = previous.ContinueWith(syntaxTree)
+        }
+
         result := compilation.Evaluate(variables)
 
         if showTree {
@@ -76,6 +83,8 @@ func main() {
             Console.ForegroundColour(Console.COLOUR_MAGENTA)
             fmt.Println(result.Value)
             Console.ResetColour()
+
+            previous = compilation
         } else {
             for _, diagnostic := range result.Diagnostics {
                 lineIndex := syntaxTree.Text.GetLineIndex(diagnostic.Span.Start)

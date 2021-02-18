@@ -5,6 +5,7 @@ import (
     "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/CodeAnalysis/Syntax"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/Util"
     "fmt"
 )
 
@@ -106,12 +107,12 @@ func TestParserUnaryExpressionHonorsPrecedences(t *testing.T) {
 func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
     out := make(chan Syntax.SyntaxNode)
 
-    var stack syntaxNodeStack
-    stack.Push(node)
+    stack := Util.NewStack()
+    stack.Push(interface{}(node))
 
     go func() {
         for stack.Count() > 0 {
-            n := stack.Pop()
+            n := stack.Pop().(Syntax.SyntaxNode)
             out<-n
 
             var children []Syntax.SyntaxNode
@@ -120,7 +121,7 @@ func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
             }
 
             for i := len(children)-1; i >= 0; i = i - 1 {
-                stack.Push(children[i])
+                stack.Push(interface{}(children[i]))
             }
         }
 
