@@ -69,3 +69,9 @@ func (db *DiagnosticBag) ReportVariableAlreadyDeclared(span *Text.TextSpan, name
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportCannotConvert(span *Text.TextSpan, fromType, toType reflect.Kind) {
+    message := fmt.Sprintf("Cannot convert type '%s' to '%s'.", fromType, toType)
+
+    db.report(span, message)
+}

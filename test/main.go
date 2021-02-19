@@ -53,6 +53,9 @@ func main() {
             } else if strings.TrimSpace(input) == "#cls" {
                 Console.Clear()
                 continue
+            } else if strings.TrimSpace(input) == "#reset" {
+                previous = nil
+                continue
             }
         }
 

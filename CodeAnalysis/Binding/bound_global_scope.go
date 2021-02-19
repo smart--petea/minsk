@@ -28,6 +28,9 @@ func BoundGlobalScopeFromCompilationUnitSyntax(previous *BoundGlobalScope, synta
 
     boundGlobalScope := NewBoundGlobalScope(previous, variables, expression)
     boundGlobalScope.AddDiagnosticsRange(binder.GetDiagnostics())
+    if previous != nil {
+        boundGlobalScope.AddDiagnosticsRange(previous.GetDiagnostics())
+    }
 
     return boundGlobalScope
 }

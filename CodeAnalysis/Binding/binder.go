@@ -55,10 +55,16 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
 
-    variable := Util.NewVariableSymbol(name, boundExpression.GetType())
-    if b.scope.TryDeclare(variable) == false {
+    var variable *Util.VariableSymbol
+    if b.scope.TryLookup(name, &variable) == false {
+        variable = Util.NewVariableSymbol(name, boundExpression.GetType())
+        b.scope.TryDeclare(variable)
+    }
+
+    if boundExpression.GetType() != variable.Type {
         span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.IdentifierToken)
-        b.ReportVariableAlreadyDeclared(span, name)
+        b.ReportCannotConvert(span, boundExpression.GetType(), variable.Type)
+        return boundExpression
     }
 
     return NewBoundAssignmentExpression(variable, boundExpression)
