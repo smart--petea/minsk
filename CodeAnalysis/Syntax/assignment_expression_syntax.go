@@ -6,6 +6,7 @@ import (
 
 type AssignmentExpressionSyntax struct {
     *syntaxNodeChildren
+
     IdentifierToken *SyntaxToken
     EqualsToken *SyntaxToken
     Expression ExpressionSyntax
@@ -18,6 +19,7 @@ func (a *AssignmentExpressionSyntax) Value() interface{} {
 func NewAssignmentExpressionSyntax(identifierToken *SyntaxToken, equalsToken *SyntaxToken, expression ExpressionSyntax) *AssignmentExpressionSyntax {
     return &AssignmentExpressionSyntax{
         syntaxNodeChildren: newSyntaxNodeChildren(identifierToken, equalsToken, expression),
+
         IdentifierToken: identifierToken,
         EqualsToken: equalsToken,
         Expression: expression,

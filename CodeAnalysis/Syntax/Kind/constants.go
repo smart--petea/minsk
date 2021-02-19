@@ -27,6 +27,10 @@ const (
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
 
+    //Statements
+    BlockStatements SyntaxKind = "BlockStatements"
+    ExpressionStatement SyntaxKind = "ExpressionStatement"
+
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 
     BinaryExpression SyntaxKind = "BinaryExpression" 

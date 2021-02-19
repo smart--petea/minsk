@@ -6,6 +6,7 @@ import (
 
 type CompilationUnitSyntax struct {
     *syntaxNodeChildren
+
     Expression ExpressionSyntax
     EndOfFileToken *SyntaxToken
 }
@@ -13,6 +14,7 @@ type CompilationUnitSyntax struct {
 func NewCompilationUnitSyntax(expression ExpressionSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
         syntaxNodeChildren: newSyntaxNodeChildren(expression),
+
         Expression: expression,
         EndOfFileToken: endOfFileToken,
     }
