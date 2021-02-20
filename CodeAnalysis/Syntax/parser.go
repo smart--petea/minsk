@@ -62,10 +62,10 @@ func NewParser(text *Text.SourceText) *Parser {
 }
 
 func (p *Parser) ParseCompilationUnit() *CompilationUnitSyntax {
-    expression  := p.ParseExpression()
+    statement  := p.ParseStatement()
     endOfFileToken := p.MatchToken(SyntaxKind.EndOfFileToken)
 
-    return NewCompilationUnitSyntax(expression, endOfFileToken)
+    return NewCompilationUnitSyntax(statement, endOfFileToken)
 }
 
 func (p *Parser) NextToken() *SyntaxToken {
@@ -183,4 +183,30 @@ func (p *Parser) ParseBinaryExpression(parentPrecedence int) ExpressionSyntax {
     }
 
     return left
+}
+
+func (p *Parser) ParseStatement() StatementSyntax {
+    if p.Current().Kind() == SyntaxKind.OpenBraceToken {
+        return p.ParseBlockStatement()
+    }
+
+    return p.ParseExpressionStatement()
+}
+
+func (p *Parser) ParseBlockStatement() BlockStatementSyntax {
+    var statements []StatementSyntax
+
+    openBraceToken := p.MatchToken(SyntaxKind.OpenBraceToken)
+    for p.Current().Kind() != SyntaxKind.EndOfFileToken && p.Current().Kind() != SyntaxKind.CloseBraceToken {
+        statement := p.ParseStatement()
+        statements = append(statements, statement)
+    }
+    closeBraceToken := p.MatchToken(SyntaxKind.CloseBraceToken)
+
+    return NewBlockStatementSyntax(openBraceToken, statements, closeBraceToken)
+}
+
+func (p *Parser) ParseExpressionStatement() StatementSyntax {
+    expression := p.ParseExpression()
+    return NewExpressionStatementSyntax(expression)
 }

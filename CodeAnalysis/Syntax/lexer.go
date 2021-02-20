@@ -79,6 +79,14 @@ func (l *Lexer) Lex() *SyntaxToken {
         l.Next()
         l.kind = SyntaxKind.OpenParenthesisToken
 
+    case '{':
+        l.Next()
+        l.kind = SyntaxKind.OpenBraceToken
+
+    case '}':
+        l.Next()
+        l.kind = SyntaxKind.CloseBraceToken
+
     case ')':
         l.Next()
         l.kind = SyntaxKind.CloseParenthesisToken

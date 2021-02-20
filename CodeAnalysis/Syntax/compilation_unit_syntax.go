@@ -7,15 +7,15 @@ import (
 type CompilationUnitSyntax struct {
     *syntaxNodeChildren
 
-    Expression ExpressionSyntax
+    statement StatementSyntax
     EndOfFileToken *SyntaxToken
 }
 
-func NewCompilationUnitSyntax(expression ExpressionSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
+func NewCompilationUnitSyntax(statement StatementSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
         syntaxNodeChildren: newSyntaxNodeChildren(expression),
 
-        Expression: expression,
+        Statement: statement,
         EndOfFileToken: endOfFileToken,
     }
 }
@@ -25,5 +25,5 @@ func (c *CompilationUnitSyntax) Kind() SyntaxKind.SyntaxKind {
 }
 
 func (c *CompilationUnitSyntax) Value() interface{} {
-    return c.Expression.Value()
+    return c.Statement.Value()
 }

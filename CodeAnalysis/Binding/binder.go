@@ -24,6 +24,19 @@ func NewBinder(parent *BoundScope) *Binder {
     }
 }
 
+func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
+    switch syntax.Kind() {
+    case SyntaxKind.BlockStatement:
+        return b.BindBlockStatement(syntax)
+
+    case SyntaxKind.ExpressionStatement:
+        return b.BindExpressionStatement(syntax)
+
+    default:
+        panic(fmt.Sprintf("Unexpected syntax %s", syntax.Kind()))
+    }
+}
+
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     switch syntax.Kind() {
     case SyntaxKind.ParenthesizedExpression:
@@ -141,4 +154,10 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     }
 
     return NewBoundBinaryExpression(boundLeft, boundOperator, boundRight)
+}
+
+func (b *Binder) BindBlockStatement() BoundStatement {
+}
+
+func (b *Binder) BindExpressionStatement() BoundStatement {
 }
