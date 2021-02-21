@@ -38,10 +38,14 @@ func GetBinaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
 
 func GetKeywordKind(text string) SyntaxKind.SyntaxKind {
     switch text {
-    case "true":
-        return SyntaxKind.TrueKeyword
+    case "let":
+        return SyntaxKind.LetKeyword
     case "false":
         return SyntaxKind.FalseKeyword
+    case "true":
+        return SyntaxKind.TrueKeyword
+    case "var":
+        return SyntaxKind.VarKeyword
     default:
         return SyntaxKind.IdentifierToken
     }
@@ -81,6 +85,10 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return "false"
     case SyntaxKind.TrueKeyword:
         return "true"
+    case SyntaxKind.LetKeyword:
+        return "let"
+    case SyntaxKind.VarKeyword:
+        return "var"
     default:
         return ""
     }

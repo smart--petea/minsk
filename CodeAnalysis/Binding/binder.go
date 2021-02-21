@@ -29,6 +29,9 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
     case SyntaxKind.BlockStatement:
         return b.BindBlockStatement(syntax)
 
+    case SyntaxKind.VariableDeclaration:
+        return b.BindVariableDeclaration(syntax)
+
     case SyntaxKind.ExpressionStatement:
         return b.BindExpressionStatement(syntax)
 
@@ -173,4 +176,13 @@ func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundSta
     expression := b.BindExpression(expressionStatementSyntax.Expression)
 
     return NewBoundExpressionStatement(expression)
+}
+
+func (b *Binder) BindVariableDeclaration(syntax Syntax.StatementSyntax) BoundStatement {
+    variableDeclarationSyntax := (syntax).(*Syntax.VariableDeclaration)
+
+    name := variableDeclarationSyntax.Identifier.Runes
+    isReadOnly := variableDeclarationSyntax.Keyword.Kind() == SyntaxKind.LetKeyword
+    initializer := p.BindExpression(variableDeclarationSyntax.Initializer)
+    variable := NewVariableSymbol( )
 }

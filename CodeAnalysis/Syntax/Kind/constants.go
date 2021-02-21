@@ -23,14 +23,17 @@ const (
     BangEqualsToken SyntaxKind = "BangEqualsToken"
 
     //Keywords
-    TrueKeyword SyntaxKind = "TrueKeyword"
+    LetKeyword SyntaxKind = "LetKeyword"
     FalseKeyword SyntaxKind = "FalseKeyword"
+    TrueKeyword SyntaxKind = "TrueKeyword"
+    VarKeyword SyntaxKind = "VarKeyword"
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
 
     //Statements
     BlockStatement SyntaxKind = "BlockStatement"
+    VariableDeclaration SyntaxKind = "VariableDeclaration"
     ExpressionStatement SyntaxKind = "ExpressionStatement"
 
     //expressions

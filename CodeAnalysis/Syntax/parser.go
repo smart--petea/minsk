@@ -186,11 +186,29 @@ func (p *Parser) ParseBinaryExpression(parentPrecedence int) ExpressionSyntax {
 }
 
 func (p *Parser) ParseStatement() StatementSyntax {
-    if p.Current().Kind() == SyntaxKind.OpenBraceToken {
+    switch p.Current().Kind() {
+    case SyntaxKind.OpenBraceToken:
         return p.ParseBlockStatement()
+    case SyntaxKind.LetKeyword, SyntaxKind.VarKeyword:
+        return p.ParseVariableDeclaration()
+    default:
+        return p.ParseExpressionStatement()
+    }
+}
+
+func (p *Parser) ParseVariableDeclaration() VariableDeclarationSyntax {
+    var expected SyntaxKind.SyntaxKind
+    if p.Current().Kind() == SyntaxKind.LetKeyword {
+        expected = SyntaxKind.LetKeyword
+    } else {
+        expected = SyntaxKind.VarKeyword
     }
 
-    return p.ParseExpressionStatement()
+    keyword := p.MatchToken(expected)
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    equals := p.MatchToken(SyntaxKind.EqualsToken)
+    initializer := p.ParseExpression()
+    return NewVariableDeclarationSyntax(keyword, identifier, equals, initializer)
 }
 
 func (p *Parser) ParseBlockStatement() *BlockStatementSyntax {
