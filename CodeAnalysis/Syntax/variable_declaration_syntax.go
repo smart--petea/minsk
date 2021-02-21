@@ -1,11 +1,15 @@
 package Syntax
 
+import (
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+)
+
 type VariableDeclarationSyntax struct {
     *syntaxNodeChildren
 
-    Keyword SyntaxToken
-    Identifier SyntaxToken
-    EqualsToken SyntaxToken
+    Keyword *SyntaxToken
+    Identifier *SyntaxToken
+    EqualsToken *SyntaxToken
     Initializer ExpressionSyntax
 }
 
@@ -13,7 +17,7 @@ func (v *VariableDeclarationSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.VariableDeclaration
 }
 
-func NewVariableDeclarationSyntax(keyword, identifier, equalsToken  SyntaxToken, initializer ExpressionSyntax) *VariableDeclarationSyntax {
+func NewVariableDeclarationSyntax(keyword, identifier, equalsToken  *SyntaxToken, initializer ExpressionSyntax) *VariableDeclarationSyntax {
     return &VariableDeclarationSyntax{
         syntaxNodeChildren: newSyntaxNodeChildren(keyword, identifier, equalsToken, initializer),
 

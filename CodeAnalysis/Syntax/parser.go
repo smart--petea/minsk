@@ -196,7 +196,7 @@ func (p *Parser) ParseStatement() StatementSyntax {
     }
 }
 
-func (p *Parser) ParseVariableDeclaration() VariableDeclarationSyntax {
+func (p *Parser) ParseVariableDeclaration() *VariableDeclarationSyntax {
     var expected SyntaxKind.SyntaxKind
     if p.Current().Kind() == SyntaxKind.LetKeyword {
         expected = SyntaxKind.LetKeyword

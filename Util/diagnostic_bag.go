@@ -75,3 +75,9 @@ func (db *DiagnosticBag) ReportCannotConvert(span *Text.TextSpan, fromType, toTy
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportCannotAssign(span *Text.TextSpan, name string) {
+    message := fmt.Sprintf("Variable %s is read-only and cannot be assigned to.", name)
+
+    db.report(span, message)
+}

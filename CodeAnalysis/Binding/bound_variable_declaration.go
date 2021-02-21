@@ -2,14 +2,15 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundVariableDeclaration struct {
-    Variable VariableSymbol
+    Variable *Util.VariableSymbol
     Initializer BoundExpression
 }
 
-func NewBoundVariableDeclaration(variable VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
+func NewBoundVariableDeclaration(variable *Util.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
     return &BoundVariableDeclaration{
         Variable: variable,
         Initializer: initializer,

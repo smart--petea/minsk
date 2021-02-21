@@ -73,8 +73,14 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
 
     var variable *Util.VariableSymbol
     if b.scope.TryLookup(name, &variable) == false {
-        variable = Util.NewVariableSymbol(name, boundExpression.GetType())
-        b.scope.TryDeclare(variable)
+        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.IdentifierToken)
+        b.ReportUndefinedName(span, name)
+        return boundExpression
+    }
+
+    if variable.IsReadOnly {
+        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.EqualsToken)
+        b.ReportCannotAssign(span, name)
     }
 
     if boundExpression.GetType() != variable.Type {
@@ -179,10 +185,17 @@ func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundSta
 }
 
 func (b *Binder) BindVariableDeclaration(syntax Syntax.StatementSyntax) BoundStatement {
-    variableDeclarationSyntax := (syntax).(*Syntax.VariableDeclaration)
+    variableDeclarationSyntax := (syntax).(*Syntax.VariableDeclarationSyntax)
 
-    name := variableDeclarationSyntax.Identifier.Runes
+    name := string(variableDeclarationSyntax.Identifier.Runes)
     isReadOnly := variableDeclarationSyntax.Keyword.Kind() == SyntaxKind.LetKeyword
-    initializer := p.BindExpression(variableDeclarationSyntax.Initializer)
-    variable := NewVariableSymbol( )
+    initializer := b.BindExpression(variableDeclarationSyntax.Initializer)
+    variable := Util.NewVariableSymbol(name, isReadOnly, initializer.GetType())
+
+    if !b.scope.TryDeclare(variable) {
+        span := Syntax.SyntaxNodeToTextSpan(variableDeclarationSyntax.Identifier)
+        b.ReportVariableAlreadyDeclared(span, name)
+    }
+
+    return NewBoundVariableDeclaration(variable, initializer)
 }

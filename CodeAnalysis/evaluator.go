@@ -35,6 +35,8 @@ func (e *Evaluator) evaluateStatement(node Binding.BoundStatement) {
     switch node.Kind() {
         case BoundNodeKind.BlockStatement:
             e.evaluateBlockStatement(node.(*Binding.BoundBlockStatement))
+        case BoundNodeKind.VariableDeclaration:
+            e.evaluateVariableDeclaration(node.(*Binding.BoundVariableDeclaration))
         case BoundNodeKind.ExpressionStatement:
             e.evaluateExpressionStatement(node.(*Binding.BoundExpressionStatement))
         default:
@@ -138,4 +140,10 @@ func (e *Evaluator) evaluateBlockStatement(node *Binding.BoundBlockStatement) {
 
 func (e *Evaluator) evaluateExpressionStatement(node *Binding.BoundExpressionStatement) {
     e.lastValue = e.evaluateExpression(node.Expression)
+}
+
+func (e *Evaluator) evaluateVariableDeclaration(node *Binding.BoundVariableDeclaration) {
+    value := e.evaluateExpression(node.Initializer)
+    e.variables[node.Variable] = value
+    e.lastValue = value
 }
