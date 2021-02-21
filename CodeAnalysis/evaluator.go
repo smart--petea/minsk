@@ -13,19 +13,33 @@ import (
 )
 
 type Evaluator struct {
-        Root Binding.BoundExpression
-        _variables map[*Util.VariableSymbol]interface{}
+        Root Binding.BoundStatement
+        variables map[*Util.VariableSymbol]interface{}
+        lastValue interface{}
 }
 
-func NewEvaluator(root Binding.BoundExpression, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
+func NewEvaluator(root Binding.BoundStatement, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
     return &Evaluator{
         Root: root,
-        _variables: variables,
+        variables: variables,
     }
 }
 
 func (e *Evaluator) Evaluate() interface{} {
-    return e.evaluateExpression(e.Root)
+    e.evaluateStatement(e.Root)
+
+    return e.lastValue
+}
+
+func (e *Evaluator) evaluateStatement(node Binding.BoundStatement) {
+    switch node.Kind() {
+        case BoundNodeKind.BlockStatement:
+            e.evaluateBlockStatement(node.(*Binding.BoundBlockStatement))
+        case BoundNodeKind.ExpressionStatement:
+            e.evaluateExpressionStatement(node.(*Binding.BoundExpressionStatement))
+        default:
+            panic(fmt.Sprintf("Unexpected node %s", node.Kind()))
+    }
 }
 
 func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{} {
@@ -50,12 +64,12 @@ func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression)
 }
 
 func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpression) interface{} {
-    return e._variables[v.Variable]
+    return e.variables[v.Variable]
 }
 
 func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpression) interface{} {
     value := e.evaluateExpression(a.Expression)
-    e._variables[a.Variable] = value
+    e.variables[a.Variable] = value
     return value
 }
 
@@ -114,4 +128,14 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
     default:
         panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
     }
+}
+
+func (e *Evaluator) evaluateBlockStatement(node *Binding.BoundBlockStatement) {
+    for _, statement := range node.Statements {
+        e.evaluateStatement(statement)
+    }
+}
+
+func (e *Evaluator) evaluateExpressionStatement(node *Binding.BoundExpressionStatement) {
+    e.lastValue = e.evaluateExpression(node.Expression)
 }

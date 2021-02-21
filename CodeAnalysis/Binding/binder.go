@@ -156,8 +156,21 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
     return NewBoundBinaryExpression(boundLeft, boundOperator, boundRight)
 }
 
-func (b *Binder) BindBlockStatement() BoundStatement {
+func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockStatement {
+    blockStatementSyntax := (syntax).(*Syntax.BlockStatementSyntax)
+
+    var statements []BoundStatement
+    for _, statementSyntax := range blockStatementSyntax.Statements {
+        statement := b.BindStatement(statementSyntax)
+        statements = append(statements, statement)
+    }
+
+    return NewBoundBlockStatement(statements)
 }
 
-func (b *Binder) BindExpressionStatement() BoundStatement {
+func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundStatement {
+    expressionStatementSyntax := (syntax).(*Syntax.ExpressionStatementSyntax)
+    expression := b.BindExpression(expressionStatementSyntax.Expression)
+
+    return NewBoundExpressionStatement(expression)
 }

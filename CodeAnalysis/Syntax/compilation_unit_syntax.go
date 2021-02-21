@@ -7,13 +7,13 @@ import (
 type CompilationUnitSyntax struct {
     *syntaxNodeChildren
 
-    statement StatementSyntax
+    Statement StatementSyntax
     EndOfFileToken *SyntaxToken
 }
 
 func NewCompilationUnitSyntax(statement StatementSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(expression),
+        syntaxNodeChildren: newSyntaxNodeChildren(statement.(SyntaxNode)),
 
         Statement: statement,
         EndOfFileToken: endOfFileToken,

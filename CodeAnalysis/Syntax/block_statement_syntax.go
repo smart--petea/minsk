@@ -1,16 +1,27 @@
 package Syntax
 
+import (
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+)
+
 type BlockStatementSyntax struct {
     *syntaxNodeChildren
 
     OpenBraceToken *SyntaxToken
-    Statements []*StatementSyntax
+    Statements []StatementSyntax
     CloseBraceToken *SyntaxToken
 }
 
-func NewBlockStatementSyntax(openBraceToken *SyntaxToken, statements []*StatementSyntax, closeBraceToken *SyntaxToken) *BlockStatementSyntax {
+func NewBlockStatementSyntax(openBraceToken *SyntaxToken, statements []StatementSyntax, closeBraceToken *SyntaxToken) *BlockStatementSyntax {
+    var children []SyntaxNode
+    children = append(children, openBraceToken)
+    for _, statement := range statements {
+        children = append(children, statement.(SyntaxNode))
+    }
+    children = append(children, closeBraceToken)
+
     return &BlockStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(openBraceToken, statements..., closeBraceToken),
+        syntaxNodeChildren: newSyntaxNodeChildren(children...),
 
         OpenBraceToken: openBraceToken,
         Statements: statements,

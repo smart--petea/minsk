@@ -30,7 +30,7 @@ const (
     CompilationUnit SyntaxKind = "CompilationUnit"
 
     //Statements
-    BlockStatements SyntaxKind = "BlockStatements"
+    BlockStatement SyntaxKind = "BlockStatement"
     ExpressionStatement SyntaxKind = "ExpressionStatement"
 
     //expressions

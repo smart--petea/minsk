@@ -56,7 +56,7 @@ func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *
         return NewEvaluationResult(c.GlobalScope().GetDiagnostics(), nil)
     }
 
-    evaluator := NewEvaluator(c.GlobalScope().Expression, variables)
+    evaluator := NewEvaluator(c.GlobalScope().Statement, variables)
     value := evaluator.Evaluate()
     return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }

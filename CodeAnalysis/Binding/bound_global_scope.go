@@ -9,24 +9,24 @@ type BoundGlobalScope struct {
     Util.DiagnosticBag
     Previous *BoundGlobalScope
     Variables []*Util.VariableSymbol
-    Expression BoundExpression
+    Statement BoundStatement
 }
 
-func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Util.VariableSymbol, expression BoundExpression) *BoundGlobalScope {
+func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Util.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
     return &BoundGlobalScope{
         Previous: previous,
         Variables: variables,
-        Expression: expression,
+        Statement: statement,
     }
 }
 
 func BoundGlobalScopeFromCompilationUnitSyntax(previous *BoundGlobalScope, syntax *Syntax.CompilationUnitSyntax) *BoundGlobalScope {
     parentScope := CreateParentScopes(previous)
     binder := NewBinder(parentScope)
-    expression := binder.BindExpression(syntax.Expression)
+    statement := binder.BindStatement(syntax.Statement)
     variables := binder.scope.GetDeclaredVariables()
 
-    boundGlobalScope := NewBoundGlobalScope(previous, variables, expression)
+    boundGlobalScope := NewBoundGlobalScope(previous, variables, statement)
     boundGlobalScope.AddDiagnosticsRange(binder.GetDiagnostics())
     if previous != nil {
         boundGlobalScope.AddDiagnosticsRange(previous.GetDiagnostics())

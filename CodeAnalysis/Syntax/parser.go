@@ -193,7 +193,7 @@ func (p *Parser) ParseStatement() StatementSyntax {
     return p.ParseExpressionStatement()
 }
 
-func (p *Parser) ParseBlockStatement() BlockStatementSyntax {
+func (p *Parser) ParseBlockStatement() *BlockStatementSyntax {
     var statements []StatementSyntax
 
     openBraceToken := p.MatchToken(SyntaxKind.OpenBraceToken)

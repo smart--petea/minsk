@@ -1,5 +1,9 @@
 package Syntax
 
+import (
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+)
+
 type ExpressionStatementSyntax struct {
     *syntaxNodeChildren
 
