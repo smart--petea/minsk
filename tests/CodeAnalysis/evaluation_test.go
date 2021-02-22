@@ -93,7 +93,7 @@ func TestEvaluations(t *testing.T) {
             expectedValue: true,
         },
         {
-            text: "(a = 10) * a",
+            text: "{ var a = 0 (a = 10) * a }",
             expectedValue: 100,
         },
     }
