@@ -167,12 +167,15 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
 func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockStatement {
     blockStatementSyntax := (syntax).(*Syntax.BlockStatementSyntax)
+    b.scope = NewBoundScope(b.scope)
 
     var statements []BoundStatement
     for _, statementSyntax := range blockStatementSyntax.Statements {
         statement := b.BindStatement(statementSyntax)
         statements = append(statements, statement)
     }
+    
+    b.scope = b.scope.Parent
 
     return NewBoundBlockStatement(statements)
 }
