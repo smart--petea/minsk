@@ -26,7 +26,7 @@ func newSyntaxTree(sourceText *Text.SourceText) *SyntaxTree {
     return syntaxTree
 }
 
-func ParseSyntaxTree(text string) *SyntaxTree {
+func SyntaxTreeParse(text string) *SyntaxTree {
     sourceText := Text.SourceTextFrom(text)
     return newSyntaxTree(sourceText)
 }

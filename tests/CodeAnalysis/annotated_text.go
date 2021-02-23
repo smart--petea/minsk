@@ -2,10 +2,12 @@ package CodeAnalysisTest
 
 import (
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
     "strings"
     "bufio"
     "math"
     "fmt"
+    "text/scanner"
 )
 
 
@@ -22,9 +24,53 @@ func NewAnnotatedText(text string, spans []*Text.TextSpan) *AnnotatedText {
 }
 
 func AnnotatedTextParse(text string) *AnnotatedText {
+    text = annotatedTextUnindent(text)
+
+    var textBuilder []rune
+    var spanBuilder []*Text.TextSpan
+    startStack := Util.NewStack()
+
+    var position int
+    for _, c := range text {
+        if c == '[' {
+            startStack.Push(position)
+        }
+    } else if c == ']' {
+        if startStack.Count() == 0 {
+            message := fmt.Sprintf("Too many ']' in text %s", text)
+            panic(message)
+        }
+
+        start := int(startStack.Pop())
+        end := position
+        span := Text.NewTextSpan(start, end - start)
+        spanBuilder = append(spanBuilder, span)
+    } else {
+        position = position + 1
+        textBuilder = append(textBuilder, c)
+    }
+
+    if startStack.Count() != 0 {
+        message := fmt.Sprintf("Missing ']' in text %s", text)
+        panic(message)
+    }
+
+    return NewAnnotatedText(string(textBuilder), spanBuilder)
 }
 
-func AnnotatedTextUnindent(text string) string {
+func annotatedTextUnindent(text string) string {
+    lines := AnnotatedTextUnindentLines(text)
+
+    newline := fmt.Sprintln()
+    return strings.Join(lines, newline) 
+}
+
+func getIndentation(text string) int {
+    trimmed := strings.TrimSpace(text)
+    return strings.Index(text, trimmed)
+}
+
+func AnnotatedTextUnindentLines(text string) []string {
     stringReader := strings.NewReader(text)
     reader := bufio.NewScanner(stringReader)
 
@@ -65,8 +111,7 @@ func AnnotatedTextUnindent(text string) string {
         lines = lines[:i+1]
     }
 
-    newline := fmt.Sprintln()
-    return strings.Join(lines, newline) 
+    return lines
 }
 
 func getIndentation(text string) int {

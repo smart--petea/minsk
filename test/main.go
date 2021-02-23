@@ -62,7 +62,7 @@ func main() {
         textBuilder.WriteString(input)
         text := textBuilder.String()
 
-        syntaxTree := Syntax.ParseSyntaxTree(text)
+        syntaxTree := Syntax.SyntaxTreeParse(text)
         if !isBlank && len(syntaxTree.GetDiagnostics()) > 0 {
             continue
         }

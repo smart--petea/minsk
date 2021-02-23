@@ -99,7 +99,7 @@ func TestEvaluations(t *testing.T) {
     }
 
     for _, test := range tests {
-        syntaxTree := Syntax.ParseSyntaxTree(test.text)
+        syntaxTree := Syntax.SyntaxTreeParse(test.text)
         compilation := CA.NewCompilation(syntaxTree)
         variables := make(map[*Util.VariableSymbol]interface{})
         result := compilation.Evaluate(variables)
@@ -112,4 +112,51 @@ func TestEvaluations(t *testing.T) {
             t.Errorf("(%s)=%+v, expected=%+v", test.text, result.Value, test.expectedValue)
         }
     }
+}
+
+func assertHasDiagnostics(text, diagnosticText string, t *testing.T) {
+    annotatedText := AnnotatedTextParse(text)
+    syntaxTree := Syntax.ParseSyntaxTree(annotatedText.Text)
+    compilation := NewCompilation(syntaxTree)
+    variables := make(map[*Util.VariableSymbol]interface{})
+    result := compilation.Evaluate(variables)
+
+    expectedDiagnostics := AnnotatedTextUnindentLines(diagnosticText)
+    if len(annotatedText.Spans) != len(expectedDiagnostics) {
+        message := fmt.Sprintf("Must mark as many spans as there are expected diagnostics")
+        panic(message)
+    }
+
+    if len(expectedDiagnostics) != len(result.Diagnostics) {
+        t.Errorf("len(expectedDiagnostics) != len(result.Diagnostics). actual=%s expected=%s", len(expectedDiagnostics), len(result.Diagnostics))
+    }
+
+    for i, _ := range expectedDiagnostics {
+        expectedMessage := expectedDiagnostics[i]
+        actualMessage := result.Diagnostics[i].Message
+        if expectedMessage != actualMessage {
+            t.Errorf("actualMessage != expectedMessage. actual=%s expected=%s", expectedMessage, actualMessage)
+        }
+
+        expectedSpan := annotatedText.Spans[i]
+        actualSpan := result.Diagnostics[i].Span
+        if expectedSpan != actualSpan {
+            t.Errorf("actualSpan != expectedSpan. actual=%+v expected=%+v", expectedSpan, actualSpan)
+        }
+    }
+}
+
+func TestEvaluatorVariableDeclarationsReportsRedeclaration() {
+    text := `
+        var x = 10
+        var y = 100
+        {
+            var x = 10
+        }
+        var [x] = 5
+    `
+
+    diagnostics := `
+        Variable 'x' is already declared
+    `
 }

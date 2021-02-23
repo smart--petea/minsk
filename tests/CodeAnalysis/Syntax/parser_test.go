@@ -106,7 +106,7 @@ func TestParserUnaryExpressionHonorsPrecedences(t *testing.T) {
 
 
 func parseExpression(text string, t *testing.T) Syntax.ExpressionSyntax {
-    var syntaxTree *Syntax.SyntaxTree = Syntax.ParseSyntaxTree(text)
+    var syntaxTree *Syntax.SyntaxTree = Syntax.SyntaxTreeParse(text)
     var root *Syntax.CompilationUnitSyntax = syntaxTree.Root
     var statement Syntax.StatementSyntax = root.Statement
 
