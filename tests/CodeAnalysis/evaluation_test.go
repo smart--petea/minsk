@@ -118,6 +118,7 @@ func TestEvaluations(t *testing.T) {
 func assertDiagnostics(text, diagnosticText string, t *testing.T) {
     annotatedText := AnnotatedTextParse(text)
     syntaxTree := Syntax.SyntaxTreeParse(annotatedText.Text)
+    fmt.Printf("%s %d\n", annotatedText.Text, len(annotatedText.Text))
     compilation := CA.NewCompilation(syntaxTree)
     variables := make(map[*Util.VariableSymbol]interface{})
     result := compilation.Evaluate(variables)
@@ -161,6 +162,76 @@ func TestEvaluatorVariableDeclarationsReportsRedeclaration(t *testing.T) {
 
     diagnostics := `
         Variable x is already declared
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorNameReportsUndefined(t *testing.T) {
+    text := `[x] * 10 `
+
+    diagnostics := `
+        Variable x doesn't exist
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignedReportsUndefined(t *testing.T) {
+    text := `[x] = 10 `
+
+    diagnostics := `
+        Variable x doesn't exist
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignedReportsCannotAssign(t *testing.T) {
+    text := `
+    {
+        let x = 10
+        x [=] 0
+    }
+    `
+
+    diagnostics := `
+        Variable x is read-only and cannot be assigned to.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignedReportsCannotConvert(t *testing.T) {
+    text := `
+    {
+        var x = 10
+        [x] = true
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'bool' to 'int'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorUnaryReportsUndefined(t *testing.T) {
+    text := `[+]true`
+
+    diagnostics := `
+        Unary operator '+' is not defined for type 'bool'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorBinaryReportsUndefined(t *testing.T) {
+    text := `10 [+] false`
+
+    diagnostics := `
+        Binary operator '+' is not defined for types 'int' and 'bool'.
     `
 
     assertDiagnostics(text, diagnostics, t)
