@@ -17,7 +17,7 @@ func TestParserBinaryExpressionHonorsPrecedences(t *testing.T) {
             op1Text := SyntaxFacts.GetText(op1)
             op2Text := SyntaxFacts.GetText(op2)
             text := fmt.Sprintf("a %s b %s c", op1Text, op2Text) 
-            expression := parseExpression(text, t)
+            expression := parseExpression(text, t).(*Syntax.ExpressionStatementSyntax).Expression
 
             if op1Precedence >= op2Precedence {
                 //     op2
@@ -66,7 +66,7 @@ func TestParserUnaryExpressionHonorsPrecedences(t *testing.T) {
             unaryText := SyntaxFacts.GetText(unary)
             binaryText := SyntaxFacts.GetText(binary)
             text := fmt.Sprintf("%s a %s b", unaryText, binaryText) 
-            expression := parseExpression(text, t)
+            expression := parseExpression(text, t).(*Syntax.ExpressionStatementSyntax).Expression
 
             if unaryPrecedence >= binaryPrecedence {
                 //   binary  

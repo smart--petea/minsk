@@ -114,21 +114,24 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
         return left.(bool) || right.(bool)
 
     case BoundBinaryOperatorKind.Equals:
-        if b.Left.GetType() == reflect.Bool {
-            return left.(bool) == right.(bool)
-        } else {
-            return left.(int) == right.(int)
-        }
+        return equals(left, right, b.Left.GetType())
 
     case BoundBinaryOperatorKind.NotEquals:
-        if b.Left.GetType() == reflect.Bool {
-            return left.(bool) != right.(bool)
-        } else {
-            return left.(int) != right.(int)
-        }
+        return !equals(left, right, b.Left.GetType())
 
     default:
         panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
+    }
+}
+
+func equals(left, right interface{}, ttype reflect.Kind) {
+    switch ttype {
+    case reflect.Bool:
+        return left.(bool) == right.(bool)
+    case reflect.Int:
+        return left.(int) == right.(int)
+    default:
+        return false
     }
 }
 

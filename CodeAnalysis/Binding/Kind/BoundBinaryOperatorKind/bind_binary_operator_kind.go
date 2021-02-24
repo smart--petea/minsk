@@ -11,4 +11,8 @@ const (
     LogicalOr BoundBinaryOperatorKind = "LogicalOr"
     Equals BoundBinaryOperatorKind = "Equals"
     NotEquals BoundBinaryOperatorKind = "NotEquals"
+    Less BoundBinaryOperatorKind = "Less"
+    LessOrEquals BoundBinaryOperatorKind = "LessOrEquals"
+    Greater BoundBinaryOperatorKind = "Greater"
+    GreaterOrEquals BoundBinaryOperatorKind = "GreaterOrEquals"
 )

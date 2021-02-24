@@ -36,9 +36,12 @@ var _operators = []*BoundBinaryOperator{
     NewBoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, reflect.Int, reflect.Int, reflect.Int),
     NewBoundBinaryOperator(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, reflect.Int, reflect.Int, reflect.Int),
     NewBoundBinaryOperator(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, reflect.Int, reflect.Int, reflect.Int),
-
     NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Int, reflect.Int, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, reflect.Int, reflect.Int, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.LessToken, BoundBinaryOperatorKind.Less, reflect.Int, reflect.Int, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.LessOrEqualsToken, BoundBinaryOperatorKind.LessOrEquals, reflect.Int, reflect.Int, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, reflect.Int, reflect.Int, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken, BoundBinaryOperatorKind.GreaterOrEquals, reflect.Int, reflect.Int, reflect.Bool),
 
     NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, reflect.Bool, reflect.Bool, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, reflect.Bool, reflect.Bool, reflect.Bool),

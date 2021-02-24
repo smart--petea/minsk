@@ -22,7 +22,7 @@ func GetBinaryOperatorPrecedence(kind SyntaxKind.SyntaxKind) int {
         case SyntaxKind.PlusToken, SyntaxKind.MinusToken: 
             return 4
 
-        case SyntaxKind.EqualsEqualsToken, SyntaxKind.BangEqualsToken: 
+        case SyntaxKind.EqualsEqualsToken, SyntaxKind.BangEqualsToken, SyntaxKind.LessToken, SyntaxKind.LessOrEqualsToken, SyntaxKind.GreaterToken, SyntaxKind.GreaterOrEqualsToken: 
             return 3
 
         case SyntaxKind.AmpersandAmpersandToken:
@@ -65,6 +65,14 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return "!"
     case SyntaxKind.EqualsToken:
         return "="
+    case SyntaxKind.LessToken:
+        return "<"
+    case SyntaxKind.LessOrEqualsToken:
+        return "<="
+    case SyntaxKind.GreaterToken:
+        return ">"
+    case SyntaxKind.GreaterOrEqualsToken:
+        return ">="
     case SyntaxKind.AmpersandAmpersandToken:
         return "&&"
     case SyntaxKind.PipePipeToken:
