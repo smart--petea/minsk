@@ -5,6 +5,7 @@ import (
     "minsk/CodeAnalysis/Syntax"
     CA "minsk/CodeAnalysis"
     "minsk/Util"
+    "fmt"
 )
 
 func TestEvaluations(t *testing.T) {
@@ -114,10 +115,10 @@ func TestEvaluations(t *testing.T) {
     }
 }
 
-func assertHasDiagnostics(text, diagnosticText string, t *testing.T) {
+func assertDiagnostics(text, diagnosticText string, t *testing.T) {
     annotatedText := AnnotatedTextParse(text)
-    syntaxTree := Syntax.ParseSyntaxTree(annotatedText.Text)
-    compilation := NewCompilation(syntaxTree)
+    syntaxTree := Syntax.SyntaxTreeParse(annotatedText.Text)
+    compilation := CA.NewCompilation(syntaxTree)
     variables := make(map[*Util.VariableSymbol]interface{})
     result := compilation.Evaluate(variables)
 
@@ -128,7 +129,7 @@ func assertHasDiagnostics(text, diagnosticText string, t *testing.T) {
     }
 
     if len(expectedDiagnostics) != len(result.Diagnostics) {
-        t.Errorf("len(expectedDiagnostics) != len(result.Diagnostics). actual=%s expected=%s", len(expectedDiagnostics), len(result.Diagnostics))
+        t.Errorf("len(expectedDiagnostics) != len(result.Diagnostics). actual=%d expected=%d", len(expectedDiagnostics), len(result.Diagnostics))
     }
 
     for i, _ := range expectedDiagnostics {
@@ -140,23 +141,27 @@ func assertHasDiagnostics(text, diagnosticText string, t *testing.T) {
 
         expectedSpan := annotatedText.Spans[i]
         actualSpan := result.Diagnostics[i].Span
-        if expectedSpan != actualSpan {
+        if *expectedSpan != *actualSpan {
             t.Errorf("actualSpan != expectedSpan. actual=%+v expected=%+v", expectedSpan, actualSpan)
         }
     }
 }
 
-func TestEvaluatorVariableDeclarationsReportsRedeclaration() {
+func TestEvaluatorVariableDeclarationsReportsRedeclaration(t *testing.T) {
     text := `
-        var x = 10
-        var y = 100
         {
             var x = 10
+            var y = 100
+            {
+                var x = 10
+            }
+            var [x] = 5
         }
-        var [x] = 5
     `
 
     diagnostics := `
-        Variable 'x' is already declared
+        Variable x is already declared
     `
+
+    assertDiagnostics(text, diagnostics, t)
 }

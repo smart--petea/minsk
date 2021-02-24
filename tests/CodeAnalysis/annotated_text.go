@@ -7,7 +7,6 @@ import (
     "bufio"
     "math"
     "fmt"
-    "text/scanner"
 )
 
 
@@ -34,20 +33,20 @@ func AnnotatedTextParse(text string) *AnnotatedText {
     for _, c := range text {
         if c == '[' {
             startStack.Push(position)
-        }
-    } else if c == ']' {
-        if startStack.Count() == 0 {
-            message := fmt.Sprintf("Too many ']' in text %s", text)
-            panic(message)
-        }
+        } else if c == ']' {
+            if startStack.Count() == 0 {
+                message := fmt.Sprintf("Too many ']' in text %s", text)
+                panic(message)
+            }
 
-        start := int(startStack.Pop())
-        end := position
-        span := Text.NewTextSpan(start, end - start)
-        spanBuilder = append(spanBuilder, span)
-    } else {
-        position = position + 1
-        textBuilder = append(textBuilder, c)
+            start := startStack.Pop().(int)
+            end := position
+            span := Text.NewTextSpan(start, end - start)
+            spanBuilder = append(spanBuilder, span)
+        } else {
+            position = position + 1
+            textBuilder = append(textBuilder, c)
+        }
     }
 
     if startStack.Count() != 0 {
@@ -65,11 +64,6 @@ func annotatedTextUnindent(text string) string {
     return strings.Join(lines, newline) 
 }
 
-func getIndentation(text string) int {
-    trimmed := strings.TrimSpace(text)
-    return strings.Index(text, trimmed)
-}
-
 func AnnotatedTextUnindentLines(text string) []string {
     stringReader := strings.NewReader(text)
     reader := bufio.NewScanner(stringReader)
@@ -81,14 +75,14 @@ func AnnotatedTextUnindentLines(text string) []string {
     }
 
     minIndentation := math.MaxInt32
-    for _, line := range lines {
+    for i, line := range lines {
         if strings.TrimSpace(line) == "" {
             lines[i] = ""
             continue
         }
 
         indentation := getIndentation(line) 
-        if indentation < minIndetation {
+        if indentation < minIndentation {
             minIndentation = indentation
         }
     }
@@ -102,11 +96,10 @@ func AnnotatedTextUnindentLines(text string) []string {
     }
 
     var i int
-    for i < len(lines) && len(lines[i]) == 0; i = i + 1 {}
+    for i = 0; i < len(lines) && len(lines[i]) == 0; i = i + 1 {}
     lines = lines[i:]
 
-    i = len(lines) - 1
-    for i >= 0 && lines[i] == 0; i = i - 1 {}
+    for i = len(lines) - 1; i >= 0 && len(lines[i]) == 0; i = i - 1 {}
     if i + 1 < len(lines) {
         lines = lines[:i+1]
     }
