@@ -129,31 +129,22 @@ func (l *Lexer) Lex() *SyntaxToken {
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            l.kind = SyntaxKind.LessToken
+            l.kind = SyntaxKind.LessOrEqualsToken
         } else {
             l.Next()
-            l.kind = SyntaxKind.LessOrEqualsToken
+            l.kind = SyntaxKind.LessToken
         }
 
     case '>':
         if l.Lookahead() == '=' {
             l.Next()
             l.Next()
-            l.kind = SyntaxKind.GreaterToken
+            l.kind = SyntaxKind.GreaterOrEqualsToken
         } else {
             l.Next()
-            l.kind = SyntaxKind.GreaterOrEqualsToken
+            l.kind = SyntaxKind.GreaterToken
         }
 
-    case '!':
-        if l.Lookahead() == '=' {
-            l.Next()
-            l.Next()
-            l.kind = SyntaxKind.BangEqualsToken
-        } else {
-            l.Next()
-            l.kind = SyntaxKind.BangToken
-        }
     case '0','1','2','3','4','5','6','7','8','9':
             l.ReadNumberToken() 
     case ' ','\t','\n','\r':

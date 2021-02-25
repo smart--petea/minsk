@@ -62,6 +62,47 @@ func TestEvaluations(t *testing.T) {
             expectedValue: false,
         },
         {
+            text: "3 < 4",
+            expectedValue: true,
+        },
+        {
+            text: "5 < 4",
+            expectedValue: false,
+        },
+        {
+            text: "4 <= 4",
+            expectedValue: false,
+        },
+        {
+            text: "4 <= 5",
+            expectedValue: true,
+        },
+        {
+            text: "5 <= 4",
+            expectedValue: false,
+        },
+        {
+            text: "4 > 3",
+            expectedValue: true,
+        },
+        {
+            text: "4 > 5",
+            expectedValue: false,
+        },
+        {
+            text: "4 >= 4",
+            expectedValue: false,
+        },
+        {
+            text: "5 >= 4",
+            expectedValue: true,
+        },
+        {
+            text: "4 >= 5",
+            expectedValue: false,
+        },
+
+        {
             text: "false == false",
             expectedValue: true,
         },

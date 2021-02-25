@@ -29,6 +29,10 @@ func getTokens() []testToken {
         {kind: SyntaxKind.SlashToken, text: "/"},
         {kind: SyntaxKind.BangToken, text: "!"},
         {kind: SyntaxKind.EqualsToken, text: "="},
+        {kind: SyntaxKind.LessToken, text: "<"},
+        {kind: SyntaxKind.LessOrEqualsToken, text: "<="},
+        {kind: SyntaxKind.GreaterToken, text: ">"},
+        {kind: SyntaxKind.GreaterOrEqualsToken, text: ">="},
         {kind: SyntaxKind.AmpersandAmpersandToken, text: "&&"},
         {kind: SyntaxKind.PipePipeToken, text: "||"},
         {kind: SyntaxKind.EqualsEqualsToken, text: "=="},
@@ -195,6 +199,22 @@ func requiresSeparator(t1kind, t2kind SyntaxKind.SyntaxKind) bool {
     }
 
     if t1kind == SyntaxKind.EqualsToken && t2kind == SyntaxKind.EqualsEqualsToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.LessToken && t2kind == SyntaxKind.EqualsToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.LessToken && t2kind == SyntaxKind.EqualsEqualsToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.GreaterToken && t2kind == SyntaxKind.EqualsToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.GreaterToken && t2kind == SyntaxKind.EqualsEqualsToken {
         return true
     }
 

@@ -117,14 +117,26 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
         return equals(left, right, b.Left.GetType())
 
     case BoundBinaryOperatorKind.NotEquals:
-        return !equals(left, right, b.Left.GetType())
+       return !equals(left, right, b.Left.GetType())
+
+    case BoundBinaryOperatorKind.Less:
+        return left.(int) < right.(int)
+
+    case BoundBinaryOperatorKind.LessOrEquals:
+        return left.(int) <= right.(int)
+
+    case BoundBinaryOperatorKind.Greater:
+        return left.(int) > right.(int)
+
+    case BoundBinaryOperatorKind.GreaterOrEquals:
+        return left.(int) >= right.(int)
 
     default:
         panic(fmt.Sprintf("Unexpected binary operator %s", b.Op.Kind))
     }
 }
 
-func equals(left, right interface{}, ttype reflect.Kind) {
+func equals(left, right interface{}, ttype reflect.Kind) bool {
     switch ttype {
     case reflect.Bool:
         return left.(bool) == right.(bool)
