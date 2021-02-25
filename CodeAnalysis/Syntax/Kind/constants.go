@@ -39,6 +39,8 @@ const (
     BlockStatement SyntaxKind = "BlockStatement"
     VariableDeclaration SyntaxKind = "VariableDeclaration"
     ExpressionStatement SyntaxKind = "ExpressionStatement"
+    IfStatement SyntaxKind = "IfStatement"
+    ElseClause SyntaxKind = "ElseClause"
 
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 
