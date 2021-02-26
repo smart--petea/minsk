@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type BinaryExpressionSyntax struct {
@@ -26,4 +27,8 @@ func NewBinaryExpressionSyntax(left ExpressionSyntax, operatorNode SyntaxNode, r
 
 func (b *BinaryExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.BinaryExpression
+}
+
+func (b *BinaryExpressionSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(b)
 }

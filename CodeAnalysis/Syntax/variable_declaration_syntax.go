@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type VariableDeclarationSyntax struct {
@@ -30,4 +31,8 @@ func NewVariableDeclarationSyntax(keyword, identifier, equalsToken  *SyntaxToken
 
 func (v *VariableDeclarationSyntax) Value() interface{} {
     return nil
+}
+
+func (v *VariableDeclarationSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(v)
 }

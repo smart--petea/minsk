@@ -1,17 +1,17 @@
 package Syntax
 
 type syntaxNodeChildren struct {
-    children []SyntaxNode
+    children []CoreSyntaxNode
 }
 
-func newSyntaxNodeChildren(children ...SyntaxNode) *syntaxNodeChildren {
+func newSyntaxNodeChildren(children ...CoreSyntaxNode) *syntaxNodeChildren {
     return &syntaxNodeChildren{
         children: children,
     }
 }
 
-func (s *syntaxNodeChildren) GetChildren() <-chan SyntaxNode {
-    chanChildren := make(chan SyntaxNode)
+func (s *syntaxNodeChildren) GetChildren() <-chan CoreSyntaxNode {
+    chanChildren := make(chan CoreSyntaxNode)
 
     go func(){
         defer close(chanChildren)

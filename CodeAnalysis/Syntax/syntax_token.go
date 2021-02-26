@@ -2,10 +2,12 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type SyntaxToken struct {
     *syntaxNodeChildren
+
     kind SyntaxKind.SyntaxKind
     Position int
     Runes []rune
@@ -23,9 +25,15 @@ func (s *SyntaxToken) Value() interface{} {
 func NewSyntaxToken(kind SyntaxKind.SyntaxKind, position int, runes []rune, value interface{}) *SyntaxToken {
     return &SyntaxToken{
         syntaxNodeChildren: newSyntaxNodeChildren(),
+
         kind: kind,
         Position: position,
         Runes: runes,
         value: value,
     }
+}
+
+
+func (s *SyntaxToken) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(s)
 }

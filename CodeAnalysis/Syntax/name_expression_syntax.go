@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type NameExpressionSyntax struct {
@@ -22,4 +23,8 @@ func NewNameExpressionSyntax(identifierToken *SyntaxToken) *NameExpressionSyntax
 
 func (n *NameExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.NameExpression 
+}
+
+func (n *NameExpressionSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(n)
 }

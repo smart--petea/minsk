@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type BlockStatementSyntax struct {
@@ -13,7 +14,7 @@ type BlockStatementSyntax struct {
 }
 
 func NewBlockStatementSyntax(openBraceToken *SyntaxToken, statements []StatementSyntax, closeBraceToken *SyntaxToken) *BlockStatementSyntax {
-    var children []SyntaxNode
+    var children []CoreSyntaxNode
     children = append(children, openBraceToken)
     for _, statement := range statements {
         children = append(children, statement.(SyntaxNode))
@@ -35,4 +36,8 @@ func (b *BlockStatementSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func (b *BlockStatementSyntax) Value() interface{} {
     return nil
+}
+
+func (b *BlockStatementSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(b)
 }

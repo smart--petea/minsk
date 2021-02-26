@@ -29,6 +29,8 @@ const (
     //Keywords
     LetKeyword SyntaxKind = "LetKeyword"
     FalseKeyword SyntaxKind = "FalseKeyword"
+    IfKeyword SyntaxKind = "IfKeyword"
+    ElseKeyword SyntaxKind = "ElseKeyword"
     TrueKeyword SyntaxKind = "TrueKeyword"
     VarKeyword SyntaxKind = "VarKeyword"
 

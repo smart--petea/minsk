@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type IfStatementSyntax struct {
@@ -15,7 +16,7 @@ type IfStatementSyntax struct {
 
 func NewIfStatementSyntax(ifKeyword *SyntaxToken, condition ExpressionSyntax, thenStatement StatementSyntax, elseClause *ElseClauseSyntax) *IfStatementSyntax {
     return &IfStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(ifKeyword, condition thenStatement, elseClauseSyntax),
+        syntaxNodeChildren: newSyntaxNodeChildren(ifKeyword, condition, thenStatement, elseClause),
 
         IfKeyword: ifKeyword,
         Condition: condition,
@@ -24,10 +25,14 @@ func NewIfStatementSyntax(ifKeyword *SyntaxToken, condition ExpressionSyntax, th
     }
 }
 
-func (e *IfStatementSyntax) Kind() SyntaxKind.SyntaxKind {
+func (i *IfStatementSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.IfStatement
 }
 
-func (e *IfStatementSyntax) Value() interface{} {
+func (i *IfStatementSyntax) Value() interface{} {
     return nil
+}
+
+func (i *IfStatementSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(i)
 }

@@ -10,6 +10,7 @@ import (
     "minsk/Util"
 
     "fmt"
+    "reflect"
 )
 
 type Binder struct {
@@ -32,12 +33,24 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
     case SyntaxKind.VariableDeclaration:
         return b.BindVariableDeclaration(syntax)
 
+    case SyntaxKind.IfStatement:
+        return b.BindIfStatement(syntax)
+
     case SyntaxKind.ExpressionStatement:
         return b.BindExpressionStatement(syntax)
 
     default:
         panic(fmt.Sprintf("Unexpected syntax %s", syntax.Kind()))
     }
+}
+
+func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, expectedType reflect.Kind) BoundExpression {
+    result := b.BindExpression(syntax)
+    if result.GetType() != expectedType {
+        b.ReportCannotConvert(syntax.GetSpan(), result.GetType(), expectedType)
+    }
+
+    return result
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
@@ -73,18 +86,18 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
 
     var variable *Util.VariableSymbol
     if b.scope.TryLookup(name, &variable) == false {
-        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.IdentifierToken)
+        span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
         b.ReportUndefinedName(span, name)
         return boundExpression
     }
 
     if variable.IsReadOnly {
-        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.EqualsToken)
+        span := assignmentExpressionSyntax.EqualsToken.GetSpan()
         b.ReportCannotAssign(span, name)
     }
 
     if boundExpression.GetType() != variable.Type {
-        span := Syntax.SyntaxNodeToTextSpan(assignmentExpressionSyntax.IdentifierToken)
+        span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
         b.ReportCannotConvert(span, boundExpression.GetType(), variable.Type)
         return boundExpression
     }
@@ -101,7 +114,7 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
         return NewBoundVariableExpression(variable)
     }
 
-    span := Syntax.SyntaxNodeToTextSpan(nameExpressionSyntax.IdentifierToken)
+    span := nameExpressionSyntax.IdentifierToken.GetSpan()
     b.ReportUndefinedName(span, name)
     return NewBoundLiteralExpression(0)
 }
@@ -139,7 +152,7 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
 
     if boundOperator == nil {
         syntaxToken := unarySyntax.OperatorNode.(*Syntax.SyntaxToken)
-        span := Syntax.SyntaxNodeToTextSpan(syntaxToken)
+        span := syntaxToken.GetSpan()
         b.ReportUndefinedUnaryOperator(span, syntaxToken.Runes, boundOperand.GetType())
         return boundOperand;
     }
@@ -156,7 +169,7 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
     if boundOperator == nil {
         syntaxToken := binarySyntax.OperatorNode.(*Syntax.SyntaxToken)
-        span := Syntax.SyntaxNodeToTextSpan(syntaxToken)
+        span := syntaxToken.GetSpan()
         b.ReportUndefinedBinaryOperator(span, syntaxToken.Runes, boundLeft.GetType(), boundRight.GetType())
 
         return boundLeft;
@@ -180,6 +193,19 @@ func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockSt
     return NewBoundBlockStatement(statements)
 }
 
+func (b *Binder) BindIfStatement(syntax Syntax.StatementSyntax) BoundStatement {
+    ifStatementSyntax := (syntax).(*Syntax.IfStatementSyntax)
+
+    condition := b.BindExpressionWithType(ifStatementSyntax.Condition, reflect.Bool) 
+    thenStatement := b.BindStatement(ifStatementSyntax.ThenStatement)
+    var elseStatement BoundStatement
+    if ifStatementSyntax.ElseClause != nil {
+        elseStatement = b.BindStatement(ifStatementSyntax.ElseClause.ElseStatement)
+    }
+
+    return NewBoundIfStatement(condition, thenStatement, elseStatement)
+}
+
 func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundStatement {
     expressionStatementSyntax := (syntax).(*Syntax.ExpressionStatementSyntax)
     expression := b.BindExpression(expressionStatementSyntax.Expression)
@@ -196,7 +222,7 @@ func (b *Binder) BindVariableDeclaration(syntax Syntax.StatementSyntax) BoundSta
     variable := Util.NewVariableSymbol(name, isReadOnly, initializer.GetType())
 
     if !b.scope.TryDeclare(variable) {
-        span := Syntax.SyntaxNodeToTextSpan(variableDeclarationSyntax.Identifier)
+        span := variableDeclarationSyntax.Identifier.GetSpan()
         b.ReportVariableAlreadyDeclared(span, name)
     }
 

@@ -2,10 +2,12 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type ParenthesizedExpressionSyntax struct {
     *syntaxNodeChildren
+
     OpenParenthesisToken *SyntaxToken
     Expression ExpressionSyntax
     CloseParenthesisToken *SyntaxToken
@@ -14,6 +16,7 @@ type ParenthesizedExpressionSyntax struct {
 func NewParenthesizedExpressionSyntax(openParenthesisToken *SyntaxToken, expression ExpressionSyntax, closeParenthesisToken *SyntaxToken)  *ParenthesizedExpressionSyntax {
     return &ParenthesizedExpressionSyntax{
         syntaxNodeChildren: newSyntaxNodeChildren(openParenthesisToken, expression, closeParenthesisToken),
+
         OpenParenthesisToken: openParenthesisToken,
         Expression: expression,
         CloseParenthesisToken: closeParenthesisToken,
@@ -26,4 +29,8 @@ func (p *ParenthesizedExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func (p *ParenthesizedExpressionSyntax) Value() interface{} {
     return nil
+}
+
+func (p *ParenthesizedExpressionSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(p)
 }

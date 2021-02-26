@@ -87,7 +87,7 @@ func (p *Parser) MatchToken(kind SyntaxKind.SyntaxKind) *SyntaxToken {
         return p.NextToken()
     }
 
-    p.ReportUnexpectedToken(SyntaxNodeToTextSpan(current), current.Kind(), kind)
+    p.ReportUnexpectedToken(current.GetSpan(), current.Kind(), kind)
 
     return NewSyntaxToken(kind, current.Position, nil, nil)
 }
@@ -191,6 +191,8 @@ func (p *Parser) ParseStatement() StatementSyntax {
         return p.ParseBlockStatement()
     case SyntaxKind.LetKeyword, SyntaxKind.VarKeyword:
         return p.ParseVariableDeclaration()
+    case SyntaxKind.IfKeyword:
+        return p.ParseIfStatement()
     default:
         return p.ParseExpressionStatement()
     }
@@ -209,6 +211,26 @@ func (p *Parser) ParseVariableDeclaration() *VariableDeclarationSyntax {
     equals := p.MatchToken(SyntaxKind.EqualsToken)
     initializer := p.ParseExpression()
     return NewVariableDeclarationSyntax(keyword, identifier, equals, initializer)
+}
+
+func (p *Parser) ParseIfStatement() *IfStatementSyntax {
+    keyword := p.MatchToken(SyntaxKind.IfKeyword)
+    condition := p.ParseExpression()
+    statement := p.ParseStatement()
+    elseClause := p.ParseElseClause()
+
+    return NewIfStatementSyntax(keyword, condition, statement, elseClause) 
+}
+
+func (p *Parser) ParseElseClause() *ElseClauseSyntax {
+    if p.Current().Kind() != SyntaxKind.ElseKeyword {
+        return nil
+    }
+
+    elseKeyword := p.NextToken()
+    elseStatement := p.ParseStatement()
+
+    return NewElseClauseSyntax(elseKeyword, elseStatement)
 }
 
 func (p *Parser) ParseBlockStatement() *BlockStatementSyntax {

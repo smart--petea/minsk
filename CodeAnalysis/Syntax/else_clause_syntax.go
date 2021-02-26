@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type ElseClauseSyntax struct {
@@ -26,4 +27,8 @@ func (e *ElseClauseSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func (e *ElseClauseSyntax) Value() interface{} {
     return nil
+}
+
+func (e *ElseClauseSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(e)
 }

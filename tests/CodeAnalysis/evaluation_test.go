@@ -138,6 +138,10 @@ func TestEvaluations(t *testing.T) {
             text: "{ var a = 0 (a = 10) * a }",
             expectedValue: 100,
         },
+        {
+            text: "{ var a = 0 if a == 0 a = 10 a }",
+            expectedValue: 10,
+        },
     }
 
     for _, test := range tests {

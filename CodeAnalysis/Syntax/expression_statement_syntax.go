@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type ExpressionStatementSyntax struct {
@@ -24,4 +25,8 @@ func (e *ExpressionStatementSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func (e *ExpressionStatementSyntax) Value() interface{} {
     return e.Expression.Value()
+}
+
+func (e *ExpressionStatementSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(e)
 }

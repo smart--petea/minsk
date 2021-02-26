@@ -8,21 +8,20 @@ import (
 
     "minsk/Util/Console"
     "minsk/CodeAnalysis/Text"
-    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type SyntaxNode interface {
-    Kind() SyntaxKind.SyntaxKind
-    Value()  interface{}
-    GetChildren() <-chan SyntaxNode 
+    CoreSyntaxNode
+
+    GetSpan() *Text.TextSpan
 }
 
-func SyntaxNodeToTextSpan(sn SyntaxNode) *Text.TextSpan {
-    if syntaxToken, ok := sn.(*SyntaxToken); ok {
+func SyntaxNodeToTextSpan(coreSyntaxNode CoreSyntaxNode) *Text.TextSpan {
+    if syntaxToken, ok := coreSyntaxNode.(*SyntaxToken); ok {
         return Text.NewTextSpan(syntaxToken.Position, len(syntaxToken.Runes)) 
     }
 
-    children := sn.GetChildren()
+    children := coreSyntaxNode.GetChildren()
     first := <-children
     last := first
     for last = range children {}
@@ -32,7 +31,7 @@ func SyntaxNodeToTextSpan(sn SyntaxNode) *Text.TextSpan {
     return Text.NewTextSpan(start, end) 
 }
 
-func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast bool) {
+func prettyPrint(writer io.StringWriter, node CoreSyntaxNode, indent string, isLast bool) {
     isToConsole := (writer == os.Stdout)
     if fmt.Sprintf("%v", node) == "<nil>" {
         return
@@ -87,7 +86,7 @@ func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast 
         indent = indent + "│   "
     }
 
-    var nextChild, prevChild SyntaxNode
+    var nextChild, prevChild CoreSyntaxNode
     var ok bool
     children := node.GetChildren()
     prevChild, ok = <-children 
@@ -101,13 +100,13 @@ func prettyPrint(writer io.StringWriter, node SyntaxNode, indent string, isLast 
     prettyPrint(writer, prevChild, indent, true)
 }
 
-func WriteTo(writer io.StringWriter, node SyntaxNode) {
+func WriteTo(writer io.StringWriter, node CoreSyntaxNode) {
     indent := ""
     isLast := true
     prettyPrint(writer, node, indent, isLast)
 }
 
-func ToString(node SyntaxNode) string {
+func ToString(node CoreSyntaxNode) string {
     writer := &strings.Builder{}
     WriteTo(writer, node)
 

@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
 )
 
 type UnaryExpressionSyntax struct {
@@ -24,4 +25,8 @@ func NewUnaryExpressionSyntax(operatorNode SyntaxNode, operand ExpressionSyntax)
 
 func (u *UnaryExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.UnaryExpression
+}
+
+func (u *UnaryExpressionSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(u)
 }

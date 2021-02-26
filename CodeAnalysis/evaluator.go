@@ -39,6 +39,8 @@ func (e *Evaluator) evaluateStatement(node Binding.BoundStatement) {
             e.evaluateVariableDeclaration(node.(*Binding.BoundVariableDeclaration))
         case BoundNodeKind.ExpressionStatement:
             e.evaluateExpressionStatement(node.(*Binding.BoundExpressionStatement))
+        case BoundNodeKind.IfStatement:
+            e.evaluateIfStatement(node.(*Binding.BoundIfStatement))
         default:
             panic(fmt.Sprintf("Unexpected node %s", node.Kind()))
     }
@@ -144,6 +146,16 @@ func equals(left, right interface{}, ttype reflect.Kind) bool {
         return left.(int) == right.(int)
     default:
         return false
+    }
+}
+
+func (e *Evaluator) evaluateIfStatement(node *Binding.BoundIfStatement) {
+    condition := e.evaluateExpression(node.Condition).(bool)
+
+    if condition {
+        e.evaluateStatement(node.ThenStatement)
+    } else if node.ElseStatement != nil {
+        e.evaluateStatement(node.ElseStatement)
     }
 }
 
