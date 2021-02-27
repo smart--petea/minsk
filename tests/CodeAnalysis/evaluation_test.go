@@ -71,7 +71,7 @@ func TestEvaluations(t *testing.T) {
         },
         {
             text: "4 <= 4",
-            expectedValue: false,
+            expectedValue: true,
         },
         {
             text: "4 <= 5",
@@ -91,7 +91,7 @@ func TestEvaluations(t *testing.T) {
         },
         {
             text: "4 >= 4",
-            expectedValue: false,
+            expectedValue: true,
         },
         {
             text: "5 >= 4",
@@ -141,6 +141,19 @@ func TestEvaluations(t *testing.T) {
         {
             text: "{ var a = 0 if a == 0 a = 10 a }",
             expectedValue: 10,
+        },
+        {
+            text: "{ var a = 0 if a == 4 a = 10 a }",
+            expectedValue: 0,
+        },
+
+        {
+            text: "{ var a = 0 if a == 0 a = 10 else a = 5 a }",
+            expectedValue: 10,
+        },
+        {
+            text: "{ var a = 0 if a == 4 a = 10 else a = 5 a }",
+            expectedValue: 5,
         },
     }
 
