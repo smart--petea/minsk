@@ -155,6 +155,10 @@ func TestEvaluations(t *testing.T) {
             text: "{ var a = 0 if a == 4 a = 10 else a = 5 a }",
             expectedValue: 5,
         },
+        {
+            text: "{ var i = 10 var result = 0 while i > 0 { result = result + i i = i - 1 } result }",
+            expectedValue: 55,
+        },
     }
 
     for _, test := range tests {

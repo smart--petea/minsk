@@ -33,6 +33,7 @@ const (
     ElseKeyword SyntaxKind = "ElseKeyword"
     TrueKeyword SyntaxKind = "TrueKeyword"
     VarKeyword SyntaxKind = "VarKeyword"
+    WhileKeyword SyntaxKind = "WhileKeyword"
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
@@ -43,6 +44,7 @@ const (
     ExpressionStatement SyntaxKind = "ExpressionStatement"
     IfStatement SyntaxKind = "IfStatement"
     ElseClause SyntaxKind = "ElseClause"
+    WhileStatement SyntaxKind = "WhileStatement"
 
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 

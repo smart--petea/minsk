@@ -41,6 +41,8 @@ func (e *Evaluator) evaluateStatement(node Binding.BoundStatement) {
             e.evaluateExpressionStatement(node.(*Binding.BoundExpressionStatement))
         case BoundNodeKind.IfStatement:
             e.evaluateIfStatement(node.(*Binding.BoundIfStatement))
+        case BoundNodeKind.WhileStatement:
+            e.evaluateWhileStatement(node.(*Binding.BoundWhileStatement))
         default:
             panic(fmt.Sprintf("Unexpected node %s", node.Kind()))
     }
@@ -146,6 +148,11 @@ func equals(left, right interface{}, ttype reflect.Kind) bool {
         return left.(int) == right.(int)
     default:
         return false
+    }
+}
+func (e *Evaluator) evaluateWhileStatement(node *Binding.BoundWhileStatement) {
+    for e.evaluateExpression(node.Condition).(bool) {
+        e.evaluateStatement(node.Body)
     }
 }
 

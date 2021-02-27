@@ -36,6 +36,9 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
     case SyntaxKind.IfStatement:
         return b.BindIfStatement(syntax)
 
+    case SyntaxKind.WhileStatement:
+        return b.BindWhileStatement(syntax)
+
     case SyntaxKind.ExpressionStatement:
         return b.BindExpressionStatement(syntax)
 
@@ -191,6 +194,15 @@ func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockSt
     b.scope = b.scope.Parent
 
     return NewBoundBlockStatement(statements)
+}
+
+func (b *Binder) BindWhileStatement(syntax Syntax.StatementSyntax) BoundStatement {
+    whileStatementSyntax := (syntax).(*Syntax.WhileStatementSyntax)
+
+    condition := b.BindExpressionWithType(whileStatementSyntax.Condition, reflect.Bool) 
+    body := b.BindStatement(whileStatementSyntax.Body)
+
+    return NewBoundWhileStatement(condition, body)
 }
 
 func (b *Binder) BindIfStatement(syntax Syntax.StatementSyntax) BoundStatement {
