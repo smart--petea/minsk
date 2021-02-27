@@ -28,12 +28,14 @@ const (
 
     //Keywords
     LetKeyword SyntaxKind = "LetKeyword"
+    ToKeyword SyntaxKind = "ToKeyword"
     FalseKeyword SyntaxKind = "FalseKeyword"
     IfKeyword SyntaxKind = "IfKeyword"
     ElseKeyword SyntaxKind = "ElseKeyword"
     TrueKeyword SyntaxKind = "TrueKeyword"
     VarKeyword SyntaxKind = "VarKeyword"
     WhileKeyword SyntaxKind = "WhileKeyword"
+    ForKeyword SyntaxKind = "ForKeyword"
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
@@ -45,6 +47,7 @@ const (
     IfStatement SyntaxKind = "IfStatement"
     ElseClause SyntaxKind = "ElseClause"
     WhileStatement SyntaxKind = "WhileStatement"
+    ForStatement SyntaxKind = "ForStatement"
 
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 
@@ -75,6 +78,7 @@ func GetValues() []SyntaxKind {
         EqualsToken,
         BangEqualsToken,
         TrueKeyword,
+        ToKeyword,
         FalseKeyword,
         AssignmentExpression, 
         BinaryExpression, 

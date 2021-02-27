@@ -8,6 +8,7 @@ const (
     ExpressionStatement BoundNodeKind = "ExpressionStatement"
     IfStatement BoundNodeKind = "IfStatement"
     WhileStatement BoundNodeKind = "WhileStatement"
+    ForStatement BoundNodeKind = "ForStatement"
     VariableDeclaration BoundNodeKind = "VariableDeclaration"
 
     //Expressions

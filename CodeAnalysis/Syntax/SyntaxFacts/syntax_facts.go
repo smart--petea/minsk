@@ -46,12 +46,16 @@ func GetKeywordKind(text string) SyntaxKind.SyntaxKind {
         return SyntaxKind.ElseKeyword
     case "let":
         return SyntaxKind.LetKeyword
+    case "to":
+        return SyntaxKind.ToKeyword
     case "true":
         return SyntaxKind.TrueKeyword
     case "var":
         return SyntaxKind.VarKeyword
     case "while":
         return SyntaxKind.WhileKeyword
+    case "for":
+        return SyntaxKind.ForKeyword
     default:
         return SyntaxKind.IdentifierToken
     }
@@ -105,10 +109,14 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return "else"
     case SyntaxKind.LetKeyword:
         return "let"
+    case SyntaxKind.ToKeyword:
+        return "to"
     case SyntaxKind.VarKeyword:
         return "var"
     case SyntaxKind.WhileKeyword:
         return "while"
+    case SyntaxKind.ForKeyword:
+        return "for"
     default:
         return ""
     }

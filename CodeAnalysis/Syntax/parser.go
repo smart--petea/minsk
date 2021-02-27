@@ -195,6 +195,8 @@ func (p *Parser) ParseStatement() StatementSyntax {
         return p.ParseIfStatement()
     case SyntaxKind.WhileKeyword:
         return p.ParseWhileStatement()
+    case SyntaxKind.ForKeyword:
+        return p.ParseForStatement()
     default:
         return p.ParseExpressionStatement()
     }
@@ -222,6 +224,18 @@ func (p *Parser) ParseIfStatement() *IfStatementSyntax {
     elseClause := p.ParseElseClause()
 
     return NewIfStatementSyntax(keyword, condition, statement, elseClause) 
+}
+
+func (p *Parser) ParseForStatement() *ForStatementSyntax {
+    keyword := p.MatchToken(SyntaxKind.ForKeyword)
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    equalsToken := p.MatchToken(SyntaxKind.EqualsToken)
+    lowerBound := p.ParseExpression()
+    toKeyword := p.MatchToken(SyntaxKind.ToKeyword)
+    upperBound := p.ParseExpression()
+    body := p.ParseStatement()
+
+    return NewForStatementSyntax(keyword, identifier, equalsToken, lowerBound, toKeyword, upperBound, body)
 }
 
 func (p *Parser) ParseWhileStatement() *WhileStatementSyntax {

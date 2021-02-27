@@ -159,6 +159,10 @@ func TestEvaluations(t *testing.T) {
             text: "{ var i = 10 var result = 0 while i > 0 { result = result + i i = i - 1 } result }",
             expectedValue: 55,
         },
+        {
+            text: "{ var result = 0 for i = 1 to 10 { result = result + i} result}",
+            expectedValue: 55,
+        },
     }
 
     for _, test := range tests {

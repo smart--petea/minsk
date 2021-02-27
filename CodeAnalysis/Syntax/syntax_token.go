@@ -33,7 +33,6 @@ func NewSyntaxToken(kind SyntaxKind.SyntaxKind, position int, runes []rune, valu
     }
 }
 
-
 func (s *SyntaxToken) GetSpan() *Text.TextSpan {
     return SyntaxNodeToTextSpan(s)
 }

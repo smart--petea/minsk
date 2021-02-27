@@ -3,10 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
-
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Syntax"
-
     "minsk/Util"
 
     "fmt"
@@ -38,6 +36,9 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 
     case SyntaxKind.WhileStatement:
         return b.BindWhileStatement(syntax)
+
+    case SyntaxKind.ForStatement:
+        return b.BindForStatement(syntax)
 
     case SyntaxKind.ExpressionStatement:
         return b.BindExpressionStatement(syntax)
@@ -194,6 +195,26 @@ func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockSt
     b.scope = b.scope.Parent
 
     return NewBoundBlockStatement(statements)
+}
+
+func (b *Binder) BindForStatement(syntax Syntax.StatementSyntax) BoundStatement {
+    forStatementSyntax := (syntax).(*Syntax.ForStatementSyntax)
+
+    lowerBound := b.BindExpressionWithType(forStatementSyntax.LowerBound, reflect.Int)
+    upperBound := b.BindExpressionWithType(forStatementSyntax.UpperBound, reflect.Int)
+
+    b.scope = NewBoundScope(b.scope)
+
+    name := string(forStatementSyntax.Identifier.Runes)
+    variable := Util.NewVariableSymbol(name, true, reflect.Int)
+    if b.scope.TryDeclare(variable) == false {
+        b.ReportVariableAlreadyDeclared(forStatementSyntax.Identifier.GetSpan(), name)
+    }
+
+    body := b.BindStatement(forStatementSyntax.Body)
+
+    b.scope = b.scope.Parent
+    return NewBoundForStatement(variable, lowerBound, upperBound, body)
 }
 
 func (b *Binder) BindWhileStatement(syntax Syntax.StatementSyntax) BoundStatement {
