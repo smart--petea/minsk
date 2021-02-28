@@ -28,7 +28,7 @@ func SyntaxNodeToTextSpan(coreSyntaxNode CoreSyntaxNode) *Text.TextSpan {
 
     start := SyntaxNodeToTextSpan(first).Start
     end := SyntaxNodeToTextSpan(last).End()
-    return Text.NewTextSpan(start, end) 
+    return Text.NewTextSpan(start, end - start) 
 }
 
 func prettyPrint(writer io.StringWriter, node CoreSyntaxNode, indent string, isLast bool) {

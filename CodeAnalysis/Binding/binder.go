@@ -51,7 +51,8 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, expectedType reflect.Kind) BoundExpression {
     result := b.BindExpression(syntax)
     if result.GetType() != expectedType {
-        b.ReportCannotConvert(syntax.GetSpan(), result.GetType(), expectedType)
+        span := syntax.GetSpan()
+        b.ReportCannotConvert(span, result.GetType(), expectedType)
     }
 
     return result

@@ -283,6 +283,22 @@ func TestEvaluatorAssignedReportsCannotConvert(t *testing.T) {
     assertDiagnostics(text, diagnostics, t)
 }
 
+func TestEvaluatorIfStatementsReportsCannotConvert(t *testing.T) {
+    text := `
+    {
+        var x = 0
+        if [10]
+            x = 10
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'int' to 'bool'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
 func TestEvaluatorUnaryReportsUndefined(t *testing.T) {
     text := `[+]true`
 

@@ -6,6 +6,10 @@ type TextSpan struct {
 }
 
 func NewTextSpan(start, length int) *TextSpan {
+    if length < 0 {
+        length = 0
+    }
+
     return &TextSpan{
         Start: start,
         Length: length,
