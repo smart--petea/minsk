@@ -262,8 +262,21 @@ func (p *Parser) ParseBlockStatement() *BlockStatementSyntax {
 
     openBraceToken := p.MatchToken(SyntaxKind.OpenBraceToken)
     for p.Current().Kind() != SyntaxKind.EndOfFileToken && p.Current().Kind() != SyntaxKind.CloseBraceToken {
+        startToken := p.Current()
+
         statement := p.ParseStatement()
         statements = append(statements, statement)
+
+        //If ParseStatement() did not consume any tokens,
+        //we need to skip the current token and continue.
+        //In order to avoid an infinite loop.
+        //
+        // We do not need to report and error, because we'll
+        //already tried to parse an expression statement 
+        //and reported one.
+        if p.Current() == startToken {
+            p.NextToken()
+        }
     }
     closeBraceToken := p.MatchToken(SyntaxKind.CloseBraceToken)
 

@@ -233,51 +233,16 @@ func TestEvaluatorVariableDeclarationsReportsRedeclaration(t *testing.T) {
     assertDiagnostics(text, diagnostics, t)
 }
 
-func TestEvaluatorNameReportsUndefined(t *testing.T) {
-    text := `[x] * 10 `
-
-    diagnostics := `
-        Variable x doesn't exist
-    `
-
-    assertDiagnostics(text, diagnostics, t)
-}
-
-func TestEvaluatorAssignedReportsUndefined(t *testing.T) {
-    text := `[x] = 10 `
-
-    diagnostics := `
-        Variable x doesn't exist
-    `
-
-    assertDiagnostics(text, diagnostics, t)
-}
-
-func TestEvaluatorAssignedReportsCannotAssign(t *testing.T) {
+func TestEvaluatorBlockStatementNoInfiniteLoop(t *testing.T) {
     text := `
     {
-        let x = 10
-        x [=] 0
+        )
     }
     `
 
     diagnostics := `
-        Variable x is read-only and cannot be assigned to.
-    `
-
-    assertDiagnostics(text, diagnostics, t)
-}
-
-func TestEvaluatorAssignedReportsCannotConvert(t *testing.T) {
-    text := `
-    {
-        var x = 10
-        [x] = true
-    }
-    `
-
-    diagnostics := `
-        Cannot convert type 'bool' to 'int'.
+        Unexpected token <CloseParenthisToken>, expected <IdentifierToken>.
+        Unexpected token <EndOfFileToken>, expected <CloseBraceToken>.
     `
 
     assertDiagnostics(text, diagnostics, t)
@@ -347,7 +312,7 @@ func TestEvaluatorForStatementsReportsCannotConvertUpperBound(t *testing.T) {
     assertDiagnostics(text, diagnostics, t)
 }
 
-func TestEvaluatorUnaryReportsUndefined(t *testing.T) {
+func TestEvaluatorUnaryExpressionReportsUndefined(t *testing.T) {
     text := `[+]true`
 
     diagnostics := `
@@ -357,7 +322,67 @@ func TestEvaluatorUnaryReportsUndefined(t *testing.T) {
     assertDiagnostics(text, diagnostics, t)
 }
 
-func TestEvaluatorBinaryReportsUndefined(t *testing.T) {
+func TestEvaluatorNameExpressionReportsUndefined(t *testing.T) {
+    text := `[x] * 10 `
+
+    diagnostics := `
+        Variable x doesn't exist
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorNameExpressionReportsNoErrorForInsertedToken(t *testing.T) {
+    text := `[]`
+
+    diagnostics := `
+        Unexpected token <EndOfFileToken>, expected <IdentifierToken>.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignmentExpressionReportsUndefined(t *testing.T) {
+    text := `[x] = 10 `
+
+    diagnostics := `
+        Variable x doesn't exist
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignmentExpressionReportsCannotAssign(t *testing.T) {
+    text := `
+    {
+        let x = 10
+        x [=] 0
+    }
+    `
+
+    diagnostics := `
+        Variable x is read-only and cannot be assigned to.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorAssignmentExpressionReportsCannotConvert(t *testing.T) {
+    text := `
+    {
+        var x = 10
+        [x] = true
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'bool' to 'int'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorBinaryExpressionReportsUndefined(t *testing.T) {
     text := `10 [+] false`
 
     diagnostics := `

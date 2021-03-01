@@ -114,6 +114,12 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
+    if len(name) == 0 {
+        //This means the token was inserted by the parser. We already reported
+        //error so we can just return an error expression.
+        return NewBoundLiteralExpression(0)
+    }
+
     var variable *Util.VariableSymbol
     if b.scope.TryLookup(name, &variable) {
         return NewBoundVariableExpression(variable)
