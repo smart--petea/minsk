@@ -26,6 +26,10 @@ func TestEvaluations(t *testing.T) {
             expectedValue: -1,
         },
         {
+            text: "~1",
+            expectedValue: 2,
+        },
+        {
             text: "14 + 12",
             expectedValue: 26,
         },
@@ -103,6 +107,34 @@ func TestEvaluations(t *testing.T) {
         },
 
         {
+            text: "1 | 2",
+            expectedValue: 3,
+        },
+        {
+            text: "1 | 0",
+            expectedValue: 1,
+        },
+        {
+            text: "1 & 2",
+            expectedValue: 0,
+        },
+        {
+            text: "1 & 0",
+            expectedValue: 0,
+        },
+        {
+            text: "1 ^ 0",
+            expectedValue: 1,
+        },
+        {
+            text: "0 ^ 1",
+            expectedValue: 1,
+        },
+        {
+            text: "1 ^ 3",
+            expectedValue: 2,
+        },
+        {
             text: "false == false",
             expectedValue: true,
         },
@@ -116,6 +148,63 @@ func TestEvaluations(t *testing.T) {
         },
         {
             text: "true != false",
+            expectedValue: true,
+        },
+        {
+            text: "false | false",
+            expectedValue: false,
+        },
+        {
+            text: "false | true",
+            expectedValue: true,
+        },
+        {
+            text: "true | false",
+            expectedValue: true,
+        },
+        {
+            text: "true | true",
+            expectedValue: true,
+        },
+
+        {
+            text: "false & false",
+            expectedValue: false,
+        },
+        {
+            text: "false & true",
+            expectedValue: false,
+        },
+        {
+            text: "true & false",
+            expectedValue: false,
+        },
+        {
+            text: "true & true",
+            expectedValue: true,
+        },
+        {
+            text: "false ^ false",
+            expectedValue: false,
+        },
+        {
+            text: "false ^ true",
+            expectedValue: true,
+        },
+        {
+            text: "true ^ false",
+            expectedValue: true,
+        },
+        {
+            text: "true ^ true",
+            expectedValue: false,
+        },
+        {
+            text: "~true",
+            expectedValue: false,
+        },
+        {
+            text: "~false",
             expectedValue: true,
         },
         {

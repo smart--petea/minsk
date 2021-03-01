@@ -87,6 +87,14 @@ func (l *Lexer) Lex() *SyntaxToken {
         l.Next()
         l.kind = SyntaxKind.CloseBraceToken
 
+    case '~':
+        l.Next()
+        l.kind = SyntaxKind.TildeToken
+
+    case '^':
+        l.Next()
+        l.kind = SyntaxKind.HatToken
+
     case ')':
         l.Next()
         l.kind = SyntaxKind.CloseParenthesisToken
@@ -96,6 +104,9 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.Next()
             l.Next()
             l.kind = SyntaxKind.AmpersandAmpersandToken
+        } else {
+            l.Next()
+            l.kind = SyntaxKind.AmpersandToken
         }
 
     case '|':
@@ -103,6 +114,9 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.Next()
             l.Next()
             l.kind = SyntaxKind.PipePipeToken
+        } else {
+            l.Next()
+            l.kind = SyntaxKind.PipeToken
         }
 
     case '=':

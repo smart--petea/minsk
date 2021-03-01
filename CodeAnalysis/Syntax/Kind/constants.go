@@ -25,6 +25,10 @@ const (
     GreaterOrEqualsToken SyntaxKind = "GreaterOrEqualsToken"
     EqualsToken SyntaxKind = "EqualsToken"
     BangEqualsToken SyntaxKind = "BangEqualsToken"
+    TildeToken SyntaxKind = "TildeToken"
+    HatToken SyntaxKind = "HatToken"
+    AmpersandToken SyntaxKind = "AmpersandToken"
+    PipeToken SyntaxKind = "PipeToken"
 
     //Keywords
     LetKeyword SyntaxKind = "LetKeyword"
