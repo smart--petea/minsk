@@ -299,6 +299,54 @@ func TestEvaluatorIfStatementsReportsCannotConvert(t *testing.T) {
     assertDiagnostics(text, diagnostics, t)
 }
 
+func TestEvaluatorWhileStatementsReportsCannotConvert(t *testing.T) {
+    text := `
+    {
+        var x = 0
+        while [10]
+            x = 10
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'int' to 'bool'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorForStatementsReportsCannotConvertLowerBound(t *testing.T) {
+    text := `
+    {
+        var result = 0
+        for i = [false] to 10
+            result = result + i
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'bool' to 'int'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
+func TestEvaluatorForStatementsReportsCannotConvertUpperBound(t *testing.T) {
+    text := `
+    {
+        var result = 0
+        for i = 1 to [true]
+            result = result + i
+    }
+    `
+
+    diagnostics := `
+        Cannot convert type 'bool' to 'int'.
+    `
+
+    assertDiagnostics(text, diagnostics, t)
+}
+
 func TestEvaluatorUnaryReportsUndefined(t *testing.T) {
     text := `[+]true`
 
