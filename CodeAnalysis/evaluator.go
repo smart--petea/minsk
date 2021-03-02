@@ -91,6 +91,21 @@ func (e *Evaluator) evaluateUnaryExpression(u *Binding.BoundUnaryExpression) int
         return -(operand.(int))
     case BoundUnaryOperatorKind.LogicalNegation:
         return !(operand.(bool))
+    case BoundUnaryOperatorKind.OnesComplement:
+        switch val := operand.(type) {
+        case bool:
+            if val {
+                return false
+            }
+
+            return true
+
+        case int:
+            return ^val
+        }
+
+
+        return !(operand.(bool))
     default:
         panic(fmt.Sprintf("Unexpected unary operator %s", u.Op.Kind))
     }
@@ -112,6 +127,66 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
 
     case BoundBinaryOperatorKind.Division:
         return left.(int) / right.(int)
+
+    case BoundBinaryOperatorKind.BitwiseAnd:
+        if _, ok := left.(int); ok {
+            return left.(int) & right.(int)
+        }
+
+        var leftOp, rightOp int
+        if left.(bool) {
+            leftOp = 1
+        }
+
+        if right.(bool) {
+            rightOp = 1
+        }
+
+        if (leftOp & rightOp) > 0 {
+            return true
+        }
+
+        return false
+
+    case BoundBinaryOperatorKind.BitwiseOr:
+        if _, ok := left.(int); ok {
+            return left.(int) | right.(int)
+        }
+
+        var leftOp, rightOp int
+        if left.(bool) {
+            leftOp = 1
+        }
+
+        if right.(bool) {
+            rightOp = 1
+        }
+
+        if (leftOp | rightOp) > 0 {
+            return true
+        }
+
+        return false
+
+    case BoundBinaryOperatorKind.BitwiseXor:
+        if _, ok := left.(int); ok {
+            return left.(int) ^ right.(int)
+        }
+
+        var leftOp, rightOp int
+        if left.(bool) {
+            leftOp = 1
+        }
+
+        if right.(bool) {
+            rightOp = 1
+        }
+
+        if (leftOp ^ rightOp) > 0 {
+            return true
+        }
+
+        return false
 
     case BoundBinaryOperatorKind.LogicalAnd:
         return left.(bool) && right.(bool)

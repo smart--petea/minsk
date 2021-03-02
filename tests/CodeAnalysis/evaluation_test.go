@@ -27,7 +27,7 @@ func TestEvaluations(t *testing.T) {
         },
         {
             text: "~1",
-            expectedValue: 2,
+            expectedValue: -2,
         },
         {
             text: "14 + 12",

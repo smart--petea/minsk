@@ -32,6 +32,8 @@ var _operators = []*BoundUnaryOperator{
     NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, reflect.Bool, reflect.Bool),
     NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, reflect.Int, reflect.Int),
     NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, reflect.Int, reflect.Int),
+    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, reflect.Int, reflect.Int),
+    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, reflect.Bool, reflect.Bool),
 }
 
 func Bind(syntaxKind SyntaxKind.SyntaxKind, operandType reflect.Kind) *BoundUnaryOperator {

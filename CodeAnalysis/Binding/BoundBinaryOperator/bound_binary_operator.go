@@ -42,9 +42,15 @@ var _operators = []*BoundBinaryOperator{
     NewBoundBinaryOperator(SyntaxKind.LessOrEqualsToken, BoundBinaryOperatorKind.LessOrEquals, reflect.Int, reflect.Int, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.GreaterToken, BoundBinaryOperatorKind.Greater, reflect.Int, reflect.Int, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.GreaterOrEqualsToken, BoundBinaryOperatorKind.GreaterOrEquals, reflect.Int, reflect.Int, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.PipeToken, BoundBinaryOperatorKind.BitwiseOr, reflect.Int, reflect.Int, reflect.Int),
+    NewBoundBinaryOperator(SyntaxKind.HatToken, BoundBinaryOperatorKind.BitwiseXor, reflect.Int, reflect.Int, reflect.Int),
 
+    NewBoundBinaryOperator(SyntaxKind.AmpersandToken, BoundBinaryOperatorKind.BitwiseAnd, reflect.Bool, reflect.Bool, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, reflect.Bool, reflect.Bool, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.PipeToken, BoundBinaryOperatorKind.BitwiseOr, reflect.Bool, reflect.Bool, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, reflect.Bool, reflect.Bool, reflect.Bool),
+    NewBoundBinaryOperator(SyntaxKind.HatToken, BoundBinaryOperatorKind.BitwiseXor, reflect.Bool, reflect.Bool, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, reflect.Bool, reflect.Bool, reflect.Bool),
     NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, reflect.Bool, reflect.Bool, reflect.Bool),
 }
