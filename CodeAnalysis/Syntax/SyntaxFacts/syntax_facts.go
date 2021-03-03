@@ -83,6 +83,14 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return ">"
     case SyntaxKind.GreaterOrEqualsToken:
         return ">="
+    case SyntaxKind.TildeToken:
+        return "~"
+    case SyntaxKind.HatToken:
+        return "^"
+    case SyntaxKind.PipeToken:
+        return "|"
+    case SyntaxKind.AmpersandToken:
+        return "&"
     case SyntaxKind.AmpersandAmpersandToken:
         return "&&"
     case SyntaxKind.PipePipeToken:

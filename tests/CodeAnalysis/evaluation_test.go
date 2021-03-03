@@ -115,8 +115,8 @@ func TestEvaluations(t *testing.T) {
             expectedValue: 1,
         },
         {
-            text: "1 & 2",
-            expectedValue: 0,
+            text: "1 & 3",
+            expectedValue: 1,
         },
         {
             text: "1 & 0",
@@ -325,13 +325,12 @@ func TestEvaluatorVariableDeclarationsReportsRedeclaration(t *testing.T) {
 func TestEvaluatorBlockStatementNoInfiniteLoop(t *testing.T) {
     text := `
     {
-        )
+        [)]
     }
     `
 
     diagnostics := `
         Unexpected token <CloseParenthisToken>, expected <IdentifierToken>.
-        Unexpected token <EndOfFileToken>, expected <CloseBraceToken>.
     `
 
     assertDiagnostics(text, diagnostics, t)

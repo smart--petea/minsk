@@ -7,11 +7,11 @@ import (
 )
 
 type AssertingEnumerator struct {
-    enumerator <-chan Syntax.SyntaxNode
+    enumerator <-chan Syntax.CoreSyntaxNode
     t *testing.T
 }
 
-func NewAssertingEnumerator(node Syntax.SyntaxNode, t *testing.T) *AssertingEnumerator {
+func NewAssertingEnumerator(node Syntax.CoreSyntaxNode, t *testing.T) *AssertingEnumerator {
     return &AssertingEnumerator{
         enumerator: flatten(node),
         t: t,

@@ -5,6 +5,8 @@ import (
     "strings"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Syntax"
+
+    "fmt"
 )
 
 type testToken struct {
@@ -34,6 +36,10 @@ func getTokens() []testToken {
         {kind: SyntaxKind.GreaterToken, text: ">"},
         {kind: SyntaxKind.GreaterOrEqualsToken, text: ">="},
         {kind: SyntaxKind.AmpersandAmpersandToken, text: "&&"},
+        {kind: SyntaxKind.AmpersandToken, text: "&"},
+        {kind: SyntaxKind.PipeToken, text: "|"},
+        {kind: SyntaxKind.TildeToken, text: "~"},
+        {kind: SyntaxKind.HatToken, text: "^"},
         {kind: SyntaxKind.PipePipeToken, text: "||"},
         {kind: SyntaxKind.EqualsEqualsToken, text: "=="},
         {kind: SyntaxKind.BangEqualsToken, text: "!="},
@@ -41,6 +47,10 @@ func getTokens() []testToken {
         {kind: SyntaxKind.CloseParenthesisToken, text: ")"},
         {kind: SyntaxKind.FalseKeyword, text: "false"},
         {kind: SyntaxKind.TrueKeyword, text: "true"},
+        {kind: SyntaxKind.ToKeyword, text: "to"},
+        {kind: SyntaxKind.WhileKeyword, text: "while"},
+        {kind: SyntaxKind.ForKeyword, text: "for"},
+        {kind: SyntaxKind.IfKeyword, text: "if"},
 
         {kind: SyntaxKind.NumberToken, text: "1"},
         {kind: SyntaxKind.NumberToken, text: "123"},
@@ -96,9 +106,12 @@ func TestLexerTokenPairs(t *testing.T) {
     for _, tokenData0 := range tokensData {
         for _, tokenData1 := range tokensData {
             if requiresSeparator(tokenData0.kind, tokenData1.kind) {
+                fmt.Printf("109. %+v %+v \n", tokenData0.kind, tokenData1.kind)
                 continue
             }
+            fmt.Printf("112. %+v %+v \n", tokenData0.kind, tokenData1.kind)
             text := tokenData0.text + tokenData1.text
+            fmt.Printf("113. %+v\n", text)
             tokens := Syntax.ParseTokens(text)
 
             if len(tokens) != 2 {
@@ -215,6 +228,32 @@ func requiresSeparator(t1kind, t2kind SyntaxKind.SyntaxKind) bool {
     }
 
     if t1kind == SyntaxKind.GreaterToken && t2kind == SyntaxKind.EqualsEqualsToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.AmpersandToken && t2kind == SyntaxKind.AmpersandAmpersandToken {
+        fmt.Printf("%+v%+v\n", t1kind, t2kind)
+        return true
+    }
+
+    if t1kind == SyntaxKind.AmpersandAmpersandToken && t2kind == SyntaxKind.AmpersandToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.AmpersandToken && t2kind == SyntaxKind.AmpersandToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.PipeToken && t2kind == SyntaxKind.PipePipeToken {
+        fmt.Printf("%+v%+v\n", t1kind, t2kind)
+        return true
+    }
+
+    if t1kind == SyntaxKind.PipePipeToken && t2kind == SyntaxKind.PipeToken {
+        return true
+    }
+
+    if t1kind == SyntaxKind.PipeToken && t2kind == SyntaxKind.PipeToken {
         return true
     }
 

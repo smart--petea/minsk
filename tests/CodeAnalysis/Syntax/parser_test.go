@@ -119,18 +119,18 @@ func parseExpression(text string, t *testing.T) Syntax.ExpressionSyntax {
     return expression
 }
 
-func flatten(node Syntax.SyntaxNode) <-chan Syntax.SyntaxNode {
-    out := make(chan Syntax.SyntaxNode)
+func flatten(node Syntax.CoreSyntaxNode) <-chan Syntax.CoreSyntaxNode {
+    out := make(chan Syntax.CoreSyntaxNode)
 
     stack := Util.NewStack()
     stack.Push(interface{}(node))
 
     go func() {
         for stack.Count() > 0 {
-            n := stack.Pop().(Syntax.SyntaxNode)
+            n := stack.Pop().(Syntax.CoreSyntaxNode)
             out<-n
 
-            var children []Syntax.SyntaxNode
+            var children []Syntax.CoreSyntaxNode
             for child := range n.GetChildren() {
                 children = append(children, child)
             }
