@@ -45,8 +45,8 @@ func prettyPrint(writer io.StringWriter, node BoundNode, indent string, isLast b
     }
     */
 
-    kindS := fmt.Sprintf("%s", node.Kind())
-    writer.WriteString(kindS)
+    writeNode(writer, node)
+    writeProperties(writer, node)
 
     /*
     if isSyntaxToken && node.Value() != nil {
@@ -92,3 +92,40 @@ func WriteTo(writer io.StringWriter, node BoundNode) {
     isLast := true
     prettyPrint(writer, node, indent, isLast)
 }
+
+func getColor(node BoundNode) Console.Colour {
+    if _, ok := node.(BoundExpression); ok {
+        return Console.COLOUR_BLUE
+    }
+
+    if _, ok := node.(BoundStatement); ok {
+        return Console.COLOUR_CYAN
+    }
+
+    return Console.COLOUR_YELLOW
+}
+
+func writeProperties(writer io.StringWriter, node BoundNode) {
+}
+
+func writeNode(writer io.StringWriter, node BoundNode) {
+    Console.ForegroundColour(getColor(node))
+
+    text := getText(node)
+    writer.WriteString(text)
+
+    Console.ResetColour()
+}
+
+func getText(node BoundNode) string {
+    if b, ok := node.(*BoundBinaryExpression); ok {
+        return fmt.Sprintf("%s Expression", b.Op.Kind)
+    }
+
+    if u, ok := node.(*BoundUnaryExpression); ok {
+        return fmt.Sprintf("%s Expression", u.Op.Kind)
+    }
+
+    return fmt.Sprintf("%s", node.Kind())
+}
+
