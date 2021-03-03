@@ -8,12 +8,16 @@ import (
 )
 
 type BoundUnaryExpression struct {
+    *boundNodeChildren
+
     Operand BoundExpression
     Op *BoundUnaryOperator.BoundUnaryOperator
 }
 
 func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand BoundExpression) *BoundUnaryExpression {
     return &BoundUnaryExpression{
+        boundNodeChildren: newBoundNodeChildren(operand),
+
         Operand: operand,
         Op: op,
     }

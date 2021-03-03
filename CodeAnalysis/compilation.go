@@ -4,7 +4,9 @@ import (
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Binding"
     "minsk/Util"
+
     "sync"
+    "io"
 )
 
 type Compilation struct {
@@ -61,3 +63,6 @@ func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *
     return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }
 
+func (c *Compilation) EmitTree(writer io.StringWriter) {
+    Binding.WriteTo(writer, c.globalScope.Statement)
+}

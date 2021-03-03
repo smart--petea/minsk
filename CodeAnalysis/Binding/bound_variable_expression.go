@@ -7,11 +7,15 @@ import (
 )
 
 type BoundVariableExpression struct {
+    *boundNodeChildren
+
     Variable *Util.VariableSymbol
 }
 
 func NewBoundVariableExpression(variable *Util.VariableSymbol) *BoundVariableExpression {
     return &BoundVariableExpression{
+        boundNodeChildren: newBoundNodeChildren(),
+
         Variable: variable,
     }
 }

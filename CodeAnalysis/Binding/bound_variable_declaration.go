@@ -6,12 +6,16 @@ import (
 )
 
 type BoundVariableDeclaration struct {
+    *boundNodeChildren
+
     Variable *Util.VariableSymbol
     Initializer BoundExpression
 }
 
 func NewBoundVariableDeclaration(variable *Util.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
     return &BoundVariableDeclaration{
+        boundNodeChildren: newBoundNodeChildren(initializer),
+
         Variable: variable,
         Initializer: initializer,
     }

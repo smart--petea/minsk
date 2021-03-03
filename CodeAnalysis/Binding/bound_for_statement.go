@@ -6,6 +6,8 @@ import (
 )
 
 type BoundForStatement struct {
+    *boundNodeChildren
+
     Variable *Util.VariableSymbol
     LowerBound BoundExpression
     UpperBound BoundExpression
@@ -14,6 +16,8 @@ type BoundForStatement struct {
 
 func NewBoundForStatement(variable *Util.VariableSymbol, lowerBound BoundExpression, upperBound BoundExpression, body BoundStatement) *BoundForStatement {
     return &BoundForStatement{
+        boundNodeChildren: newBoundNodeChildren(lowerBound, upperBound, body),
+
         Variable: variable,
         LowerBound: lowerBound,
         UpperBound: upperBound,

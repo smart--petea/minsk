@@ -6,11 +6,15 @@ import (
 )
 
 type BoundLiteralExpression struct {
+    *boundNodeChildren
+
     Value interface{}
 }
 
 func NewBoundLiteralExpression(value interface{}) *BoundLiteralExpression {
     return &BoundLiteralExpression{
+        boundNodeChildren: newBoundNodeChildren(),
+
         Value: value,
     }
 }

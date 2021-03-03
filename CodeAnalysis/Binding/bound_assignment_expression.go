@@ -7,12 +7,16 @@ import (
 )
 
 type BoundAssignmentExpression struct {
+    *boundNodeChildren
+
     Variable *Util.VariableSymbol
     Expression BoundExpression
 }
 
 func NewBoundAssignmentExpression(variable *Util.VariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
     return &BoundAssignmentExpression{
+        boundNodeChildren: newBoundNodeChildren(expression),
+
         Variable: variable,
         Expression: expression,
     }

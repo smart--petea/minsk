@@ -5,6 +5,8 @@ import (
 )
 
 type BoundIfStatement struct {
+    *boundNodeChildren
+
     Condition BoundExpression 
     ThenStatement BoundStatement
     ElseStatement BoundStatement
@@ -12,6 +14,8 @@ type BoundIfStatement struct {
 
 func NewBoundIfStatement(condition BoundExpression, thenStatement, elseStatement BoundStatement) *BoundIfStatement {
     return &BoundIfStatement{
+        boundNodeChildren: newBoundNodeChildren(condition, thenStatement, elseStatement),
+
         Condition: condition,
         ThenStatement: thenStatement,
         ElseStatement: elseStatement,

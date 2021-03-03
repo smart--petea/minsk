@@ -5,12 +5,16 @@ import (
 )
 
 type BoundWhileStatement struct {
+    *boundNodeChildren
+
     Condition BoundExpression
     Body BoundStatement
 }
 
 func NewBoundWhileStatement(condition BoundExpression, body BoundStatement) *BoundWhileStatement {
     return &BoundWhileStatement{
+        boundNodeChildren: newBoundNodeChildren(condition, body),
+
         Condition: condition,
         Body: body,
     }

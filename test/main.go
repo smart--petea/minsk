@@ -17,6 +17,7 @@ import (
 func main() {
     reader := bufio.NewReader(os.Stdin)
     var showTree bool
+    var showProgram bool
     variables := make(map[*Util.VariableSymbol]interface{})
     var textBuilder strings.Builder
     var previous *CA.Compilation
@@ -50,6 +51,15 @@ func main() {
                 }
 
                 continue
+            } else if strings.TrimSpace(input) == "#showProgram" {
+                showProgram = !showProgram
+                if showProgram {
+                    fmt.Println("Showing bound tree.")
+                } else {
+                    fmt.Println("Not showing bound tree.")
+                }
+
+                continue
             } else if strings.TrimSpace(input) == "#cls" {
                 Console.Clear()
                 continue
@@ -79,6 +89,12 @@ func main() {
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
             Syntax.WriteTo(os.Stdout, syntaxTree.Root)
+            Console.ResetColour()
+        } 
+
+        if showProgram {
+            Console.ForegroundColour(Console.COLOUR_GRAY)
+            compilation.EmitTree(os.Stdout)
             Console.ResetColour()
         } 
 
