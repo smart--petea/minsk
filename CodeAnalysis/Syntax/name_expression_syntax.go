@@ -3,10 +3,12 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type NameExpressionSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
+
     IdentifierToken *SyntaxToken
 }
 
@@ -16,7 +18,7 @@ func (b *NameExpressionSyntax) Value() interface{} {
 
 func NewNameExpressionSyntax(identifierToken *SyntaxToken) *NameExpressionSyntax {
     return &NameExpressionSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(identifierToken),
+        ChildrenProvider: Util.NewChildrenProvider(identifierToken),
         IdentifierToken: identifierToken,
     }
 }

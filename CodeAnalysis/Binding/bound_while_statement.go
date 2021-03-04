@@ -2,10 +2,11 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundWhileStatement struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Condition BoundExpression
     Body BoundStatement
@@ -13,7 +14,7 @@ type BoundWhileStatement struct {
 
 func NewBoundWhileStatement(condition BoundExpression, body BoundStatement) *BoundWhileStatement {
     return &BoundWhileStatement{
-        boundNodeChildren: newBoundNodeChildren(condition, body),
+        ChildrenProvider: Util.NewChildrenProvider(condition, body),
 
         Condition: condition,
         Body: body,

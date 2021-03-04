@@ -7,5 +7,5 @@ import (
 type CoreSyntaxNode interface {
     Kind() SyntaxKind.SyntaxKind
     Value()  interface{}
-    GetChildren() <-chan CoreSyntaxNode 
+    GetChildren() <-chan interface{} 
 }

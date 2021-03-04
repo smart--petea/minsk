@@ -6,7 +6,7 @@ import (
 )
 
 type BoundVariableDeclaration struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Variable *Util.VariableSymbol
     Initializer BoundExpression
@@ -14,7 +14,7 @@ type BoundVariableDeclaration struct {
 
 func NewBoundVariableDeclaration(variable *Util.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
     return &BoundVariableDeclaration{
-        boundNodeChildren: newBoundNodeChildren(initializer),
+        ChildrenProvider: Util.NewChildrenProvider(initializer),
 
         Variable: variable,
         Initializer: initializer,

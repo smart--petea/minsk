@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type VariableDeclarationSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     Keyword *SyntaxToken
     Identifier *SyntaxToken
@@ -20,7 +21,7 @@ func (v *VariableDeclarationSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func NewVariableDeclarationSyntax(keyword, identifier, equalsToken  *SyntaxToken, initializer ExpressionSyntax) *VariableDeclarationSyntax {
     return &VariableDeclarationSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(keyword, identifier, equalsToken, initializer),
+        ChildrenProvider: Util.NewChildrenProvider(keyword, identifier, equalsToken, initializer),
 
         Keyword: keyword,
         Identifier: identifier,

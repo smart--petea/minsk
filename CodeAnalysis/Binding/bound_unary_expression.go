@@ -3,12 +3,13 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 
     "reflect"
 )
 
 type BoundUnaryExpression struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Operand BoundExpression
     Op *BoundUnaryOperator.BoundUnaryOperator
@@ -16,7 +17,7 @@ type BoundUnaryExpression struct {
 
 func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand BoundExpression) *BoundUnaryExpression {
     return &BoundUnaryExpression{
-        boundNodeChildren: newBoundNodeChildren(operand),
+        ChildrenProvider: Util.NewChildrenProvider(operand),
 
         Operand: operand,
         Op: op,

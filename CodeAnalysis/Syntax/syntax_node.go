@@ -26,16 +26,17 @@ func SyntaxNodeToTextSpan(coreSyntaxNode CoreSyntaxNode) *Text.TextSpan {
     last := first
     for last = range children {}
 
-    start := SyntaxNodeToTextSpan(first).Start
-    end := SyntaxNodeToTextSpan(last).End()
+    start := SyntaxNodeToTextSpan(first.(CoreSyntaxNode)).Start
+    end := SyntaxNodeToTextSpan(last.(CoreSyntaxNode)).End()
     return Text.NewTextSpan(start, end - start) 
 }
 
-func prettyPrint(writer io.StringWriter, node CoreSyntaxNode, indent string, isLast bool) {
+func prettyPrint(writer io.StringWriter, nodeI interface{}, indent string, isLast bool) {
     isToConsole := (writer == os.Stdout)
-    if fmt.Sprintf("%v", node) == "<nil>" {
+    if fmt.Sprintf("%v", nodeI) == "<nil>" {
         return
     }
+    node := nodeI.(CoreSyntaxNode)
 
     var marker string
     if isLast {
@@ -86,7 +87,7 @@ func prettyPrint(writer io.StringWriter, node CoreSyntaxNode, indent string, isL
         indent = indent + "│   "
     }
 
-    var nextChild, prevChild CoreSyntaxNode
+    var nextChild, prevChild interface{}
     var ok bool
     children := node.GetChildren()
     prevChild, ok = <-children 

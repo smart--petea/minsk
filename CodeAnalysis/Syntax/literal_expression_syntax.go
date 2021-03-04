@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type LiteralExpressionSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     LiteralToken *SyntaxToken
     value interface{}
@@ -22,7 +23,7 @@ func (l *LiteralExpressionSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func NewLiteralExpressionSyntax(literalToken *SyntaxToken, value interface{}) *LiteralExpressionSyntax {
     return &LiteralExpressionSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(literalToken),
+        ChildrenProvider: Util.NewChildrenProvider(literalToken),
 
         LiteralToken: literalToken,
         value: value,

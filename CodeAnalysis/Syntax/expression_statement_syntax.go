@@ -3,17 +3,18 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type ExpressionStatementSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     Expression ExpressionSyntax
 }
 
 func NewExpressionStatementSyntax(expression ExpressionSyntax) *ExpressionStatementSyntax {
     return &ExpressionStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(expression),
+        ChildrenProvider: Util.NewChildrenProvider(expression),
 
         Expression: expression,
     }

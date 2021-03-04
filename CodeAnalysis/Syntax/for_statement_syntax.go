@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type ForStatementSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     Keyword *SyntaxToken
     Identifier *SyntaxToken
@@ -19,7 +20,7 @@ type ForStatementSyntax struct {
 
 func NewForStatementSyntax(keyword, identifier, equalsToken *SyntaxToken, lowerBound ExpressionSyntax, toKeyword *SyntaxToken, upperBound ExpressionSyntax, body StatementSyntax) *ForStatementSyntax {
     return &ForStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(keyword, identifier, equalsToken, lowerBound, toKeyword, upperBound, body),
+        ChildrenProvider: Util.NewChildrenProvider(keyword, identifier, equalsToken, lowerBound, toKeyword, upperBound, body),
 
         Keyword: keyword,
         Identifier: identifier,

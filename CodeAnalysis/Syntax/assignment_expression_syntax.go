@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type AssignmentExpressionSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     IdentifierToken *SyntaxToken
     EqualsToken *SyntaxToken
@@ -19,7 +20,7 @@ func (a *AssignmentExpressionSyntax) Value() interface{} {
 
 func NewAssignmentExpressionSyntax(identifierToken *SyntaxToken, equalsToken *SyntaxToken, expression ExpressionSyntax) *AssignmentExpressionSyntax {
     return &AssignmentExpressionSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(identifierToken, equalsToken, expression),
+        ChildrenProvider: Util.NewChildrenProvider(identifierToken, equalsToken, expression),
 
         IdentifierToken: identifierToken,
         EqualsToken: equalsToken,

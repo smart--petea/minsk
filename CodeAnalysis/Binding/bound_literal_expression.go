@@ -2,18 +2,19 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
     "reflect"
 )
 
 type BoundLiteralExpression struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Value interface{}
 }
 
 func NewBoundLiteralExpression(value interface{}) *BoundLiteralExpression {
     return &BoundLiteralExpression{
-        boundNodeChildren: newBoundNodeChildren(),
+        ChildrenProvider: Util.NewChildrenProvider(),
 
         Value: value,
     }

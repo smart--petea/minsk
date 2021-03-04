@@ -3,12 +3,13 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 
     "reflect"
 )
 
 type BoundBinaryExpression struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Left BoundExpression
     Op *BoundBinaryOperator.BoundBinaryOperator
@@ -17,7 +18,7 @@ type BoundBinaryExpression struct {
 
 func NewBoundBinaryExpression(left BoundExpression, op *BoundBinaryOperator.BoundBinaryOperator, right BoundExpression) *BoundBinaryExpression {
     return &BoundBinaryExpression{
-        boundNodeChildren: newBoundNodeChildren(left, right),
+        ChildrenProvider: Util.NewChildrenProvider(left, right),
 
         Left: left,
         Op: op,

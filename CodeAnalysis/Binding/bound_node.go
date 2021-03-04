@@ -10,14 +10,15 @@ import (
 
 type BoundNode interface {
     Kind() BoundNodeKind.BoundNodeKind
-    GetChildren() <-chan BoundNode 
+    GetChildren() <-chan interface{} 
 }
 
-func prettyPrint(writer io.StringWriter, node BoundNode, indent string, isLast bool) {
+func prettyPrint(writer io.StringWriter, nodeI interface{}, indent string, isLast bool) {
     isToConsole := (writer == os.Stdout)
-    if fmt.Sprintf("%v", node) == "<nil>" {
+    if fmt.Sprintf("%v", nodeI) == "<nil>" {
         return
     }
+    node := nodeI.(BoundNode)
 
     var marker string
     if isLast {
@@ -73,7 +74,7 @@ func prettyPrint(writer io.StringWriter, node BoundNode, indent string, isLast b
         indent = indent + "│   "
     }
 
-    var nextChild, prevChild BoundNode
+    var nextChild, prevChild interface{}
     var ok bool
     children := node.GetChildren()
     prevChild, ok = <-children 

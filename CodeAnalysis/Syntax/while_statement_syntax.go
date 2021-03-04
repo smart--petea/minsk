@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type WhileStatementSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     WhileKeyword *SyntaxToken
     Condition ExpressionSyntax
@@ -15,7 +16,7 @@ type WhileStatementSyntax struct {
 
 func NewWhileStatementSyntax(whileKeyword *SyntaxToken, condition ExpressionSyntax, body StatementSyntax) *WhileStatementSyntax {
     return &WhileStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(),
+        ChildrenProvider: Util.NewChildrenProvider(),
 
         WhileKeyword: whileKeyword,
         Condition: condition,

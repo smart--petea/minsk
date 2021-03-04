@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type IfStatementSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     IfKeyword *SyntaxToken
     Condition ExpressionSyntax
@@ -16,7 +17,7 @@ type IfStatementSyntax struct {
 
 func NewIfStatementSyntax(ifKeyword *SyntaxToken, condition ExpressionSyntax, thenStatement StatementSyntax, elseClause *ElseClauseSyntax) *IfStatementSyntax {
     return &IfStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(ifKeyword, condition, thenStatement, elseClause),
+        ChildrenProvider: Util.NewChildrenProvider(ifKeyword, condition, thenStatement, elseClause),
 
         IfKeyword: ifKeyword,
         Condition: condition,

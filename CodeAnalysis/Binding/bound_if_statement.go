@@ -2,10 +2,11 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundIfStatement struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Condition BoundExpression 
     ThenStatement BoundStatement
@@ -14,7 +15,7 @@ type BoundIfStatement struct {
 
 func NewBoundIfStatement(condition BoundExpression, thenStatement, elseStatement BoundStatement) *BoundIfStatement {
     return &BoundIfStatement{
-        boundNodeChildren: newBoundNodeChildren(condition, thenStatement, elseStatement),
+        ChildrenProvider: Util.NewChildrenProvider(condition, thenStatement, elseStatement),
 
         Condition: condition,
         ThenStatement: thenStatement,

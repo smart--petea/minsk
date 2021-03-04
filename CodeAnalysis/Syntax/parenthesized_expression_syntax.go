@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type ParenthesizedExpressionSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     OpenParenthesisToken *SyntaxToken
     Expression ExpressionSyntax
@@ -15,7 +16,7 @@ type ParenthesizedExpressionSyntax struct {
 
 func NewParenthesizedExpressionSyntax(openParenthesisToken *SyntaxToken, expression ExpressionSyntax, closeParenthesisToken *SyntaxToken)  *ParenthesizedExpressionSyntax {
     return &ParenthesizedExpressionSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(openParenthesisToken, expression, closeParenthesisToken),
+        ChildrenProvider: Util.NewChildrenProvider(openParenthesisToken, expression, closeParenthesisToken),
 
         OpenParenthesisToken: openParenthesisToken,
         Expression: expression,

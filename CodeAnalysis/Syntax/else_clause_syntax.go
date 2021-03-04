@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type ElseClauseSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     ElseKeyword *SyntaxToken
     ElseStatement StatementSyntax
@@ -14,7 +15,7 @@ type ElseClauseSyntax struct {
 
 func NewElseClauseSyntax(elseKeyword *SyntaxToken, elseStatement StatementSyntax) *ElseClauseSyntax {
     return &ElseClauseSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(elseKeyword, elseStatement),
+        ChildrenProvider: Util.NewChildrenProvider(elseKeyword, elseStatement),
 
         ElseKeyword: elseKeyword,
         ElseStatement: elseStatement,

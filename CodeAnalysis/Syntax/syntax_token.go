@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type SyntaxToken struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     kind SyntaxKind.SyntaxKind
     Position int
@@ -24,7 +25,7 @@ func (s *SyntaxToken) Value() interface{} {
 
 func NewSyntaxToken(kind SyntaxKind.SyntaxKind, position int, runes []rune, value interface{}) *SyntaxToken {
     return &SyntaxToken{
-        syntaxNodeChildren: newSyntaxNodeChildren(),
+        ChildrenProvider: Util.NewChildrenProvider(),
 
         kind: kind,
         Position: position,

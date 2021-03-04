@@ -3,10 +3,11 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type BlockStatementSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     OpenBraceToken *SyntaxToken
     Statements []StatementSyntax
@@ -14,15 +15,15 @@ type BlockStatementSyntax struct {
 }
 
 func NewBlockStatementSyntax(openBraceToken *SyntaxToken, statements []StatementSyntax, closeBraceToken *SyntaxToken) *BlockStatementSyntax {
-    var children []CoreSyntaxNode
+    var children []interface{}
     children = append(children, openBraceToken)
     for _, statement := range statements {
-        children = append(children, statement.(SyntaxNode))
+        children = append(children, statement)
     }
     children = append(children, closeBraceToken)
 
     return &BlockStatementSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(children...),
+        ChildrenProvider: Util.NewChildrenProvider(children...),
 
         OpenBraceToken: openBraceToken,
         Statements: statements,

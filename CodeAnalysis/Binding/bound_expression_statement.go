@@ -2,17 +2,18 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundExpressionStatement struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Expression BoundExpression
 }
 
 func NewBoundExpressionStatement(expression BoundExpression) *BoundExpressionStatement {
     return &BoundExpressionStatement{
-        boundNodeChildren: newBoundNodeChildren(expression),
+        ChildrenProvider: Util.NewChildrenProvider(expression),
 
         Expression: expression,
     }

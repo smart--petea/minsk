@@ -2,10 +2,11 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/Util"
 )
 
 type CompilationUnitSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
 
     Statement StatementSyntax
     EndOfFileToken *SyntaxToken
@@ -13,7 +14,7 @@ type CompilationUnitSyntax struct {
 
 func NewCompilationUnitSyntax(statement StatementSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(statement.(SyntaxNode)),
+        ChildrenProvider: Util.NewChildrenProvider(statement),
 
         Statement: statement,
         EndOfFileToken: endOfFileToken,

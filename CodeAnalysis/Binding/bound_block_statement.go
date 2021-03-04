@@ -2,22 +2,23 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/Util"
 )
 
 type BoundBlockStatement struct {
-    *boundNodeChildren
+    *Util.ChildrenProvider
 
     Statements []BoundStatement
 }
 
 func NewBoundBlockStatement(statements []BoundStatement) *BoundBlockStatement {
-    var boundNodes []BoundNode
+    var boundNodes []interface{}
     for _, statement := range statements {
-        boundNodes = append(boundNodes, BoundNode(statement))
+        boundNodes = append(boundNodes, statement)
     }
 
     return &BoundBlockStatement{
-        boundNodeChildren: newBoundNodeChildren(boundNodes...),
+        ChildrenProvider: Util.NewChildrenProvider(boundNodes...),
 
         Statements: statements,
     }

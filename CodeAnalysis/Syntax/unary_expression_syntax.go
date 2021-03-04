@@ -3,10 +3,12 @@ package Syntax
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
+    "minsk/Util"
 )
 
 type UnaryExpressionSyntax struct {
-    *syntaxNodeChildren
+    *Util.ChildrenProvider
+
     OperatorNode SyntaxNode
     Operand ExpressionSyntax
 }
@@ -17,7 +19,8 @@ func (u *UnaryExpressionSyntax) Value() interface{} {
 
 func NewUnaryExpressionSyntax(operatorNode SyntaxNode, operand ExpressionSyntax) *UnaryExpressionSyntax {
     return &UnaryExpressionSyntax{
-        syntaxNodeChildren: newSyntaxNodeChildren(operatorNode, operand),
+        ChildrenProvider: Util.NewChildrenProvider(operatorNode, operand),
+
         OperatorNode: operatorNode,
         Operand: operand,
     }
