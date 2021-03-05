@@ -22,3 +22,8 @@ func NewBoundExpressionStatement(expression BoundExpression) *BoundExpressionSta
 func (b *BoundExpressionStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.ExpressionStatement
 }
+
+//todo
+func (b *BoundExpressionStatement) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{}
+}

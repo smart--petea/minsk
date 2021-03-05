@@ -33,3 +33,12 @@ func (b *BoundBinaryExpression) Kind() BoundNodeKind.BoundNodeKind {
 func (b *BoundBinaryExpression) GetType() reflect.Kind {
     return b.Op.ResultType
 }
+
+func (b *BoundBinaryExpression) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{
+        {
+            Name: "type",
+            Value: b.GetType(),
+        },
+    }
+}

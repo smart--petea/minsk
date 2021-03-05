@@ -3,6 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
+
+    "reflect"
 )
 
 type BoundVariableDeclaration struct {
@@ -23,4 +25,17 @@ func NewBoundVariableDeclaration(variable *Util.VariableSymbol, initializer Boun
 
 func (b *BoundVariableDeclaration) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.VariableDeclaration
+}
+
+func (b *BoundVariableDeclaration) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{
+        {
+            Name: "variable",
+            Value: reflect.TypeOf(b.Variable),
+        },
+        {
+            Name: "initializer",
+            Value: reflect.TypeOf(b.Initializer),
+        },
+    }
 }

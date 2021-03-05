@@ -27,3 +27,16 @@ func (b *BoundLiteralExpression) Kind() BoundNodeKind.BoundNodeKind {
 func (b *BoundLiteralExpression) GetType() reflect.Kind {
     return reflect.TypeOf(b.Value).Kind()
 }
+
+func (b *BoundLiteralExpression) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{
+        {
+            Name: "type",
+            Value: b.GetType(),
+        },
+        {
+            Name: "value",
+            Value: b.Value,
+        },
+    }
+}

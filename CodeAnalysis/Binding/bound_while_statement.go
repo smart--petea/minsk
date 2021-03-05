@@ -24,3 +24,8 @@ func NewBoundWhileStatement(condition BoundExpression, body BoundStatement) *Bou
 func (b *BoundWhileStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.WhileStatement
 }
+
+//todo
+func (b *BoundWhileStatement) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{}
+}

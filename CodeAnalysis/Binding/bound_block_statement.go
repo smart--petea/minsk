@@ -27,3 +27,8 @@ func NewBoundBlockStatement(statements []BoundStatement) *BoundBlockStatement {
 func (b *BoundBlockStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.BlockStatement
 }
+
+//todo
+func (b *BoundBlockStatement) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{}
+}

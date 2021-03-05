@@ -31,3 +31,20 @@ func (b *BoundUnaryExpression) GetType() reflect.Kind {
 func (b *BoundUnaryExpression) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.UnaryExpression
 }
+
+func (b *BoundUnaryExpression) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{
+        {
+            Name: "type",
+            Value: b.GetType(),
+        },
+        {
+            Name: "operand",
+            Value: reflect.TypeOf(b.Operand),
+        },
+        {
+            Name: "op",
+            Value: reflect.TypeOf(b.Op),
+        },
+    }
+}

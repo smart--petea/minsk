@@ -26,3 +26,8 @@ func NewBoundIfStatement(condition BoundExpression, thenStatement, elseStatement
 func (b *BoundIfStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.IfStatement
 }
+
+//todo
+func (b *BoundIfStatement) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{}
+}

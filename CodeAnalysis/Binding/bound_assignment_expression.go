@@ -29,3 +29,13 @@ func (b *BoundAssignmentExpression) GetType() reflect.Kind {
 func (b *BoundAssignmentExpression) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.AssignmentExpression
 }
+
+//todo
+func (b *BoundAssignmentExpression) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{
+        {
+            Name: "type",
+            Value: b.GetType(),
+        },
+    }
+}

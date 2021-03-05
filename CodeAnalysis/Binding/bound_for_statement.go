@@ -28,3 +28,7 @@ func NewBoundForStatement(variable *Util.VariableSymbol, lowerBound BoundExpress
 func (b *BoundForStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.ForStatement
 }
+
+func (b *BoundForStatement) GetProperties() []*BoundNodeProperty {
+    return []*BoundNodeProperty{}
+}

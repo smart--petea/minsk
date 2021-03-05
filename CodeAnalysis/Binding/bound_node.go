@@ -11,6 +11,7 @@ import (
 type BoundNode interface {
     Kind() BoundNodeKind.BoundNodeKind
     GetChildren() <-chan interface{} 
+    GetProperties() []*BoundNodeProperty
 }
 
 func prettyPrint(writer io.StringWriter, nodeI interface{}, indent string, isLast bool) {
@@ -35,33 +36,41 @@ func prettyPrint(writer io.StringWriter, nodeI interface{}, indent string, isLas
     writer.WriteString(marker)
     Console.ResetColour()
 
-    /*
-    _, isSyntaxToken := node.(*SyntaxToken) 
     if isToConsole {
-        if isSyntaxToken {
-            Console.ForegroundColour(Console.COLOUR_BLUE)
+        Console.ForegroundColour(getColor(node))
+    }
+
+    text := getText(node)
+    writer.WriteString(text)
+
+    isFirstProperty := true
+    for _, p := range node.GetProperties() {
+        if isFirstProperty {
+            isFirstProperty = false
         } else {
-            Console.ForegroundColour(Console.COLOUR_CYAN)
+            if isToConsole {
+                Console.ForegroundColour(Console.COLOUR_GRAY)
+            }
+
+            writer.WriteString(", ")
         }
-    }
-    */
+        writer.WriteString(" ")
 
-    writeNode(writer, node)
-    writeProperties(writer, node)
-
-    /*
-    if isSyntaxToken && node.Value() != nil {
-        var s string
-        switch val := node.Value().(type) {
-        case int:
-            s = fmt.Sprintf(" %d", val)
-        default:
-            s = fmt.Sprintf(" %s", val)
+        if isToConsole {
+            Console.ForegroundColour(Console.COLOUR_YELLOW)
         }
+        writer.WriteString(p.Name)
 
-        writer.WriteString(s)
+        if isToConsole {
+            Console.ForegroundColour(Console.COLOUR_GRAY)
+        }
+        writer.WriteString(" = ")
+
+        if isToConsole {
+            Console.ForegroundColour(Console.COLOUR_DARK_YELLOW)
+        }
+        writer.WriteString(fmt.Sprintf("%v", p.Value))
     }
-    */
 
     if isToConsole {
         Console.ResetColour()
@@ -104,18 +113,6 @@ func getColor(node BoundNode) Console.Colour {
     }
 
     return Console.COLOUR_YELLOW
-}
-
-func writeProperties(writer io.StringWriter, node BoundNode) {
-}
-
-func writeNode(writer io.StringWriter, node BoundNode) {
-    Console.ForegroundColour(getColor(node))
-
-    text := getText(node)
-    writer.WriteString(text)
-
-    Console.ResetColour()
 }
 
 func getText(node BoundNode) string {
