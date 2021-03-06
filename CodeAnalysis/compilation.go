@@ -3,6 +3,7 @@ package CodeAnalysis
 import (
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Binding"
+    "minsk/CodeAnalysis/Lowering"
     "minsk/Util"
 
     "sync"
@@ -58,11 +59,18 @@ func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *
         return NewEvaluationResult(c.GlobalScope().GetDiagnostics(), nil)
     }
 
-    evaluator := NewEvaluator(c.GlobalScope().Statement, variables)
+    statement := c.GetStatement()
+    evaluator := NewEvaluator(statement, variables)
     value := evaluator.Evaluate()
     return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }
 
 func (c *Compilation) EmitTree(writer io.StringWriter) {
-    Binding.WriteTo(writer, c.globalScope.Statement)
+    statement := c.GetStatement()
+    Binding.WriteTo(writer, statement)
+}
+
+func (c *Compilation) GetStatement() Binding.BoundStatement {
+    result := c.globalScope.Statement
+    return Lowering.LowererLower(result)
 }
