@@ -4,6 +4,9 @@ type BoundITreeRewriter interface {
     RewriteStatement(BoundITreeRewriter, BoundStatement) BoundStatement 
     RewriteExpression(BoundITreeRewriter, BoundExpression) BoundExpression
 
+    RewriteLabelStatement(BoundITreeRewriter, *BoundLabelStatement) BoundStatement
+    RewriteGotoStatement(BoundITreeRewriter, *BoundGotoStatement) BoundStatement
+    RewriteConditionalGotoStatement(BoundITreeRewriter, *BoundConditionalGotoStatement) BoundStatement
     RewriteBlockStatement(BoundITreeRewriter, *BoundBlockStatement) BoundStatement 
     RewriteExpressionStatement(BoundITreeRewriter, *BoundExpressionStatement) BoundStatement 
     RewriteIfStatement(BoundITreeRewriter, *BoundIfStatement) BoundStatement 

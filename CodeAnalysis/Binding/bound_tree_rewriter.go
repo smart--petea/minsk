@@ -19,6 +19,12 @@ func (*BoundTreeRewriter) RewriteStatement(b BoundITreeRewriter, node BoundState
             return b.RewriteWhileStatement(b, n)
         case *BoundForStatement:
             return b.RewriteForStatement(b, n)
+        case *BoundLabelStatement:
+            return b.RewriteLabelStatement(b, n)
+        case *BoundGotoStatement:
+            return b.RewriteGotoStatement(b, n)
+        case *BoundConditionalGotoStatement:
+            return b.RewriteConditionalGotoStatement(b, n)
         case *BoundVariableDeclaration:
             return b.RewriteVariableDeclaration(b, n)
         default:
@@ -152,4 +158,15 @@ func (*BoundTreeRewriter) RewriteAssignmentExpression(b BoundITreeRewriter, node
     }
 
     return NewBoundAssignmentExpression(node.Variable, expression)
+}
+
+func (*BoundTreeRewriter) RewriteLabelStatement(b BoundITreeRewriter, node *BoundLabelStatement) BoundStatement {
+    return node
+}
+
+func (*BoundTreeRewriter) RewriteGotoStatement(b BoundITreeRewriter, node *BoundGotoStatement) BoundStatement {
+    return node
+}
+
+func (*BoundTreeRewriter) RewriteConditionalGotoStatement(b BoundITreeRewriter, node *BoundConditionalGotoStatement) BoundStatement {
 }

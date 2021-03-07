@@ -5,10 +5,13 @@ type BoundNodeKind string
 const (
     //Statements
     BlockStatement BoundNodeKind = "BlockStatement"
+    ConditionalGotoStatement BoundNodeKind = "ConditionalGotoStatement"
     ExpressionStatement BoundNodeKind = "ExpressionStatement"
     IfStatement BoundNodeKind = "IfStatement"
     WhileStatement BoundNodeKind = "WhileStatement"
     ForStatement BoundNodeKind = "ForStatement"
+    GotoStatement BoundNodeKind = "GotoStatement"
+    LabelStatement BoundNodeKind = "LabelStatement"
     VariableDeclaration BoundNodeKind = "VariableDeclaration"
 
     //Expressions
