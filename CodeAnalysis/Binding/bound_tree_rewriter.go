@@ -7,48 +7,48 @@ import (
 type BoundTreeRewriter struct {
 }
 
-func (b *BoundTreeRewriter) RewriteStatement(node BoundStatement) BoundStatement {
+func (*BoundTreeRewriter) RewriteStatement(b BoundITreeRewriter, node BoundStatement) BoundStatement {
     switch n := node.(type) {
         case *BoundBlockStatement:
-            return b.RewriteBlockStatement(n)
+            return b.RewriteBlockStatement(b, n)
         case *BoundExpressionStatement:
-            return b.RewriteExpressionStatement(n)
+            return b.RewriteExpressionStatement(b, n)
         case *BoundIfStatement:
-            return b.RewriteIfStatement(n)
+            return b.RewriteIfStatement(b, n)
         case *BoundWhileStatement:
-            return b.RewriteWhileStatement(n)
+            return b.RewriteWhileStatement(b, n)
         case *BoundForStatement:
-            return b.RewriteForStatement(n)
+            return b.RewriteForStatement(b, n)
         case *BoundVariableDeclaration:
-            return b.RewriteVariableDeclaration(n)
+            return b.RewriteVariableDeclaration(b, n)
         default:
             panic(fmt.Sprintf("Unexpected node: %s", node.Kind()))
     }
 }
 
-func (b *BoundTreeRewriter) RewriteExpression(node BoundExpression) BoundExpression {
+func (*BoundTreeRewriter) RewriteExpression(b BoundITreeRewriter, node BoundExpression) BoundExpression {
     switch n := node.(type) {
         case *BoundUnaryExpression:
-            return b.RewriteUnaryExpression(n)
+            return b.RewriteUnaryExpression(b, n)
         case *BoundLiteralExpression:
-            return b.RewriteLiteralExpression(n)
+            return b.RewriteLiteralExpression(b, n)
         case *BoundBinaryExpression:
-            return b.RewriteBinaryExpression(n)
+            return b.RewriteBinaryExpression(b, n)
         case *BoundVariableExpression:
-            return b.RewriteVariableExpression(n)
+            return b.RewriteVariableExpression(b, n)
         case *BoundAssignmentExpression:
-            return b.RewriteAssignmentExpression(n)
+            return b.RewriteAssignmentExpression(b, n)
         default:
             panic(fmt.Sprintf("Unexpected node: %s", node.Kind()))
     }
 }
 
-func (b *BoundTreeRewriter) RewriteBlockStatement(node *BoundBlockStatement) BoundStatement {
+func (*BoundTreeRewriter) RewriteBlockStatement(b BoundITreeRewriter, node *BoundBlockStatement) BoundStatement {
     var builder []BoundStatement
     var isBuilderNew bool
 
     for _, oldStatement := range node.Statements {
-        newStatement := b.RewriteStatement(oldStatement)
+        newStatement := b.RewriteStatement(b, oldStatement)
         if newStatement != oldStatement {
             builder = append(builder, newStatement)
             isBuilderNew = true
@@ -64,8 +64,8 @@ func (b *BoundTreeRewriter) RewriteBlockStatement(node *BoundBlockStatement) Bou
     return NewBoundBlockStatement(builder)
 }
 
-func (b *BoundTreeRewriter) RewriteExpressionStatement(node *BoundExpressionStatement) BoundStatement {
-    expression := b.RewriteExpression(node.Expression)
+func (*BoundTreeRewriter) RewriteExpressionStatement(b BoundITreeRewriter, node *BoundExpressionStatement) BoundStatement {
+    expression := b.RewriteExpression(b, node.Expression)
     if expression == node.Expression {
         return node
     }
@@ -73,12 +73,12 @@ func (b *BoundTreeRewriter) RewriteExpressionStatement(node *BoundExpressionStat
     return NewBoundExpressionStatement(expression)
 }
 
-func (b *BoundTreeRewriter) RewriteIfStatement(node *BoundIfStatement) BoundStatement {
-    condition := b.RewriteExpression(node.Condition)
-    thenStatement := b.RewriteStatement(node.ThenStatement)
+func (*BoundTreeRewriter) RewriteIfStatement(b BoundITreeRewriter, node *BoundIfStatement) BoundStatement {
+    condition := b.RewriteExpression(b, node.Condition)
+    thenStatement := b.RewriteStatement(b, node.ThenStatement)
     var elseStatement BoundStatement
     if node.ElseStatement != nil {
-        elseStatement = b.RewriteStatement(node.ElseStatement)
+        elseStatement = b.RewriteStatement(b, node.ElseStatement)
     }
 
     if condition == node.Condition && thenStatement == node.ThenStatement && elseStatement == node.ElseStatement {
@@ -88,9 +88,9 @@ func (b *BoundTreeRewriter) RewriteIfStatement(node *BoundIfStatement) BoundStat
     return NewBoundIfStatement(condition, thenStatement, elseStatement)
 }
 
-func (b *BoundTreeRewriter) RewriteWhileStatement(node *BoundWhileStatement) BoundStatement {
-    condition := b.RewriteExpression(node.Condition)
-    body := b.RewriteStatement(node.Body)
+func (*BoundTreeRewriter) RewriteWhileStatement(b BoundITreeRewriter, node *BoundWhileStatement) BoundStatement {
+    condition := b.RewriteExpression(b, node.Condition)
+    body := b.RewriteStatement(b, node.Body)
     if condition == node.Condition && body == node.Body {
         return node
     }
@@ -98,10 +98,10 @@ func (b *BoundTreeRewriter) RewriteWhileStatement(node *BoundWhileStatement) Bou
     return NewBoundWhileStatement(condition, body)
 }
 
-func (b *BoundTreeRewriter) RewriteForStatement(node *BoundForStatement) BoundStatement {
-    lowerBound := b.RewriteExpression(node.LowerBound)
-    upperBound := b.RewriteExpression(node.UpperBound)
-    body := b.RewriteStatement(node.Body)
+func (*BoundTreeRewriter) RewriteForStatement(b BoundITreeRewriter, node *BoundForStatement) BoundStatement {
+    lowerBound := b.RewriteExpression(b, node.LowerBound)
+    upperBound := b.RewriteExpression(b, node.UpperBound)
+    body := b.RewriteStatement(b, node.Body)
     if lowerBound == node.LowerBound && upperBound == node.UpperBound && body == node.Body {
         return node
     }
@@ -109,8 +109,8 @@ func (b *BoundTreeRewriter) RewriteForStatement(node *BoundForStatement) BoundSt
     return NewBoundForStatement(node.Variable, lowerBound, upperBound, body)
 }
 
-func (b *BoundTreeRewriter) RewriteVariableDeclaration(node *BoundVariableDeclaration) BoundStatement {
-    initializer := b.RewriteExpression(node.Initializer)
+func (*BoundTreeRewriter) RewriteVariableDeclaration(b BoundITreeRewriter, node *BoundVariableDeclaration) BoundStatement {
+    initializer := b.RewriteExpression(b, node.Initializer)
     if initializer == node.Initializer {
         return node
     }
@@ -118,8 +118,8 @@ func (b *BoundTreeRewriter) RewriteVariableDeclaration(node *BoundVariableDeclar
     return NewBoundVariableDeclaration(node.Variable, initializer)
 }
 
-func (b *BoundTreeRewriter) RewriteUnaryExpression(node *BoundUnaryExpression) BoundExpression {
-    operand := b.RewriteExpression(node.Operand)
+func (*BoundTreeRewriter) RewriteUnaryExpression(b BoundITreeRewriter, node *BoundUnaryExpression) BoundExpression {
+    operand := b.RewriteExpression(b, node.Operand)
     if operand == node.Operand {
         return node
     }
@@ -127,13 +127,13 @@ func (b *BoundTreeRewriter) RewriteUnaryExpression(node *BoundUnaryExpression) B
     return NewBoundUnaryExpression(node.Op, operand)
 }
 
-func (b *BoundTreeRewriter) RewriteLiteralExpression(node *BoundLiteralExpression) BoundExpression {
+func (*BoundTreeRewriter) RewriteLiteralExpression(b BoundITreeRewriter, node *BoundLiteralExpression) BoundExpression {
     return node
 }
 
-func (b *BoundTreeRewriter) RewriteBinaryExpression(node *BoundBinaryExpression) BoundExpression {
-    left := b.RewriteExpression(node.Left)
-    right := b.RewriteExpression(node.Right)
+func (*BoundTreeRewriter) RewriteBinaryExpression(b BoundITreeRewriter, node *BoundBinaryExpression) BoundExpression {
+    left := b.RewriteExpression(b, node.Left)
+    right := b.RewriteExpression(b, node.Right)
     if left == node.Left && right == node.Right {
         return node
     }
@@ -141,12 +141,12 @@ func (b *BoundTreeRewriter) RewriteBinaryExpression(node *BoundBinaryExpression)
     return NewBoundBinaryExpression(left, node.Op, right)
 }
 
-func (b *BoundTreeRewriter) RewriteVariableExpression(node *BoundVariableExpression) BoundExpression {
+func (*BoundTreeRewriter) RewriteVariableExpression(b BoundITreeRewriter, node *BoundVariableExpression) BoundExpression {
     return node
 }
 
-func (b *BoundTreeRewriter) RewriteAssignmentExpression(node *BoundAssignmentExpression) BoundExpression {
-    expression := b.RewriteExpression(node.Expression)
+func (*BoundTreeRewriter) RewriteAssignmentExpression(b BoundITreeRewriter, node *BoundAssignmentExpression) BoundExpression {
+    expression := b.RewriteExpression(b, node.Expression)
     if expression == node.Expression {
         return node
     }

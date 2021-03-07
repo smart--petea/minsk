@@ -2,6 +2,7 @@ package Lowering
 
 import (
     "minsk/CodeAnalysis/Binding"
+    "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "reflect"
 )
@@ -17,10 +18,10 @@ func newLowerer() *Lowerer {
 func LowererLower(statement Binding.BoundStatement) Binding.BoundStatement {
     lowerer := newLowerer()
 
-    return lowerer.RewriteStatement(statement)
+    return lowerer.RewriteStatement(lowerer, statement)
 }
 
-func (l *Lowerer) RewriteForStatement(node *BoundForStatement) Binding.BoundStatement {
+func (*Lowerer) RewriteForStatement(b Binding.BoundITreeRewriter, node *Binding.BoundForStatement) Binding.BoundStatement {
     //for i = <lower> to <upper>
     //      <body>
     //
@@ -38,7 +39,7 @@ func (l *Lowerer) RewriteForStatement(node *BoundForStatement) Binding.BoundStat
     variableExpression := Binding.NewBoundVariableExpression(node.Variable)
     condition := Binding.NewBoundBinaryExpression(
         variableExpression,
-        Binding.BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, reflect.Int, reflect.Int),
+        BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, reflect.Int, reflect.Int),
         node.UpperBound,
     )
 
@@ -47,15 +48,15 @@ func (l *Lowerer) RewriteForStatement(node *BoundForStatement) Binding.BoundStat
             node.Variable,
             Binding.NewBoundBinaryExpression(
                 variableExpression,
-                Binding.BoundBinaryOperator.Bind(SyntaxKind.PlusToken, reflect.Int, reflect.Int),
+                BoundBinaryOperator.Bind(SyntaxKind.PlusToken, reflect.Int, reflect.Int),
                 Binding.NewBoundLiteralExpression(1),
             ),
-        )
+        ),
     )
 
-    whileBody := Binding.NewBoundBlockStatement([]BoundStatement{node.Body, increment})
+    whileBody := Binding.NewBoundBlockStatement([]Binding.BoundStatement{node.Body, increment})
     whileStatement := Binding.NewBoundWhileStatement(condition, whileBody)
-    result := Binding.NewBoundBlockStatement([]BoundStatement{variableDeclaration, whileStatement})
+    result := Binding.NewBoundBlockStatement([]Binding.BoundStatement{variableDeclaration, whileStatement})
 
-    return l.RewriteStatement(result)
+    return b.RewriteStatement(b, result)
 }
