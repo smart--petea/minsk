@@ -33,9 +33,5 @@ func (b *BoundVariableDeclaration) GetProperties() []*BoundNodeProperty {
             Name: "variable",
             Value: reflect.TypeOf(b.Variable),
         },
-        {
-            Name: "initializer",
-            Value: reflect.TypeOf(b.Initializer),
-        },
     }
 }

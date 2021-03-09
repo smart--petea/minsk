@@ -5,7 +5,7 @@ type LabelSymbol struct {
 }
 
 func NewLabelSymbol(name string) *LabelSymbol {
-    return &VariableSymbol{
+    return &LabelSymbol{
         Name: name,
     }
 }

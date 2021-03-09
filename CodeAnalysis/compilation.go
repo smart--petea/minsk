@@ -70,7 +70,7 @@ func (c *Compilation) EmitTree(writer io.StringWriter) {
     Binding.WriteTo(writer, statement)
 }
 
-func (c *Compilation) GetStatement() Binding.BoundStatement {
+func (c *Compilation) GetStatement() *Binding.BoundBlockStatement {
     result := c.globalScope.Statement
     return Lowering.LowererLower(result)
 }

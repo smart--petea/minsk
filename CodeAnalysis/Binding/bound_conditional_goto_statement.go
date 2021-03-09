@@ -3,6 +3,7 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
+    "reflect"
 )
 
 type BoundConditionalGotoStatement struct {
@@ -15,7 +16,7 @@ type BoundConditionalGotoStatement struct {
 
 func NewBoundConditionalGotoStatement(label *Util.LabelSymbol, condition BoundExpression, jumpIfFalse bool) *BoundConditionalGotoStatement {
     return &BoundConditionalGotoStatement{
-        ChildrenProvider: Util.NewChildrenProvider(label, condition, jumpIfFalse),
+        ChildrenProvider: Util.NewChildrenProvider(condition, jumpIfFalse),
 
         Label: label,
         Condition: condition,
@@ -28,5 +29,14 @@ func (b *BoundConditionalGotoStatement) Kind() BoundNodeKind.BoundNodeKind {
 }
 
 func (b *BoundConditionalGotoStatement) GetProperties() []*BoundNodeProperty {
-    return []*BoundNodeProperty{}
+    return []*BoundNodeProperty{
+        {
+            Name: "Label",
+            Value: reflect.TypeOf(b.Label).Name(),
+        },
+        {
+            Name: "JumpIfFalse",
+            Value: b.JumpIfFalse,
+        },
+    }
 }

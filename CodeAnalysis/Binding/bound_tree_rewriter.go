@@ -169,4 +169,10 @@ func (*BoundTreeRewriter) RewriteGotoStatement(b BoundITreeRewriter, node *Bound
 }
 
 func (*BoundTreeRewriter) RewriteConditionalGotoStatement(b BoundITreeRewriter, node *BoundConditionalGotoStatement) BoundStatement {
+    condition := b.RewriteExpression(b, node.Condition)
+    if condition == node.Condition {
+        return node
+    }
+
+    return NewBoundConditionalGotoStatement(node.Label, condition, node.JumpIfFalse)
 }

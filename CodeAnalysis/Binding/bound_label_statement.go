@@ -13,7 +13,7 @@ type BoundLabelStatement struct {
 
 func NewBoundLabelStatement(label *Util.LabelSymbol) *BoundLabelStatement {
     return &BoundLabelStatement{
-        ChildrenProvider: Util.NewChildrenProvider(label),
+        ChildrenProvider: Util.NewChildrenProvider(),
 
         Label: label,
     }

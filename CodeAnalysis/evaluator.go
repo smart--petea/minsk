@@ -13,12 +13,12 @@ import (
 )
 
 type Evaluator struct {
-        Root Binding.BoundStatement
+        Root *Binding.BoundBlockStatement
         variables map[*Util.VariableSymbol]interface{}
         lastValue interface{}
 }
 
-func NewEvaluator(root Binding.BoundStatement, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
+func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
     return &Evaluator{
         Root: root,
         variables: variables,
@@ -26,26 +26,44 @@ func NewEvaluator(root Binding.BoundStatement, variables map[*Util.VariableSymbo
 }
 
 func (e *Evaluator) Evaluate() interface{} {
-    e.evaluateStatement(e.Root)
+    labelToIndex := make(map[*Util.LabelSymbol]int)
+
+    for i := range e.Root.Statements {
+        if l, ok := e.Root.Statements[i].(*Binding.BoundLabelStatement); ok {
+            labelToIndex[l.Label] = i + 1
+        }
+    }
+
+    for index := 0; index < len(e.Root.Statements); {
+        s := e.Root.Statements[index]
+        switch s.Kind() {
+            case BoundNodeKind.VariableDeclaration:
+                e.evaluateVariableDeclaration(s.(*Binding.BoundVariableDeclaration))
+                index = index + 1
+
+            case BoundNodeKind.ExpressionStatement:
+                e.evaluateExpressionStatement(s.(*Binding.BoundExpressionStatement))
+                index = index + 1
+
+            case BoundNodeKind.GotoStatement:
+                gs := s.(*Binding.BoundGotoStatement)
+                index = labelToIndex[gs.Label]
+
+            case BoundNodeKind.ConditionalGotoStatement:
+                cgs := s.(*Binding.BoundConditionalGotoStatement)
+                condition := e.evaluateExpression(cgs.Condition).(bool)
+                if condition && !cgs.JumpIfFalse || !condition && cgs.JumpIfFalse {
+                    index = labelToIndex[cgs.Label]
+                }
+
+            case BoundNodeKind.LabelStatement:
+
+            default:
+                panic(fmt.Sprintf("Unexpected node %s", s.Kind()))
+        }
+    }
 
     return e.lastValue
-}
-
-func (e *Evaluator) evaluateStatement(node Binding.BoundStatement) {
-    switch node.Kind() {
-        case BoundNodeKind.BlockStatement:
-            e.evaluateBlockStatement(node.(*Binding.BoundBlockStatement))
-        case BoundNodeKind.VariableDeclaration:
-            e.evaluateVariableDeclaration(node.(*Binding.BoundVariableDeclaration))
-        case BoundNodeKind.ExpressionStatement:
-            e.evaluateExpressionStatement(node.(*Binding.BoundExpressionStatement))
-        case BoundNodeKind.IfStatement:
-            e.evaluateIfStatement(node.(*Binding.BoundIfStatement))
-        case BoundNodeKind.WhileStatement:
-            e.evaluateWhileStatement(node.(*Binding.BoundWhileStatement))
-        default:
-            panic(fmt.Sprintf("Unexpected node %s", node.Kind()))
-    }
 }
 
 func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{} {
@@ -223,28 +241,6 @@ func equals(left, right interface{}, ttype reflect.Kind) bool {
         return left.(int) == right.(int)
     default:
         return false
-    }
-}
-
-func (e *Evaluator) evaluateWhileStatement(node *Binding.BoundWhileStatement) {
-    for e.evaluateExpression(node.Condition).(bool) {
-        e.evaluateStatement(node.Body)
-    }
-}
-
-func (e *Evaluator) evaluateIfStatement(node *Binding.BoundIfStatement) {
-    condition := e.evaluateExpression(node.Condition).(bool)
-
-    if condition {
-        e.evaluateStatement(node.ThenStatement)
-    } else if node.ElseStatement != nil {
-        e.evaluateStatement(node.ElseStatement)
-    }
-}
-
-func (e *Evaluator) evaluateBlockStatement(node *Binding.BoundBlockStatement) {
-    for _, statement := range node.Statements {
-        e.evaluateStatement(statement)
     }
 }
 

@@ -13,7 +13,7 @@ type BoundGotoStatement struct {
 
 func NewBoundGotoStatement(label *Util.LabelSymbol) *BoundGotoStatement {
     return &BoundGotoStatement{
-        ChildrenProvider: Util.NewChildrenProvider(label),
+        ChildrenProvider: Util.NewChildrenProvider(),
 
         Label: label,
     }
@@ -23,6 +23,6 @@ func (b *BoundGotoStatement) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.GotoStatement
 }
 
-func (b *BoundBlockStatement) GetProperties() []*BoundNodeProperty {
+func (b *BoundGotoStatement) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{}
 }
