@@ -37,5 +37,9 @@ func (b *BoundAssignmentExpression) GetProperties() []*BoundNodeProperty {
             Name: "type",
             Value: b.GetType(),
         },
+        {
+            Name: "variable",
+            Value: reflect.TypeOf(*b.Variable).Name(),
+        },
     }
 }

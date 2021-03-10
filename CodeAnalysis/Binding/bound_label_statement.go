@@ -3,6 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
+
+    "reflect"
 )
 
 type BoundLabelStatement struct {
@@ -24,5 +26,10 @@ func (b *BoundLabelStatement) Kind() BoundNodeKind.BoundNodeKind {
 }
 
 func (b *BoundLabelStatement) GetProperties() []*BoundNodeProperty {
-    return []*BoundNodeProperty{}
+    return []*BoundNodeProperty{
+        {
+            Name: "label",
+            Value: reflect.TypeOf(*b.Label).Name(),
+        },
+    }
 }

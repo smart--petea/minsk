@@ -16,7 +16,7 @@ type BoundConditionalGotoStatement struct {
 
 func NewBoundConditionalGotoStatement(label *Util.LabelSymbol, condition BoundExpression, jumpIfFalse bool) *BoundConditionalGotoStatement {
     return &BoundConditionalGotoStatement{
-        ChildrenProvider: Util.NewChildrenProvider(condition, jumpIfFalse),
+        ChildrenProvider: Util.NewChildrenProvider(condition),
 
         Label: label,
         Condition: condition,
@@ -32,7 +32,7 @@ func (b *BoundConditionalGotoStatement) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
             Name: "Label",
-            Value: reflect.TypeOf(b.Label).Name(),
+            Value: reflect.TypeOf(*b.Label).Name(),
         },
         {
             Name: "JumpIfFalse",

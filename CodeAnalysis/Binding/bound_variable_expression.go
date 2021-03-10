@@ -28,12 +28,15 @@ func (b *BoundVariableExpression) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.VariableExpression
 }
 
-//todo
 func (b *BoundVariableExpression) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
             Name: "type",
             Value: b.GetType(),
+        },
+        {
+            Name: "variable",
+            Value: reflect.TypeOf(*b.Variable).Name(),
         },
     }
 }
