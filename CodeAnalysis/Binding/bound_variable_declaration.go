@@ -3,8 +3,6 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
-
-    "reflect"
 )
 
 type BoundVariableDeclaration struct {
@@ -31,7 +29,7 @@ func (b *BoundVariableDeclaration) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
             Name: "variable",
-            Value: reflect.TypeOf(b.Variable),
+            Value: b.Variable.Name,
         },
     }
 }

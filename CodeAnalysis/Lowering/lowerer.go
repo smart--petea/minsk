@@ -87,7 +87,7 @@ func (l *Lowerer) RewriteIfStatement(b Binding.BoundITreeRewriter, node *Binding
         endLabel := l.GenerateLabel()
         elseLabel := l.GenerateLabel()
 
-        gotoFalse := Binding.NewBoundConditionalGotoStatement(endLabel, node.Condition, true)
+        gotoFalse := Binding.NewBoundConditionalGotoStatement(elseLabel, node.Condition, true)
         gotoEndStatement := Binding.NewBoundGotoStatement(endLabel)
         elseLabelStatement := Binding.NewBoundLabelStatement(elseLabel)
         endLabelStatement := Binding.NewBoundLabelStatement(endLabel)

@@ -54,9 +54,12 @@ func (e *Evaluator) Evaluate() interface{} {
                 condition := e.evaluateExpression(cgs.Condition).(bool)
                 if condition && !cgs.JumpIfFalse || !condition && cgs.JumpIfFalse {
                     index = labelToIndex[cgs.Label]
+                } else {
+                    index = index + 1
                 }
 
             case BoundNodeKind.LabelStatement:
+                index = index + 1
 
             default:
                 panic(fmt.Sprintf("Unexpected node %s", s.Kind()))

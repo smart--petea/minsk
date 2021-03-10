@@ -3,7 +3,6 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
-    "reflect"
 )
 
 type BoundConditionalGotoStatement struct {
@@ -32,7 +31,7 @@ func (b *BoundConditionalGotoStatement) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
             Name: "Label",
-            Value: reflect.TypeOf(*b.Label).Name(),
+            Value: b.Label.Name,
         },
         {
             Name: "JumpIfFalse",

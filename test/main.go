@@ -84,8 +84,6 @@ func main() {
             compilation = previous.ContinueWith(syntaxTree)
         }
 
-        result := compilation.Evaluate(variables)
-
         if showTree {
             Console.ForegroundColour(Console.COLOUR_GRAY)
             Syntax.WriteTo(os.Stdout, syntaxTree.Root)
@@ -97,6 +95,8 @@ func main() {
             compilation.EmitTree(os.Stdout)
             Console.ResetColour()
         } 
+
+        result := compilation.Evaluate(variables)
 
         if len(result.Diagnostics) == 0  {
             Console.ForegroundColour(Console.COLOUR_MAGENTA)

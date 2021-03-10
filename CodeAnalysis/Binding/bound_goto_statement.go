@@ -24,5 +24,10 @@ func (b *BoundGotoStatement) Kind() BoundNodeKind.BoundNodeKind {
 }
 
 func (b *BoundGotoStatement) GetProperties() []*BoundNodeProperty {
-    return []*BoundNodeProperty{}
+    return []*BoundNodeProperty{
+        {
+            Name: "label",
+            Value: b.Label.Name,
+        },
+    }
 }

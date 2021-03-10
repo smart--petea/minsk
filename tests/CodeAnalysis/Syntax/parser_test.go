@@ -132,7 +132,7 @@ func flatten(node Syntax.CoreSyntaxNode) <-chan Syntax.CoreSyntaxNode {
 
             var children []Syntax.CoreSyntaxNode
             for child := range n.GetChildren() {
-                children = append(children, child)
+                children = append(children, child.(Syntax.CoreSyntaxNode))
             }
 
             for i := len(children)-1; i >= 0; i = i - 1 {
