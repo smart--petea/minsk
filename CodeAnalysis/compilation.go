@@ -71,6 +71,6 @@ func (c *Compilation) EmitTree(writer io.StringWriter) {
 }
 
 func (c *Compilation) GetStatement() *Binding.BoundBlockStatement {
-    result := c.globalScope.Statement
+    result := c.GlobalScope().Statement
     return Lowering.LowererLower(result)
 }
