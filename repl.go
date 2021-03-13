@@ -4,6 +4,7 @@ import (
     "fmt"
     "bufio"
     "os"
+    "os/exec"
     "log"
     "strings"
 
@@ -46,33 +47,85 @@ func (r *Repl) editSubmission(ir IRepl) string {
     view := NewSubmissionView(document)
 
     for r.submissionText == "" {
-        key := Console.ReadKey(true) //todo c#
+        key := ConsoleReadKey()
         r.handleKey(key, document, view)
     }
 
     return r.submissionText
 }
 
-func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollection, view *SubmissionView) {
-    if key.Modifiers == default(ConsoleModifiers) { //todo c#
-        switch key {
-        case ConsoleKey.Enter:
-            r.HandleEnter(document, view)
-        case ConsoleKey.LeftArrow:
-            r.HandleLefttArrow(document, view)
-        case ConsoleKey.RightArrow:
-            r.HandleRightArrow(document, view)
-        case ConsoleKey.UpArrow:
-            r.HandleUpArrow(document, view)
-        case ConsoleKey.DownArrow:
-            r.HandleDownArrow(document, view)
-        default:
-            if key.KeyChar > ' ' {//todo c#
-                r.HandleTyping(document, view, key.KeyChar)
-            }
+func ConsoleInit() {
+    //disable input buffering
+    exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+    //do not display entered characters on the screen
+    exec.Command("stty", "-F", "/dev/tty", "-echo").Run()
+}
 
+func ConsoleReadKey() *ConsoleKeyInfo {
+    b := make([]byte, 8)
+    size, _ := os.Stdin.Read(b)
+
+    return NewConsoleKeyInfo(b[0])
+}
+
+type ConsoleKeyInfo struct {
+    Bytes []byte
+    Kind ConsoleKey
+}
+
+func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
+    return &ConsoleKeyInfo{
+        Bytes: bytes,
+    }
+}
+
+func (c *ConsoleKeyInfo) Kind() ConsoleKey {
+    if len(c.Bytes) && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
+        switch c.Bytes[3] {
+        case 10:
+            return Enter
+        case 67:
+            return LeftArrow
+        case 68:
+            return RightArrow
+        case 65:
+            return UpArrow
+        case 66:
+            return DownArrow
+        default:
+            panic(fmt.Sprintf("Unknown console command %+v", c.Bytes[:3]))
         }
     }
+
+    return Symbol
+}
+
+type ConsoleKey string
+
+const (
+        Enter ConsoleKey = "Enter"
+        LeftArrow ConsoleKey = "LeftArrow"
+        RightArrow ConsoleKey = "RightArrow"
+        UpArrow ConsoleKey = "UpArrow"
+        DownArrow ConsoleKey = "DownArrow"
+        Symbol ConsoleKey = "Symbol"
+)
+
+func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollection, view *SubmissionView) {
+        switch key.Kind() {
+        case Enter:
+            r.HandleEnter(document, view)
+        case LeftArrow:
+            r.HandleLefttArrow(document, view)
+        case RightArrow:
+            r.HandleRightArrow(document, view)
+        case UpArrow:
+            r.HandleUpArrow(document, view)
+        case DownArrow:
+            r.HandleDownArrow(document, view)
+        default:
+            r.HandleTyping(document, view, key.KeyChar)
+        }
 }
 
 func (r *Repl) HandleEnter(document *Util.ObservableCollection, view *SubmissionView) {
