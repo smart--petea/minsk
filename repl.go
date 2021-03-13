@@ -12,6 +12,7 @@ import (
 
 type Repl struct {
     reader *bufio.Reader
+    submissionText string
 
     EvaluateSubmission func(text string) 
     IsCompleteSubmission func(text string) bool
@@ -40,13 +41,16 @@ func (r *Repl) Run(ir IRepl) {
 }
 
 func (r *Repl) editSubmission(ir IRepl) string {
-    document := Util.NewObservableCollection()
+    r.submissionText = ""
+    document := Util.NewObservableCollection("")
     view := NewSubmissionView(document)
 
-    for {
+    for r.submissionText == "" {
         key := Console.ReadKey(true) //todo c#
         r.handleKey(key, document, view)
     }
+
+    return r.submissionText
 }
 
 func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollection, view *SubmissionView) {
@@ -72,22 +76,49 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollectio
 }
 
 func (r *Repl) HandleEnter(document *Util.ObservableCollection, view *SubmissionView) {
+    submissionText :=  string.Join('\n', document) //todo c#
+    if r.IsCompleteSubmission(submissionText) {
+        r.submissionText = submissionText
+        return
+    }
+
+    document.Add("") //todo c#
+    view.CurrentCharacter = 0
+    view.CurrentLineIndex = document.Count() - 1
 }
+
 func (r *Repl) HandleLefttArrow(document *Util.ObservableCollection, view *SubmissionView) {
+    if view.CurrentCharacter > 0 {
+        view.CurrentCharacter = view.CurrentCharacter - 1
+    }
 }
+
 func (r *Repl) HandleRightArrow(document *Util.ObservableCollection, view *SubmissionView){
+    line := document[view.CurrentLineIndex]
+    if view.CurrentCharacter < len(line) - 1 {
+        view.CurrentCharacter = view.CurrentCharacter + 1
+    }
 }
+
 func (r *Repl) HandleUpArrow(document *Util.ObservableCollection, view *SubmissionView) {
+    if view.CurrentLineIndex > 0 {
+        view.CurrentLineIndex = view.CurrentLineIndex - 1
+    }
 }
+
 func (r *Repl) HandleDownArrow(document *Util.ObservableCollection, view *SubmissionView) {
+    if view.CurrentLineIndex < document.Count() - 1 {
+        view.CurrentLineIndex = view.CurrentLineIndex + 1
+    }
 }
+
 func (r *Repl) HandleTyping(document *Util.ObservableCollection, view *SubmissionView, text string) {
     lineIndex := view.CurrentLineIndex
     start := view.CurrentCharacter
     text := kkk
 
     document[lineIndex] = document[lineIndex].Insert(start, text)
-    view.CurrentCharacter = view.CurrentCharacter + 1
+    view.CurrentCharacter = view.CurrentCharacter + len(text) 
 }
 
 func (r *Repl) editSubmissionOld(ir IRepl) string {
@@ -152,6 +183,7 @@ func NewSubmissionView(submissionDocument *Util.ObservableCollection) *Submissio
     }
 
     submissionDocument.CollectionChanged(s.SubmissionDocumentChanged)
+    s.Render()
 
     return s
 }
