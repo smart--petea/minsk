@@ -43,7 +43,7 @@ func (r *Repl) Run(ir IRepl) {
 
 func (r *Repl) editSubmission(ir IRepl) string {
     r.submissionText = ""
-    document := Util.NewObservableCollection("")
+    document := NewObservableCollection("")
     view := NewSubmissionView(document)
 
     for r.submissionText == "" {
@@ -65,12 +65,11 @@ func ConsoleReadKey() *ConsoleKeyInfo {
     b := make([]byte, 8)
     size, _ := os.Stdin.Read(b)
 
-    return NewConsoleKeyInfo(b[0])
+    return NewConsoleKeyInfo(b[:size])
 }
 
 type ConsoleKeyInfo struct {
     Bytes []byte
-    Kind ConsoleKey
 }
 
 func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
@@ -80,7 +79,7 @@ func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
 }
 
 func (c *ConsoleKeyInfo) Kind() ConsoleKey {
-    if len(c.Bytes) && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
+    if len(c.Bytes) == 3 && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
         switch c.Bytes[3] {
         case 10:
             return Enter
@@ -111,7 +110,34 @@ const (
         Symbol ConsoleKey = "Symbol"
 )
 
-func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollection, view *SubmissionView) {
+type ObservableCollection struct {
+    Elements []string
+}
+
+func (o *ObservableCollection) Add(el string) {
+    o.Elements = append(o.Elements, el)
+    //todo callback
+}
+
+func (o *ObservableCollection) GetElement(index int) string {
+    return o.Elements[index]
+}
+
+func (o *ObservableCollection) SetElement(index int, val string) {
+    o.Elements[index] = val
+}
+
+func (o *ObservableCollection) Count() int {
+    return len(o.Elements)
+}
+
+func NewObservableCollection(elements... string) *ObservableCollection {
+    return &ObservableCollection{
+        Elements: elements,
+    }
+}
+
+func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, view *SubmissionView) {
         switch key.Kind() {
         case Enter:
             r.HandleEnter(document, view)
@@ -124,54 +150,64 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *Util.ObservableCollectio
         case DownArrow:
             r.HandleDownArrow(document, view)
         default:
-            r.HandleTyping(document, view, key.KeyChar)
+            r.HandleTyping(document, view, string(key.Bytes))
         }
 }
 
-func (r *Repl) HandleEnter(document *Util.ObservableCollection, view *SubmissionView) {
-    submissionText :=  string.Join('\n', document) //todo c#
+func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
+    lines := document.Elements
+    submissionText :=  strings.Join(lines, "\n")
     if r.IsCompleteSubmission(submissionText) {
         r.submissionText = submissionText
         return
     }
 
-    document.Add("") //todo c#
-    view.CurrentCharacter = 0
-    view.CurrentLineIndex = document.Count() - 1
+    document.Add("")
+    view.SetCurrentCharacter(0)
+    view.SetCurrentLineIndex(document.Count() - 1)
 }
 
-func (r *Repl) HandleLefttArrow(document *Util.ObservableCollection, view *SubmissionView) {
-    if view.CurrentCharacter > 0 {
-        view.CurrentCharacter = view.CurrentCharacter - 1
+func (r *Repl) HandleLefttArrow(document *ObservableCollection, view *SubmissionView) {
+    currentCharacter := view.GetCurrentCharacter()
+    if currentCharacter > 0 {
+        view.SetCurrentCharacter(currentCharacter - 1)
     }
 }
 
-func (r *Repl) HandleRightArrow(document *Util.ObservableCollection, view *SubmissionView){
-    line := document[view.CurrentLineIndex]
-    if view.CurrentCharacter < len(line) - 1 {
-        view.CurrentCharacter = view.CurrentCharacter + 1
+func (r *Repl) HandleRightArrow(document *ObservableCollection, view *SubmissionView){
+    line := document.GetElement(view.GetCurrentLineIndex())
+
+     currentCharacter := view.GetCurrentCharacter()
+    if currentCharacter < len(line) - 1 {
+        view.SetCurrentCharacter(currentCharacter + 1)
     }
 }
 
-func (r *Repl) HandleUpArrow(document *Util.ObservableCollection, view *SubmissionView) {
-    if view.CurrentLineIndex > 0 {
-        view.CurrentLineIndex = view.CurrentLineIndex - 1
+func (r *Repl) HandleUpArrow(document *ObservableCollection, view *SubmissionView) {
+    currentLineIndex := view.GetCurrentLineIndex()
+    if currentLineIndex > 0 {
+        view.SetCurrentLineIndex(currentLineIndex - 1)
     }
 }
 
-func (r *Repl) HandleDownArrow(document *Util.ObservableCollection, view *SubmissionView) {
-    if view.CurrentLineIndex < document.Count() - 1 {
-        view.CurrentLineIndex = view.CurrentLineIndex + 1
+func (r *Repl) HandleDownArrow(document *ObservableCollection, view *SubmissionView) {
+    currentLineIndex := view.GetCurrentLineIndex()
+    if currentLineIndex < document.Count() - 1 {
+        view.SetCurrentLineIndex(currentLineIndex + 1)
     }
 }
 
-func (r *Repl) HandleTyping(document *Util.ObservableCollection, view *SubmissionView, text string) {
-    lineIndex := view.CurrentLineIndex
-    start := view.CurrentCharacter
-    text := kkk
+func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView, text string) {
+    lineIndex := view.GetCurrentLineIndex()
+    start := view.GetCurrentCharacter()
 
-    document[lineIndex] = document[lineIndex].Insert(start, text)
-    view.CurrentCharacter = view.CurrentCharacter + len(text) 
+    line := document.GetElement(lineIndex)
+    line =  line[:start] + text + line[start:]
+
+    document.SetElement(lineIndex, line)
+    currentCharacter := view.GetCurrentCharacter() 
+    currentCharacter = currentCharacter + len(text)
+    view.SetCurrentCharacter(currentCharacter)
 }
 
 func (r *Repl) editSubmissionOld(ir IRepl) string {
@@ -223,13 +259,13 @@ func (r *Repl) EvaluateMetaCommand(input string) {
 type SubmissionView struct {
     _currentLineIndex int
     _currentCharacter int
-    SubmissionDocument *Util.ObservableCollection
+    SubmissionDocument *ObservableCollection
 
     cursorTop int
     renderedLineCount int
 }
 
-func NewSubmissionView(submissionDocument *Util.ObservableCollection) *SubmissionView {
+func NewSubmissionView(submissionDocument *ObservableCollection) *SubmissionView {
     s := &SubmissionView{
         SubmissionDocument: submissionDocument,
         cursorTop: Util.Console.CursorTop,
@@ -266,7 +302,7 @@ func (s *SubmissionView) Render() {
 
     numberOfBlankLines := s.renderedLineCount - lineCount
     if numberOfBlankLines > 0 {
-        blankLine := new string( ' ', Console.WindowWidth)
+        blankLine := strings.Repeat(" ", ConsoleWindowWidth())
         for numberOfBlankLines > 0 {
             fmt.Println(blankLine)
         }
@@ -275,6 +311,18 @@ func (s *SubmissionView) Render() {
     s.renderedLineCount = lineCount
     Console.CursorVisibile = true //todo C#
     s.UpdateCursorPosition() 
+}
+
+func ConsoleWindowWidth() int {
+    cmd := exec.Command("stty", "size")
+    cmd.Stdin = os.Stdin
+    out, err := cmd.Output()
+    if err != nil {
+        panic(err)
+    }
+
+    fields := strings.Field(string(out))
+    return fields[1]
 }
 
 func (s *SubmissionView) UpdateCursorPosition() {
