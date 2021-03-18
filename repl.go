@@ -7,6 +7,9 @@ import (
     "os/exec"
     "log"
     "strings"
+    "golang.org/x/sys/unix"
+    "syscall"
+    "strconv"
 
     "minsk/Util/Console"
 )
@@ -32,6 +35,7 @@ func (r *Repl) GetInput() (string, error) {
 }
 
 func (r *Repl) Run(ir IRepl) {
+    exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
     for {
         text := r.editSubmission(ir)
         if text == "" {
@@ -80,10 +84,10 @@ func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
 
 func (c *ConsoleKeyInfo) Kind() ConsoleKey {
     if len(c.Bytes) == 3 && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
-        switch c.Bytes[3] {
-        case 10:
-            return Enter
+        switch c.Bytes[2] {
         case 67:
+            fmt.Printf("\n\n\nLeftArrow\n\n\n")
+            panic("90")
             return LeftArrow
         case 68:
             return RightArrow
@@ -94,6 +98,10 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
         default:
             panic(fmt.Sprintf("Unknown console command %+v", c.Bytes[:3]))
         }
+    }
+
+    if c.Bytes[0] == 10 {
+        return Enter
     }
 
     return Symbol
@@ -110,30 +118,43 @@ const (
         Symbol ConsoleKey = "Symbol"
 )
 
-type ObservableCollection struct {
-    Elements []string
+type NotifyCollectionChangedEventArgs struct {
 }
 
-func (o *ObservableCollection) Add(el string) {
-    o.Elements = append(o.Elements, el)
+func NewNotifyCollectionChangedEventArgs() *NotifyCollectionChangedEventArgs {
+    return &NotifyCollectionChangedEventArgs{
+    }
+}
+
+type ObservableCollection struct {
+    Collection []string
+}
+
+func (o *ObservableCollection) CollectionChanged(listener func(interface{}, *NotifyCollectionChangedEventArgs) ) {
+    //todo
+}
+
+
+func (o *ObservableCollection) Add(e string) {
+    o.Collection = append(o.Collection, e)
     //todo callback
 }
 
-func (o *ObservableCollection) GetElement(index int) string {
-    return o.Elements[index]
+func (o *ObservableCollection) Get(index int) string {
+    return o.Collection[index]
 }
 
-func (o *ObservableCollection) SetElement(index int, val string) {
-    o.Elements[index] = val
+func (o *ObservableCollection) Set(index int, val string) {
+    o.Collection[index] = val
 }
 
 func (o *ObservableCollection) Count() int {
-    return len(o.Elements)
+    return len(o.Collection)
 }
 
-func NewObservableCollection(elements... string) *ObservableCollection {
+func NewObservableCollection(collection... string) *ObservableCollection {
     return &ObservableCollection{
-        Elements: elements,
+        Collection: collection,
     }
 }
 
@@ -155,7 +176,7 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
 }
 
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
-    lines := document.Elements
+    lines := document.Collection
     submissionText :=  strings.Join(lines, "\n")
     if r.IsCompleteSubmission(submissionText) {
         r.submissionText = submissionText
@@ -175,7 +196,7 @@ func (r *Repl) HandleLefttArrow(document *ObservableCollection, view *Submission
 }
 
 func (r *Repl) HandleRightArrow(document *ObservableCollection, view *SubmissionView){
-    line := document.GetElement(view.GetCurrentLineIndex())
+    line := document.Get(view.GetCurrentLineIndex())
 
      currentCharacter := view.GetCurrentCharacter()
     if currentCharacter < len(line) - 1 {
@@ -201,10 +222,10 @@ func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView
     lineIndex := view.GetCurrentLineIndex()
     start := view.GetCurrentCharacter()
 
-    line := document.GetElement(lineIndex)
+    line := document.Get(lineIndex)
     line =  line[:start] + text + line[start:]
 
-    document.SetElement(lineIndex, line)
+    document.Set(lineIndex, line)
     currentCharacter := view.GetCurrentCharacter() 
     currentCharacter = currentCharacter + len(text)
     view.SetCurrentCharacter(currentCharacter)
@@ -265,10 +286,69 @@ type SubmissionView struct {
     renderedLineCount int
 }
 
+func ConsoleCursorPos() (int, int) {
+    fd := os.Stdin.Fd()
+    term, err := unix.IoctlGetTermios(int(fd), unix.TCGETS)
+    if err != nil {
+        panic(err)
+    }
+
+    restore := *term
+    term.Lflag &^= (syscall.ICANON | syscall.ECHO)
+    err = unix.IoctlSetTermios(int(fd), unix.TCSETS, term)
+    if err != nil {
+        panic(err)
+    }
+
+    _, err = os.Stdout.Write([]byte("\033[6n"))//todo save []byte("\033[6n") in a constant
+    if err != nil {
+        panic(err)
+    }
+
+    var x, y int
+    var zeroes int = 1
+    var firstNumber bool = true
+    b := make([]byte, 1)
+    for {
+        _, err = os.Stdin.Read(b)
+        if err != nil {
+            panic(err)
+        }
+
+        if b[0] == 'R' {
+            break
+        }
+
+        if b[0] == ';' {
+            firstNumber = false
+            zeroes = 1
+            continue
+        }
+
+        if b[0] >= '0' && b[0] <= '9' {
+            if firstNumber {
+                x = x * zeroes + int(b[0]) - int('0') //todo constants
+            } else {
+                y = y * zeroes + int(b[0]) - int('0') //todo constants
+            }
+            zeroes *= 10
+            continue
+        }
+    }
+
+    err = unix.IoctlSetTermios(int(fd), unix.TCSETS, &restore)
+    if err != nil {
+        panic(err)
+    }
+
+    return x, y
+}
+
 func NewSubmissionView(submissionDocument *ObservableCollection) *SubmissionView {
+    top, _ := ConsoleCursorPos()
     s := &SubmissionView{
         SubmissionDocument: submissionDocument,
-        cursorTop: Util.Console.CursorTop,
+        cursorTop: top,
     }
 
     submissionDocument.CollectionChanged(s.SubmissionDocumentChanged)
@@ -277,16 +357,29 @@ func NewSubmissionView(submissionDocument *ObservableCollection) *SubmissionView
     return s
 }
 
-func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}, e *Util.NotifyCollectionChangedEventArgs) {
+func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}, e *NotifyCollectionChangedEventArgs) {
     s.Render()
 }
 
+func ConsoleSetCursorPos(left, top int) {
+    fmt.Printf("\033[%d;%dH", top, left)
+}
+
+
+func ConsoleSetCursorVisibile(v bool) {
+    if v {
+        fmt.Printf("\033]?25h")
+    } else {
+        fmt.Printf("\033]?25l")
+    }
+}
+
 func (s *SubmissionView) Render() {
-    Console.SetCursorPosition(0, s.cursorTop) //todo C#
-    Console.CursorVisibile = false //todo C#
+    ConsoleSetCursorPos(0, s.cursorTop)
+    ConsoleSetCursorVisibile(false)
 
     var lineCount int
-    for _, line := range s.submissionDocument {
+    for _, line := range s.SubmissionDocument.Collection {
         Console.ForegroundColour(Console.COLOUR_GREEN)
         if lineCount == 0 {
             fmt.Print("» ")
@@ -309,7 +402,7 @@ func (s *SubmissionView) Render() {
     }
 
     s.renderedLineCount = lineCount
-    Console.CursorVisibile = true //todo C#
+    ConsoleSetCursorVisibile(true)
     s.UpdateCursorPosition() 
 }
 
@@ -321,20 +414,27 @@ func ConsoleWindowWidth() int {
         panic(err)
     }
 
-    fields := strings.Field(string(out))
-    return fields[1]
+    fields := strings.Fields(string(out))
+    i, err := strconv.Atoi(fields[1])
+    if err != nil {
+        panic(err)
+    }
+
+    return i
 }
 
 func (s *SubmissionView) UpdateCursorPosition() {
-    Console.CursorTop = s.cursorTop + s.GetCurrentLineIndex()
-    Console.CursorLeft = 2 + s.CurrentCharacter
+    top := s.cursorTop + s.GetCurrentLineIndex()
+    left := 2 + s._currentCharacter
+
+    ConsoleSetCursorPos(left, top)
 }
 
 func (s *SubmissionView) GetCurrentLineIndex() int {
     return s._currentLineIndex 
 }
 
-func (s *SubmissionView) SetCurrentLineIndex(value int) int {
+func (s *SubmissionView) SetCurrentLineIndex(value int) {
     if value != s._currentLineIndex {
         s._currentLineIndex  = value
         s.UpdateCursorPosition()
@@ -345,7 +445,7 @@ func (s *SubmissionView) GetCurrentCharacter() int {
     return s._currentCharacter 
 }
 
-func (s *SubmissionView) SetCurrentCharacter(value int) int {
+func (s *SubmissionView) SetCurrentCharacter(value int) {
     if value != s._currentCharacter {
         s._currentCharacter  = value
         s.UpdateCursorPosition()
