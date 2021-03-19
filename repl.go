@@ -35,7 +35,7 @@ func (r *Repl) GetInput() (string, error) {
 }
 
 func (r *Repl) Run(ir IRepl) {
-    exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
+    ConsoleInit()
     for {
         text := r.editSubmission(ir)
         if text == "" {
@@ -52,6 +52,7 @@ func (r *Repl) editSubmission(ir IRepl) string {
 
     for r.submissionText == "" {
         key := ConsoleReadKey()
+        log.Printf("editSubmission %+v %+s", key.Bytes, string(key.Bytes))
         r.handleKey(key, document, view)
     }
 
@@ -59,6 +60,10 @@ func (r *Repl) editSubmission(ir IRepl) string {
 }
 
 func ConsoleInit() {
+    //clean screen
+    fmt.Print("\033[2J")
+    ConsoleSetCursorPos(1,1)
+
     //disable input buffering
     exec.Command("stty", "-F", "/dev/tty", "cbreak", "min", "1").Run()
     //do not display entered characters on the screen
@@ -68,6 +73,7 @@ func ConsoleInit() {
 func ConsoleReadKey() *ConsoleKeyInfo {
     b := make([]byte, 8)
     size, _ := os.Stdin.Read(b)
+    log.Printf("ConsoleReadKey %s", string(b))
 
     return NewConsoleKeyInfo(b[:size])
 }
@@ -86,11 +92,9 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
     if len(c.Bytes) == 3 && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
         switch c.Bytes[2] {
         case 67:
-            fmt.Printf("\n\n\nLeftArrow\n\n\n")
-            panic("90")
-            return LeftArrow
-        case 68:
             return RightArrow
+        case 68:
+            return LeftArrow
         case 65:
             return UpArrow
         case 66:
@@ -104,12 +108,17 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
         return Enter
     }
 
+    if c.Bytes[0] == 127 {
+        return Backspace
+    }
+
     return Symbol
 }
 
 type ConsoleKey string
 
 const (
+        Backspace ConsoleKey = "Backspace"
         Enter ConsoleKey = "Enter"
         LeftArrow ConsoleKey = "LeftArrow"
         RightArrow ConsoleKey = "RightArrow"
@@ -160,10 +169,12 @@ func NewObservableCollection(collection... string) *ObservableCollection {
 
 func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, view *SubmissionView) {
         switch key.Kind() {
+        case Backspace:
+            r.HandleBackspace(document, view)
         case Enter:
             r.HandleEnter(document, view)
         case LeftArrow:
-            r.HandleLefttArrow(document, view)
+            r.HandleLeftArrow(document, view)
         case RightArrow:
             r.HandleRightArrow(document, view)
         case UpArrow:
@@ -175,7 +186,38 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
         }
 }
 
+func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
+    lineIndex := view.GetCurrentLineIndex()
+    line := document.Get(lineIndex)
+    if len(line) == 0{
+        return
+    }
+
+    start := view.GetCurrentCharacter()
+    if start == 0 {
+        return
+    }
+
+    //prepare coordinates
+    top, left := ConsoleGetCursorPos()
+
+    //coordinates to print
+    ConsoleSetCursorPos(left - 1, top)
+
+    line = line[:start-1] + line[start:]
+    document.Set(lineIndex, line)
+    view.SetCurrentCharacter(start - 1)
+
+    fmt.Printf("%s", line[start-1:] + " ")
+
+    //restore coordinates after printing
+    ConsoleSetCursorPos(left - 1, top)
+}
+
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
+    top, _ := ConsoleGetCursorPos()
+    ConsoleSetCursorPos(1, top + 1)
+
     lines := document.Collection
     submissionText :=  strings.Join(lines, "\n")
     if r.IsCompleteSubmission(submissionText) {
@@ -188,7 +230,7 @@ func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView)
     view.SetCurrentLineIndex(document.Count() - 1)
 }
 
-func (r *Repl) HandleLefttArrow(document *ObservableCollection, view *SubmissionView) {
+func (r *Repl) HandleLeftArrow(document *ObservableCollection, view *SubmissionView) {
     currentCharacter := view.GetCurrentCharacter()
     if currentCharacter > 0 {
         view.SetCurrentCharacter(currentCharacter - 1)
@@ -198,7 +240,7 @@ func (r *Repl) HandleLefttArrow(document *ObservableCollection, view *Submission
 func (r *Repl) HandleRightArrow(document *ObservableCollection, view *SubmissionView){
     line := document.Get(view.GetCurrentLineIndex())
 
-     currentCharacter := view.GetCurrentCharacter()
+    currentCharacter := view.GetCurrentCharacter()
     if currentCharacter < len(line) - 1 {
         view.SetCurrentCharacter(currentCharacter + 1)
     }
@@ -219,11 +261,16 @@ func (r *Repl) HandleDownArrow(document *ObservableCollection, view *SubmissionV
 }
 
 func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView, text string) {
+
     lineIndex := view.GetCurrentLineIndex()
     start := view.GetCurrentCharacter()
+    log.Printf("handleTyping start=%d lineIndex=%d", start, lineIndex)
 
     line := document.Get(lineIndex)
     line =  line[:start] + text + line[start:]
+    fmt.Printf("%s", line[start:])
+
+    log.Printf("handleTyping line=%s", string(line))
 
     document.Set(lineIndex, line)
     currentCharacter := view.GetCurrentCharacter() 
@@ -286,7 +333,7 @@ type SubmissionView struct {
     renderedLineCount int
 }
 
-func ConsoleCursorPos() (int, int) {
+func ConsoleGetCursorPos() (left int, top int) {
     fd := os.Stdin.Fd()
     term, err := unix.IoctlGetTermios(int(fd), unix.TCGETS)
     if err != nil {
@@ -345,7 +392,7 @@ func ConsoleCursorPos() (int, int) {
 }
 
 func NewSubmissionView(submissionDocument *ObservableCollection) *SubmissionView {
-    top, _ := ConsoleCursorPos()
+    top, _ := ConsoleGetCursorPos()
     s := &SubmissionView{
         SubmissionDocument: submissionDocument,
         cursorTop: top,
