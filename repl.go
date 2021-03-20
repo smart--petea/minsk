@@ -73,7 +73,7 @@ func ConsoleInit() {
 func ConsoleReadKey() *ConsoleKeyInfo {
     b := make([]byte, 8)
     size, _ := os.Stdin.Read(b)
-    log.Printf("ConsoleReadKey %s", string(b))
+    log.Printf("ConsoleReadKey %+v %s", b, string(b))
 
     return NewConsoleKeyInfo(b[:size])
 }
@@ -82,6 +82,13 @@ type ConsoleKeyInfo struct {
     Bytes []byte
 }
 
+const (
+    NoModifiers int = 0
+    Alt int = 1
+    Control int = 2
+    Shift int = 4
+)
+
 func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
     return &ConsoleKeyInfo{
         Bytes: bytes,
@@ -89,6 +96,10 @@ func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
 }
 
 func (c *ConsoleKeyInfo) Kind() ConsoleKey {
+    if len(c.Bytes) == 4 && c.Bytes[0] == 27 && c.Bytes[1] == 91 && c.Bytes[2] == 51 && c.Bytes[3] == 126 {
+        return Delete
+    }
+
     if len(c.Bytes) == 3 && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
         switch c.Bytes[2] {
         case 67:
@@ -125,6 +136,7 @@ const (
         UpArrow ConsoleKey = "UpArrow"
         DownArrow ConsoleKey = "DownArrow"
         Symbol ConsoleKey = "Symbol"
+        Delete ConsoleKey = "Delete"
 )
 
 type NotifyCollectionChangedEventArgs struct {
@@ -168,6 +180,8 @@ func NewObservableCollection(collection... string) *ObservableCollection {
 }
 
 func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, view *SubmissionView) {
+    log.Printf("handleKey kind=%s", key.Kind())
+    //if key.Modifiers() == NoModifiers {
         switch key.Kind() {
         case Backspace:
             r.HandleBackspace(document, view)
@@ -181,9 +195,62 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
             r.HandleUpArrow(document, view)
         case DownArrow:
             r.HandleDownArrow(document, view)
-        default:
-            r.HandleTyping(document, view, string(key.Bytes))
+        case Delete:
+            r.HandleDelete(document, view)
         }
+    //}
+
+    if key.Kind() == Symbol {
+        r.HandleTyping(document, view, string(key.Bytes))
+    }
+}
+
+func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView) {
+    lineIndex := view.GetCurrentLineIndex()
+    line := document.Get(lineIndex)
+    start := view.GetCurrentCharacter()
+    top, left := ConsoleGetCursorPos()
+
+    log.Printf("HandleDelete start=%d len(line)=%d line=%s left=%d", start, len(line), line, left)
+    if len(line) == 0 {
+        return
+    }
+
+    forPrint := ""
+    if (start >= len(line)) {
+        log.Printf("HandleDelete:222")
+
+        start = start - 1
+        left = left - 1
+    } else if len(line) == 1 {
+        log.Printf("HandleDelete:226")
+
+        line = line[:start] + line[start + 1:]
+        forPrint = line[start:] + " "
+        start = 0
+    } else if start == len(line) - 1 {
+        log.Printf("HandleDelete:230")
+
+        left = left - 1
+        line = line[:start] + line[start + 1:]
+        forPrint = line[start:] + " "
+        start = start - 1
+    } else {
+        log.Printf("HandleDelete:236")
+
+        line = line[:start] + line[start + 1:]
+        forPrint = line[start:] + " "
+        start = start - 1
+    }
+    log.Printf("HandleDelete start=%d len(line)=%d line=%s left=%d forPrint=%s len(forPrint)=%d", start, len(line), line, left, forPrint, len(forPrint))
+
+    document.Set(lineIndex, line)
+
+    ConsoleSetCursorPos(left, top)
+    fmt.Printf("%s", forPrint)
+
+    ConsoleSetCursorPos(left, top)
+    view.SetCurrentCharacter(start)
 }
 
 func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
@@ -409,6 +476,7 @@ func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}, e *Notify
 }
 
 func ConsoleSetCursorPos(left, top int) {
+    log.Printf("ConsoleSetCursorPos left=%d top=%d", left, top)
     fmt.Printf("\033[%d;%dH", top, left)
 }
 
