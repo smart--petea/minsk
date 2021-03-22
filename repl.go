@@ -52,10 +52,11 @@ func (r *Repl) editSubmission(ir IRepl) string {
 
     for r.submissionText == "" {
         key := ConsoleReadKey()
-        log.Printf("editSubmission %+v %+s", key.Bytes, string(key.Bytes))
+        log.Printf("editSubmission [loop] %+v %+s", key.Bytes, string(key.Bytes))
         r.handleKey(key, document, view)
     }
 
+    log.Printf("editSubmission [return] %s", r.submissionText)
     return r.submissionText
 }
 
@@ -209,7 +210,8 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
     lineIndex := view.GetCurrentLineIndex()
     line := document.Get(lineIndex)
     start := view.GetCurrentCharacter()
-    top, left := ConsoleGetCursorPos()
+    //top, left := ConsoleGetCursorPos()
+    _, left := ConsoleGetCursorPos()
 
     log.Printf("HandleDelete start=%d len(line)=%d line=%s left=%d", start, len(line), line, left)
     if len(line) == 0 {
@@ -231,7 +233,6 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
     } else if start == len(line) - 1 {
         log.Printf("HandleDelete:230")
 
-        left = left - 1
         line = line[:start] + line[start + 1:]
         forPrint = line[start:] + " "
         start = start - 1
@@ -246,45 +247,36 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
 
     document.Set(lineIndex, line)
 
-    ConsoleSetCursorPos(left, top)
+    //ConsoleSetCursorPos(left, top)
     fmt.Printf("%s", forPrint)
 
-    ConsoleSetCursorPos(left, top)
+    //ConsoleSetCursorPos(left, top)
     view.SetCurrentCharacter(start)
 }
 
 func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
     lineIndex := view.GetCurrentLineIndex()
     line := document.Get(lineIndex)
-    if len(line) == 0{
+    start := view.GetCurrentCharacter()
+    log.Printf("HandleBackspace len(line)=%d start=%d", len(line), start)
+    if len(line) == 0 {
         return
     }
 
-    start := view.GetCurrentCharacter()
     if start == 0 {
         return
     }
 
-    //prepare coordinates
-    top, left := ConsoleGetCursorPos()
-
-    //coordinates to print
-    ConsoleSetCursorPos(left - 1, top)
 
     line = line[:start-1] + line[start:]
     document.Set(lineIndex, line)
+
     view.SetCurrentCharacter(start - 1)
-
-    fmt.Printf("%s", line[start-1:] + " ")
-
-    //restore coordinates after printing
-    ConsoleSetCursorPos(left - 1, top)
+    view.Print(line[start-1:] + " ")
 }
 
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
-    top, _ := ConsoleGetCursorPos()
-    ConsoleSetCursorPos(1, top + 1)
-
+    fmt.Println()
     lines := document.Collection
     submissionText :=  strings.Join(lines, "\n")
     if r.IsCompleteSubmission(submissionText) {
@@ -308,7 +300,7 @@ func (r *Repl) HandleRightArrow(document *ObservableCollection, view *Submission
     line := document.Get(view.GetCurrentLineIndex())
 
     currentCharacter := view.GetCurrentCharacter()
-    if currentCharacter < len(line) - 1 {
+    if currentCharacter < len(line) {
         view.SetCurrentCharacter(currentCharacter + 1)
     }
 }
@@ -398,6 +390,14 @@ type SubmissionView struct {
 
     cursorTop int
     renderedLineCount int
+}
+
+func (s *SubmissionView) Print(text string) {
+    left, top := ConsoleGetCursorPos()
+
+    fmt.Printf(text)
+
+    ConsoleSetCursorPos(top, left)
 }
 
 func ConsoleGetCursorPos() (left int, top int) {
@@ -490,7 +490,11 @@ func ConsoleSetCursorVisibile(v bool) {
 }
 
 func (s *SubmissionView) Render() {
-    ConsoleSetCursorPos(0, s.cursorTop)
+    left := 1
+    top := s.cursorTop
+    log.Printf("Render left=%d top=%d ", left, top)
+
+    ConsoleSetCursorPos(left, s.cursorTop)
     ConsoleSetCursorVisibile(false)
 
     var lineCount int
@@ -542,6 +546,8 @@ func (s *SubmissionView) UpdateCursorPosition() {
     top := s.cursorTop + s.GetCurrentLineIndex()
     left := 2 + s._currentCharacter
 
+    log.Printf("UpdateCursorPosition cursorTop=%d lineIndex=%d currentCharacter=%d left=%d top=%d", s.cursorTop, s.GetCurrentLineIndex(), s._currentCharacter, left, top)
+
     ConsoleSetCursorPos(left, top)
 }
 
@@ -550,6 +556,7 @@ func (s *SubmissionView) GetCurrentLineIndex() int {
 }
 
 func (s *SubmissionView) SetCurrentLineIndex(value int) {
+    log.Printf("SetCurrentLineIndex old=%d new=%d", s._currentLineIndex, value)
     if value != s._currentLineIndex {
         s._currentLineIndex  = value
         s.UpdateCursorPosition()
@@ -561,6 +568,7 @@ func (s *SubmissionView) GetCurrentCharacter() int {
 }
 
 func (s *SubmissionView) SetCurrentCharacter(value int) {
+    log.Printf("SetCurrentCharacter old=%d new=%d", s._currentCharacter, value)
     if value != s._currentCharacter {
         s._currentCharacter  = value
         s.UpdateCursorPosition()
