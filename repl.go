@@ -210,48 +210,14 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
     lineIndex := view.GetCurrentLineIndex()
     line := document.Get(lineIndex)
     start := view.GetCurrentCharacter()
-    //top, left := ConsoleGetCursorPos()
-    _, left := ConsoleGetCursorPos()
 
-    log.Printf("HandleDelete start=%d len(line)=%d line=%s left=%d", start, len(line), line, left)
-    if len(line) == 0 {
+    if len(line) == 0 || start >= len(line) {
         return
     }
 
-    forPrint := ""
-    if (start >= len(line)) {
-        log.Printf("HandleDelete:222")
-
-        start = start - 1
-        left = left - 1
-    } else if len(line) == 1 {
-        log.Printf("HandleDelete:226")
-
-        line = line[:start] + line[start + 1:]
-        forPrint = line[start:] + " "
-        start = 0
-    } else if start == len(line) - 1 {
-        log.Printf("HandleDelete:230")
-
-        line = line[:start] + line[start + 1:]
-        forPrint = line[start:] + " "
-        start = start - 1
-    } else {
-        log.Printf("HandleDelete:236")
-
-        line = line[:start] + line[start + 1:]
-        forPrint = line[start:] + " "
-        start = start - 1
-    }
-    log.Printf("HandleDelete start=%d len(line)=%d line=%s left=%d forPrint=%s len(forPrint)=%d", start, len(line), line, left, forPrint, len(forPrint))
-
+    line = line[:start] + line[start + 1:]
     document.Set(lineIndex, line)
-
-    //ConsoleSetCursorPos(left, top)
-    fmt.Printf("%s", forPrint)
-
-    //ConsoleSetCursorPos(left, top)
-    view.SetCurrentCharacter(start)
+    view.Print(line[start:] + " ")
 }
 
 func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
