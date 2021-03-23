@@ -113,7 +113,7 @@ func (m *MinskRepl) EvaluateSubmission(text string) {
 
 func (m *MinskRepl) IsCompleteSubmission(text string) bool {
     if len(text) == 0 {
-        return false
+        return true
     }
 
     syntaxTree := Syntax.SyntaxTreeParse(text)

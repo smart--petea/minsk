@@ -15,6 +15,7 @@ import (
 )
 
 type Repl struct {
+    done bool
     reader *bufio.Reader
     submissionText string
 
@@ -46,18 +47,19 @@ func (r *Repl) Run(ir IRepl) {
 }
 
 func (r *Repl) editSubmission(ir IRepl) string {
+    r.done = false
+
     r.submissionText = ""
     document := NewObservableCollection("")
     view := NewSubmissionView(document)
 
-    for r.submissionText == "" {
+    for r.done == false {
         key := ConsoleReadKey()
-        log.Printf("editSubmission [loop] %+v %+s", key.Bytes, string(key.Bytes))
         r.handleKey(key, document, view)
     }
+    fmt.Println()
 
-    log.Printf("editSubmission [return] %s", r.submissionText)
-    return r.submissionText
+    return strings.Join(document.Collection, "\n")
 }
 
 func ConsoleInit() {
@@ -116,6 +118,10 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
         }
     }
 
+    if len(c.Bytes) == 2 && c.Bytes[0] == 27 && c.Bytes[1] == 10 {
+        return AltEnter
+    }
+
     if c.Bytes[0] == 10 {
         return Enter
     }
@@ -138,6 +144,7 @@ const (
         DownArrow ConsoleKey = "DownArrow"
         Symbol ConsoleKey = "Symbol"
         Delete ConsoleKey = "Delete"
+        AltEnter ConsoleKey = "AltEnter"
 )
 
 type NotifyCollectionChangedEventArgs struct {
@@ -182,28 +189,32 @@ func NewObservableCollection(collection... string) *ObservableCollection {
 
 func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, view *SubmissionView) {
     log.Printf("handleKey kind=%s", key.Kind())
-    //if key.Modifiers() == NoModifiers {
-        switch key.Kind() {
-        case Backspace:
-            r.HandleBackspace(document, view)
-        case Enter:
-            r.HandleEnter(document, view)
-        case LeftArrow:
-            r.HandleLeftArrow(document, view)
-        case RightArrow:
-            r.HandleRightArrow(document, view)
-        case UpArrow:
-            r.HandleUpArrow(document, view)
-        case DownArrow:
-            r.HandleDownArrow(document, view)
-        case Delete:
-            r.HandleDelete(document, view)
-        }
-    //}
+    switch key.Kind() {
+    case Backspace:
+        r.HandleBackspace(document, view)
+    case Enter:
+        r.HandleEnter(document, view)
+    case LeftArrow:
+        r.HandleLeftArrow(document, view)
+    case RightArrow:
+        r.HandleRightArrow(document, view)
+    case UpArrow:
+        r.HandleUpArrow(document, view)
+    case DownArrow:
+        r.HandleDownArrow(document, view)
+    case Delete:
+        r.HandleDelete(document, view)
+    case AltEnter:
+        r.HandleAltEnter(document, view)
+    }
 
     if key.Kind() == Symbol {
         r.HandleTyping(document, view, string(key.Bytes))
     }
+}
+
+func (r *Repl) HandleAltEnter(document *ObservableCollection, view *SubmissionView) {
+    r.done = true
 }
 
 func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView) {
@@ -242,11 +253,10 @@ func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionV
 }
 
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
-    fmt.Println()
     lines := document.Collection
     submissionText :=  strings.Join(lines, "\n")
     if r.IsCompleteSubmission(submissionText) {
-        r.submissionText = submissionText
+        r.done = true
         return
     }
 
