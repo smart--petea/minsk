@@ -42,7 +42,12 @@ func (r *Repl) Run(ir IRepl) {
         if text == "" {
             return
         }
-        ir.EvaluateSubmission(text)
+
+        if strings.Contains(text, "\n") == false && strings.HasPrefix(text, "#") {
+            ir.EvaluateMetaCommand(text)
+        } else {
+            ir.EvaluateSubmission(text)
+        }
     }
 }
 
@@ -99,35 +104,49 @@ func NewConsoleKeyInfo(bytes []byte) *ConsoleKeyInfo {
 }
 
 func (c *ConsoleKeyInfo) Kind() ConsoleKey {
-    if len(c.Bytes) == 4 && c.Bytes[0] == 27 && c.Bytes[1] == 91 && c.Bytes[2] == 51 && c.Bytes[3] == 126 {
-        return Delete
-    }
-
-    if len(c.Bytes) == 3 && c.Bytes[0] == 27 && c.Bytes[1] == 91 {
-        switch c.Bytes[2] {
-        case 67:
-            return RightArrow
-        case 68:
-            return LeftArrow
-        case 65:
-            return UpArrow
-        case 66:
-            return DownArrow
-        default:
-            panic(fmt.Sprintf("Unknown console command %+v", c.Bytes[:3]))
+    if len(c.Bytes) == 4 {
+        if c.Bytes[0] == 27 && c.Bytes[1] == 91 && c.Bytes[3] == 126 {
+            switch  c.Bytes[2] {
+            case 51:
+                return Delete
+            case 49:
+                return Home
+            case 52:
+                return End
+            }
         }
     }
 
-    if len(c.Bytes) == 2 && c.Bytes[0] == 27 && c.Bytes[1] == 10 {
-        return AltEnter
+    if len(c.Bytes) == 3 {
+        if c.Bytes[0] == 27 && c.Bytes[1] == 91 {
+            switch c.Bytes[2] {
+            case 67:
+                return RightArrow
+            case 68:
+                return LeftArrow
+            case 65:
+                return UpArrow
+            case 66:
+                return DownArrow
+            default:
+                panic(fmt.Sprintf("Unknown console command %+v", c.Bytes[:3]))
+            }
+        }
     }
 
-    if c.Bytes[0] == 10 {
+    if len(c.Bytes) == 2 {
+        if c.Bytes[0] == 27 && c.Bytes[1] == 10 {
+            return AltEnter
+        }
+    }
+
+    switch c.Bytes[0] {
+    case 10:
         return Enter
-    }
-
-    if c.Bytes[0] == 127 {
+    case 127:
         return Backspace
+    case 9:
+        return Tab
     }
 
     return Symbol
@@ -138,12 +157,15 @@ type ConsoleKey string
 const (
         Backspace ConsoleKey = "Backspace"
         Enter ConsoleKey = "Enter"
+        Tab ConsoleKey = "Tab"
         LeftArrow ConsoleKey = "LeftArrow"
         RightArrow ConsoleKey = "RightArrow"
         UpArrow ConsoleKey = "UpArrow"
         DownArrow ConsoleKey = "DownArrow"
         Symbol ConsoleKey = "Symbol"
         Delete ConsoleKey = "Delete"
+        Home ConsoleKey = "Home"
+        End ConsoleKey = "End"
         AltEnter ConsoleKey = "AltEnter"
 )
 
@@ -204,8 +226,14 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
         r.HandleDownArrow(document, view)
     case Delete:
         r.HandleDelete(document, view)
+    case Home:
+        r.HandleHome(document, view)
+    case End:
+        r.HandleEnd(document, view)
     case AltEnter:
         r.HandleAltEnter(document, view)
+    case Tab:
+        r.HandleTab(document, view)
     }
 
     if key.Kind() == Symbol {
@@ -213,12 +241,43 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
     }
 }
 
+const TabWidth int = 4
+
+func (r *Repl) HandleTab(document *ObservableCollection, view *SubmissionView) {
+    start := view.GetCurrentCharacter()
+    remainingSpaces := TabWidth - start % TabWidth;
+
+    lineIndex := view.GetCurrentLine()
+    line := document.Get(lineIndex)
+    before := line[:start]
+
+    after := strings.Repeat(" ", remainingSpaces) + line[start:]
+    view.Print(after)
+
+    line = before + after 
+    document.Set(lineIndex, line)
+    view.SetCurrentCharacter(start + remainingSpaces)
+}
+
 func (r *Repl) HandleAltEnter(document *ObservableCollection, view *SubmissionView) {
     r.done = true
+
+    view.SetCurrentCharacter(0)
+    view.SetCurrentLine(document.Count() - 1)
+}
+
+func (r *Repl) HandleHome(document *ObservableCollection, view *SubmissionView) {
+    view.SetCurrentCharacter(0)
+}
+
+func (r *Repl) HandleEnd(document *ObservableCollection, view *SubmissionView) {
+    lineIndex := view.GetCurrentLine()
+    line := document.Get(lineIndex)
+    view.SetCurrentCharacter(len(line))
 }
 
 func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView) {
-    lineIndex := view.GetCurrentLineIndex()
+    lineIndex := view.GetCurrentLine()
     line := document.Get(lineIndex)
     start := view.GetCurrentCharacter()
 
@@ -232,7 +291,7 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
 }
 
 func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
-    lineIndex := view.GetCurrentLineIndex()
+    lineIndex := view.GetCurrentLine()
     line := document.Get(lineIndex)
     start := view.GetCurrentCharacter()
     log.Printf("HandleBackspace len(line)=%d start=%d", len(line), start)
@@ -245,24 +304,30 @@ func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionV
     }
 
 
-    line = line[:start-1] + line[start:]
+    before := line[:start-1]
+    after := line[start:]
+    line = before + after
     document.Set(lineIndex, line)
 
     view.SetCurrentCharacter(start - 1)
-    view.Print(line[start-1:] + " ")
+    view.Print(after + " ")
 }
 
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
     lines := document.Collection
     submissionText :=  strings.Join(lines, "\n")
-    if r.IsCompleteSubmission(submissionText) {
+    if strings.HasPrefix(submissionText, "#") || r.IsCompleteSubmission(submissionText) {
         r.done = true
+
+        view.SetCurrentCharacter(0)
+        view.SetCurrentLine(document.Count() - 1)
+
         return
     }
 
     document.Add("")
     view.SetCurrentCharacter(0)
-    view.SetCurrentLineIndex(document.Count() - 1)
+    view.SetCurrentLine(document.Count() - 1)
 }
 
 func (r *Repl) HandleLeftArrow(document *ObservableCollection, view *SubmissionView) {
@@ -273,7 +338,7 @@ func (r *Repl) HandleLeftArrow(document *ObservableCollection, view *SubmissionV
 }
 
 func (r *Repl) HandleRightArrow(document *ObservableCollection, view *SubmissionView){
-    line := document.Get(view.GetCurrentLineIndex())
+    line := document.Get(view.GetCurrentLine())
 
     currentCharacter := view.GetCurrentCharacter()
     if currentCharacter < len(line) {
@@ -282,22 +347,21 @@ func (r *Repl) HandleRightArrow(document *ObservableCollection, view *Submission
 }
 
 func (r *Repl) HandleUpArrow(document *ObservableCollection, view *SubmissionView) {
-    currentLineIndex := view.GetCurrentLineIndex()
+    currentLineIndex := view.GetCurrentLine()
     if currentLineIndex > 0 {
-        view.SetCurrentLineIndex(currentLineIndex - 1)
+        view.SetCurrentLine(currentLineIndex - 1)
     }
 }
 
 func (r *Repl) HandleDownArrow(document *ObservableCollection, view *SubmissionView) {
-    currentLineIndex := view.GetCurrentLineIndex()
-    if currentLineIndex < document.Count() - 1 {
-        view.SetCurrentLineIndex(currentLineIndex + 1)
+    currentLine := view.GetCurrentLine()
+    if currentLine < document.Count() - 1 {
+        view.SetCurrentLine(currentLine + 1)
     }
 }
 
 func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView, text string) {
-
-    lineIndex := view.GetCurrentLineIndex()
+    lineIndex := view.GetCurrentLine()
     start := view.GetCurrentCharacter()
     log.Printf("handleTyping start=%d lineIndex=%d", start, lineIndex)
 
@@ -313,46 +377,6 @@ func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView
     view.SetCurrentCharacter(currentCharacter)
 }
 
-func (r *Repl) editSubmissionOld(ir IRepl) string {
-    var textBuilder strings.Builder
-
-    for {
-        Console.ForegroundColour(Console.COLOUR_GREEN)
-        if textBuilder.Len() == 0 {
-            fmt.Print("» ")
-        } else {
-            fmt.Print("· ")
-        }
-        Console.ResetColour()
-
-        input, err := r.GetInput()
-        if err != nil {
-            log.Fatal(err)
-        }
-        isBlank := len(strings.TrimSpace(input)) == 0
-
-        if textBuilder.Len() == 0 {
-            if isBlank {
-                return ""
-            } 
-            
-            if (strings.HasPrefix(input, "#")) {
-                ir.EvaluateMetaCommand(input)
-                continue
-            }
-        }
-
-        textBuilder.WriteString(input)
-        text := textBuilder.String()
-
-        if !ir.IsCompleteSubmission(text) {
-            continue
-        }
-
-        return text
-    }
-}
-
 func (r *Repl) EvaluateMetaCommand(input string) {
     Console.ForegroundColour(Console.COLOUR_RED)
     fmt.Printf("Invalid command %s.", input)
@@ -360,7 +384,7 @@ func (r *Repl) EvaluateMetaCommand(input string) {
 }
 
 type SubmissionView struct {
-    _currentLineIndex int
+    _currentLine int
     _currentCharacter int
     SubmissionDocument *ObservableCollection
 
@@ -470,11 +494,11 @@ func (s *SubmissionView) Render() {
     top := s.cursorTop
     log.Printf("Render left=%d top=%d ", left, top)
 
-    ConsoleSetCursorPos(left, s.cursorTop)
     ConsoleSetCursorVisibile(false)
 
     var lineCount int
     for _, line := range s.SubmissionDocument.Collection {
+        ConsoleSetCursorPos(left, s.cursorTop + lineCount)
         Console.ForegroundColour(Console.COLOUR_GREEN)
         if lineCount == 0 {
             fmt.Print("» ")
@@ -519,22 +543,28 @@ func ConsoleWindowWidth() int {
 }
 
 func (s *SubmissionView) UpdateCursorPosition() {
-    top := s.cursorTop + s.GetCurrentLineIndex()
+    top := s.cursorTop + s.GetCurrentLine()
     left := 2 + s._currentCharacter
 
-    log.Printf("UpdateCursorPosition cursorTop=%d lineIndex=%d currentCharacter=%d left=%d top=%d", s.cursorTop, s.GetCurrentLineIndex(), s._currentCharacter, left, top)
+    log.Printf("UpdateCursorPosition cursorTop=%d lineIndex=%d currentCharacter=%d left=%d top=%d", s.cursorTop, s.GetCurrentLine(), s._currentCharacter, left, top)
 
     ConsoleSetCursorPos(left, top)
 }
 
-func (s *SubmissionView) GetCurrentLineIndex() int {
-    return s._currentLineIndex 
+func (s *SubmissionView) GetCurrentLine() int {
+    return s._currentLine
 }
 
-func (s *SubmissionView) SetCurrentLineIndex(value int) {
-    log.Printf("SetCurrentLineIndex old=%d new=%d", s._currentLineIndex, value)
-    if value != s._currentLineIndex {
-        s._currentLineIndex  = value
+func (s *SubmissionView) SetCurrentLine(value int) {
+    log.Printf("SetCurrentLine old=%d new=%d", s._currentLine, value)
+    if value != s._currentLine {
+        s._currentLine  = value
+
+        lineLen := len(s.SubmissionDocument.Collection[s._currentLine])
+        if s._currentCharacter > lineLen {
+            s._currentCharacter  = lineLen
+        }
+
         s.UpdateCursorPosition()
     }
 }
