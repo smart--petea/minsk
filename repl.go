@@ -15,12 +15,19 @@ import (
 )
 
 type Repl struct {
+    submissionHistory []string
+    submissionHistoryIndex int
+
     done bool
     reader *bufio.Reader
     submissionText string
 
     EvaluateSubmission func(text string) 
     IsCompleteSubmission func(text string) bool
+}
+
+func (r *Repl) clearHistory() {
+    r.submissionHistory = []string{}
 }
 
 func (r *Repl) getReader() *bufio.Reader {
@@ -48,6 +55,11 @@ func (r *Repl) Run(ir IRepl) {
         } else {
             ir.EvaluateSubmission(text)
         }
+
+        r.submissionHistory = append(r.submissionHistory, text)
+        r.submissionHistoryIndex = 0
+
+        log.Printf("Run len(submissionHIstory)=%d history=%+v", len(r.submissionHistory), r.submissionHistory)
     }
 }
 
@@ -107,12 +119,16 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
     if len(c.Bytes) == 4 {
         if c.Bytes[0] == 27 && c.Bytes[1] == 91 && c.Bytes[3] == 126 {
             switch  c.Bytes[2] {
-            case 51:
-                return Delete
             case 49:
                 return Home
+            case 51:
+                return Delete
             case 52:
                 return End
+            case 53:
+                return PageUp
+            case 54:
+                return PageDown
             }
         }
     }
@@ -141,6 +157,8 @@ func (c *ConsoleKeyInfo) Kind() ConsoleKey {
     }
 
     switch c.Bytes[0] {
+    case 27:
+        return Escape
     case 10:
         return Enter
     case 127:
@@ -157,6 +175,7 @@ type ConsoleKey string
 const (
         Backspace ConsoleKey = "Backspace"
         Enter ConsoleKey = "Enter"
+        Escape ConsoleKey = "Escape"
         Tab ConsoleKey = "Tab"
         LeftArrow ConsoleKey = "LeftArrow"
         RightArrow ConsoleKey = "RightArrow"
@@ -166,6 +185,8 @@ const (
         Delete ConsoleKey = "Delete"
         Home ConsoleKey = "Home"
         End ConsoleKey = "End"
+        PageUp ConsoleKey = "PageUp"
+        PageDown ConsoleKey = "PageDown"
         AltEnter ConsoleKey = "AltEnter"
 )
 
@@ -183,6 +204,10 @@ type ObservableCollection struct {
 
 func (o *ObservableCollection) CollectionChanged(listener func(interface{}, *NotifyCollectionChangedEventArgs) ) {
     //todo
+}
+
+func (o *ObservableCollection) Clear() {
+    o.Collection = []string{}
 }
 
 
@@ -216,6 +241,8 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
         r.HandleBackspace(document, view)
     case Enter:
         r.HandleEnter(document, view)
+    case Escape:
+        r.HandleEscape(document, view)
     case LeftArrow:
         r.HandleLeftArrow(document, view)
     case RightArrow:
@@ -230,6 +257,10 @@ func (r *Repl) handleKey(key *ConsoleKeyInfo, document *ObservableCollection, vi
         r.HandleHome(document, view)
     case End:
         r.HandleEnd(document, view)
+    case PageUp:
+        r.HandlePageUp(document, view)
+    case PageDown:
+        r.HandlePageDown(document, view)
     case AltEnter:
         r.HandleAltEnter(document, view)
     case Tab:
@@ -268,6 +299,41 @@ func (r *Repl) HandleAltEnter(document *ObservableCollection, view *SubmissionVi
 
 func (r *Repl) HandleHome(document *ObservableCollection, view *SubmissionView) {
     view.SetCurrentCharacter(0)
+}
+
+func (r *Repl) HandlePageUp(document *ObservableCollection, view *SubmissionView) {
+    r.submissionHistoryIndex = r.submissionHistoryIndex - 1
+    if r.submissionHistoryIndex < 0 {
+        r.submissionHistoryIndex = len(r.submissionHistory) - 1
+    }
+
+    r.UpdateDocumentFromHistory(document, view)
+}
+
+func (r *Repl) UpdateDocumentFromHistory(document *ObservableCollection, view *SubmissionView) {
+    document.Clear()
+
+    historyItem := r.submissionHistory[r.submissionHistoryIndex]
+    lines := strings.Split(historyItem, "\n")
+
+    for i, l := range lines {
+        document.Add(l)
+        view.SetCurrentCharacter(0)
+        view.SetCurrentLine(i)
+        view.Print(l)
+    }
+
+    line := lines[len(lines) - 1]
+    view.SetCurrentCharacter(len(line))
+}
+
+func (r *Repl) HandlePageDown(document *ObservableCollection, view *SubmissionView) {
+    r.submissionHistoryIndex = r.submissionHistoryIndex + 1
+    if r.submissionHistoryIndex > len(r.submissionHistory)-1 {
+        r.submissionHistoryIndex = 0
+    }
+
+    r.UpdateDocumentFromHistory(document, view)
 }
 
 func (r *Repl) HandleEnd(document *ObservableCollection, view *SubmissionView) {
@@ -311,6 +377,15 @@ func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionV
 
     view.SetCurrentCharacter(start - 1)
     view.Print(after + " ")
+}
+
+func (r *Repl) HandleEscape(document *ObservableCollection, view *SubmissionView) {
+    view.SetCurrentCharacter(0)
+
+    currentLineIndex := view.GetCurrentLine()
+    line := document.Get(currentLineIndex)
+    document.Set(currentLineIndex, "")
+    view.Print(strings.Repeat(" ", len(line)))
 }
 
 func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView) {
