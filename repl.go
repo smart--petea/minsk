@@ -30,6 +30,10 @@ func (r *Repl) clearHistory() {
     r.submissionHistory = []string{}
 }
 
+func (r *Repl) RenderLine(line string) {
+    fmt.Println(line)
+}
+
 func (r *Repl) getReader() *bufio.Reader {
     if r.reader == nil {
         r.reader = bufio.NewReader(os.Stdin)
@@ -68,7 +72,7 @@ func (r *Repl) editSubmission(ir IRepl) string {
 
     r.submissionText = ""
     document := NewObservableCollection("")
-    view := NewSubmissionView(document)
+    view := NewSubmissionView(r.RenderLine, document)
 
     for r.done == false {
         key := ConsoleReadKey()
@@ -200,20 +204,32 @@ func NewNotifyCollectionChangedEventArgs() *NotifyCollectionChangedEventArgs {
 
 type ObservableCollection struct {
     Collection []string
+    Listeners []func(interface{}, *NotifyCollectionChangedEventArgs)
 }
 
 func (o *ObservableCollection) CollectionChanged(listener func(interface{}, *NotifyCollectionChangedEventArgs) ) {
-    //todo
+    o.Listeners = append(o.Listeners, listener)
+}
+
+func (o *ObservableCollection) fireCollectionChanged() {
+    log.Printf("fireCollectionChanged")
+    for _, l := range o.Listeners {
+        args := NewNotifyCollectionChangedEventArgs()
+        l(nil, args)
+    }
 }
 
 func (o *ObservableCollection) Clear() {
+    log.Printf("ObservableCollection.Clear")
     o.Collection = []string{}
+    o.fireCollectionChanged()
 }
 
 
 func (o *ObservableCollection) Add(e string) {
+    log.Printf("ObservableCollection.Add")
     o.Collection = append(o.Collection, e)
-    //todo callback
+    o.fireCollectionChanged()
 }
 
 func (o *ObservableCollection) Get(index int) string {
@@ -221,7 +237,9 @@ func (o *ObservableCollection) Get(index int) string {
 }
 
 func (o *ObservableCollection) Set(index int, val string) {
+    log.Printf("ObservableCollection.Set")
     o.Collection[index] = val
+    o.fireCollectionChanged()
 }
 
 func (o *ObservableCollection) Count() int {
@@ -462,6 +480,7 @@ type SubmissionView struct {
     _currentLine int
     _currentCharacter int
     SubmissionDocument *ObservableCollection
+    lineRenderer func(string)
 
     cursorTop int
     renderedLineCount int
@@ -533,11 +552,15 @@ func ConsoleGetCursorPos() (left int, top int) {
     return x, y
 }
 
-func NewSubmissionView(submissionDocument *ObservableCollection) *SubmissionView {
+type ActionString struct {
+}
+
+func NewSubmissionView(lineRenderer func(string), submissionDocument *ObservableCollection) *SubmissionView {
     top, _ := ConsoleGetCursorPos()
     s := &SubmissionView{
         SubmissionDocument: submissionDocument,
         cursorTop: top,
+        lineRenderer: lineRenderer,
     }
 
     submissionDocument.CollectionChanged(s.SubmissionDocumentChanged)
@@ -576,21 +599,23 @@ func (s *SubmissionView) Render() {
         ConsoleSetCursorPos(left, s.cursorTop + lineCount)
         Console.ForegroundColour(Console.COLOUR_GREEN)
         if lineCount == 0 {
-            fmt.Print("» ")
+            fmt.Print("»")
         } else {
-            fmt.Print("· ")
+            fmt.Print("·")
         }
 
         Console.ResetColour()
+        s.lineRenderer(line)
 
-        fmt.Println(line)
         lineCount = lineCount + 1
     }
 
     numberOfBlankLines := s.renderedLineCount - lineCount
     if numberOfBlankLines > 0 {
+        log.Printf("Render blankLines=%d", numberOfBlankLines)
         blankLine := strings.Repeat(" ", ConsoleWindowWidth())
-        for numberOfBlankLines > 0 {
+        for i := 0; i < numberOfBlankLines; i = i+1 {
+            ConsoleSetCursorPos(0, s.cursorTop + lineCount + i)
             fmt.Println(blankLine)
         }
     }

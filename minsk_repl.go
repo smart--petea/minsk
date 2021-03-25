@@ -48,6 +48,22 @@ type MinskRepl struct {
     variables map[*Util.VariableSymbol]interface{}
 }
 
+func (m *MinskRepl) RenderLine(line string) {
+    tokens := Syntax.ParseTokens(line)
+    for _, token := range tokens {
+        isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
+        isNumber :=  token.Kind() == SyntaxToke.NumberToken
+        if isKeyword {
+            Console.ForegroundColour(Console.COLOUR_BLUE)
+        } else if !isNumber {
+            Console.ForegroundColour(Console.COLOUR_DARK_GRAY)
+        }
+        fmt.Print(string(token.Runes))
+
+        Console.ResetColour()
+    }
+}
+
 func (m *MinskRepl) EvaluateSubmission(text string) {
     syntaxTree := Syntax.SyntaxTreeParse(text)
 
