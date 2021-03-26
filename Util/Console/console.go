@@ -16,6 +16,7 @@ const (
     COLOUR_CYAN Colour = "[36m"
     COLOUR_WHITE Colour = "[37m"
     COLOUR_GRAY Colour = "[90m"
+    COLOUR_DARK_GRAY Colour = "[100m"
     COLOUR_YELLOW Colour = "[93m"
 )
 

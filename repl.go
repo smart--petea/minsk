@@ -31,6 +31,7 @@ func (r *Repl) clearHistory() {
 }
 
 func (r *Repl) RenderLine(line string) {
+    log.Printf("Repl.RenderLine")
     fmt.Println(line)
 }
 
@@ -72,7 +73,7 @@ func (r *Repl) editSubmission(ir IRepl) string {
 
     r.submissionText = ""
     document := NewObservableCollection("")
-    view := NewSubmissionView(r.RenderLine, document)
+    view := NewSubmissionView(ir.RenderLine, document)
 
     for r.done == false {
         key := ConsoleReadKey()

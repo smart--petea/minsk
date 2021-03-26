@@ -4,9 +4,11 @@ import (
     "fmt"
     "os"
     "strings"
+    "log"
 
     CA "minsk/CodeAnalysis"
     "minsk/CodeAnalysis/Syntax"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
     "minsk/Util/Console"
     "minsk/Util"
@@ -49,10 +51,11 @@ type MinskRepl struct {
 }
 
 func (m *MinskRepl) RenderLine(line string) {
+    log.Printf("MinskRepl.RenderLine")
     tokens := Syntax.ParseTokens(line)
     for _, token := range tokens {
         isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
-        isNumber :=  token.Kind() == SyntaxToke.NumberToken
+        isNumber :=  token.Kind() == SyntaxKind.NumberToken
         if isKeyword {
             Console.ForegroundColour(Console.COLOUR_BLUE)
         } else if !isNumber {
