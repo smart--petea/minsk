@@ -226,11 +226,31 @@ func (o *ObservableCollection) Clear() {
     o.fireCollectionChanged()
 }
 
+func (o *ObservableCollection) Insert(index int, e string) {
+    //log.Printf("ObservableCollection.Insert")
+    if index <= len(o.Collection) - 1 {
+        collection := o.Collection
+        o.Collection = append(collection[:index], e)
+        o.Collection = append(o.Collection, o.Collection[:index]...)
+    } else if index == len(o.Collection) {
+        o.Collection = append(o.Collection, e)
+    } else {
+        panic(fmt.Sprintf("ObservableCollection.Insert index(%d) > len(collection)(%d)", index, len(o.Collection)))
+    }
+}
 
 func (o *ObservableCollection) Add(e string) {
     //log.Printf("ObservableCollection.Add")
     o.Collection = append(o.Collection, e)
     o.fireCollectionChanged()
+}
+
+func (o *ObservableCollection) RemoveAt(index int) {
+    if index < len(o.Collection)  - 1 {
+        o.Collection = append(o.Collection[:index], o.Collection[index + 1:]...)
+    } else if index == len(o.Collection)  - 1 {
+        o.Collection = o.Collection[:index]
+    }
 }
 
 func (o *ObservableCollection) Get(index int) string {
@@ -310,10 +330,10 @@ func (r *Repl) HandleTab(document *ObservableCollection, view *SubmissionView) {
 }
 
 func (r *Repl) HandleAltEnter(document *ObservableCollection, view *SubmissionView) {
-    r.done = true
 
     view.SetCurrentCharacter(0)
     view.SetCurrentLine(document.Count() - 1)
+    r.done = true
 }
 
 func (r *Repl) HandleHome(document *ObservableCollection, view *SubmissionView) {
@@ -376,26 +396,32 @@ func (r *Repl) HandleDelete(document *ObservableCollection, view *SubmissionView
 }
 
 func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionView) {
-    lineIndex := view.GetCurrentLine()
-    line := document.Get(lineIndex)
+    currentLineIndex := view.GetCurrentLine()
+    currentLine := document.Get(currentLineIndex)
     start := view.GetCurrentCharacter()
     //log.Printf("HandleBackspace len(line)=%d start=%d", len(line), start)
-    if len(line) == 0 {
+    if len(currentLine) == 0 || start == 0 {
+        if currentLineIndex <= 0 {
+            return
+        }
+
+        previousLine := document.Get(currentLineIndex - 1)
+        document.RemoveAt(currentLineIndex)
+        view.SetCurrentLine(currentLineIndex - 1)
+        document.Set(currentLineIndex - 1, previousLine + currentLine)
+        view.SetCurrentCharacter(len(previousLine))
+
         return
+    } else {
+
+        before := currentLine[:start-1]
+        after := currentLine[start:]
+        currentLine = before + after
+        document.Set(currentLineIndex, currentLine)
+
+        view.SetCurrentCharacter(start - 1)
+        view.Print(after + " ")
     }
-
-    if start == 0 {
-        return
-    }
-
-
-    before := line[:start-1]
-    after := line[start:]
-    line = before + after
-    document.Set(lineIndex, line)
-
-    view.SetCurrentCharacter(start - 1)
-    view.Print(after + " ")
 }
 
 func (r *Repl) HandleEscape(document *ObservableCollection, view *SubmissionView) {
@@ -419,9 +445,19 @@ func (r *Repl) HandleEnter(document *ObservableCollection, view *SubmissionView)
         return
     }
 
-    document.Add("")
+    ReplInsertLine(document, view)
+}
+
+func ReplInsertLine(document *ObservableCollection, view *SubmissionView) {
+    lineIndex := view.GetCurrentLine()
+    currentCharacter := view.GetCurrentCharacter()
+
+    line := document.Get(lineIndex)
+
+    document.Set(lineIndex, line[:currentCharacter])
+    document.Insert(lineIndex + 1, line[currentCharacter:])
     view.SetCurrentCharacter(0)
-    view.SetCurrentLine(document.Count() - 1)
+    view.SetCurrentLine(lineIndex + 1)
 }
 
 func (r *Repl) HandleLeftArrow(document *ObservableCollection, view *SubmissionView) {

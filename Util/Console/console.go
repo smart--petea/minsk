@@ -2,7 +2,7 @@ package Console
 
 import (
     "fmt"
-    "log"
+//    "log"
 )
 
 type Colour string
@@ -21,12 +21,12 @@ const (
 )
 
 func ResetColour() {
-    log.Printf("Console.ResetColour")
+    //log.Printf("Console.ResetColour")
     ForegroundColour(COLOUR_WHITE)
 }
 
 func ForegroundColour(colour Colour) {
-    log.Printf("Console.ForegroundColor %s", string(colour))
+    //log.Printf("Console.ForegroundColor %s", string(colour))
     fmt.Printf("\033%s", colour)
 }
 
