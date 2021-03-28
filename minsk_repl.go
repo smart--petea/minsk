@@ -51,15 +51,15 @@ type MinskRepl struct {
 }
 
 func (m *MinskRepl) RenderLine(line string) {
-    log.Printf("MinskRepl.RenderLine")
     tokens := Syntax.ParseTokens(line)
+    log.Printf("MinskRepl.RenderLine line=%s len(tokens)=%d", line, len(tokens))
     for _, token := range tokens {
         isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
         isNumber :=  token.Kind() == SyntaxKind.NumberToken
         if isKeyword {
             Console.ForegroundColour(Console.COLOUR_BLUE)
         } else if !isNumber {
-            Console.ForegroundColour(Console.COLOUR_DARK_GRAY)
+            Console.ForegroundColour(Console.COLOUR_GRAY)
         }
         fmt.Print(string(token.Runes))
 

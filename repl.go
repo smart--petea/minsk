@@ -31,7 +31,7 @@ func (r *Repl) clearHistory() {
 }
 
 func (r *Repl) RenderLine(line string) {
-    log.Printf("Repl.RenderLine")
+    //log.Printf("Repl.RenderLine %s", line)
     fmt.Println(line)
 }
 
@@ -64,7 +64,7 @@ func (r *Repl) Run(ir IRepl) {
         r.submissionHistory = append(r.submissionHistory, text)
         r.submissionHistoryIndex = 0
 
-        log.Printf("Run len(submissionHIstory)=%d history=%+v", len(r.submissionHistory), r.submissionHistory)
+        //log.Printf("Run len(submissionHIstory)=%d history=%+v", len(r.submissionHistory), r.submissionHistory)
     }
 }
 
@@ -213,7 +213,7 @@ func (o *ObservableCollection) CollectionChanged(listener func(interface{}, *Not
 }
 
 func (o *ObservableCollection) fireCollectionChanged() {
-    log.Printf("fireCollectionChanged")
+    //log.Printf("fireCollectionChanged")
     for _, l := range o.Listeners {
         args := NewNotifyCollectionChangedEventArgs()
         l(nil, args)
@@ -221,14 +221,14 @@ func (o *ObservableCollection) fireCollectionChanged() {
 }
 
 func (o *ObservableCollection) Clear() {
-    log.Printf("ObservableCollection.Clear")
+    //log.Printf("ObservableCollection.Clear")
     o.Collection = []string{}
     o.fireCollectionChanged()
 }
 
 
 func (o *ObservableCollection) Add(e string) {
-    log.Printf("ObservableCollection.Add")
+    //log.Printf("ObservableCollection.Add")
     o.Collection = append(o.Collection, e)
     o.fireCollectionChanged()
 }
@@ -238,7 +238,7 @@ func (o *ObservableCollection) Get(index int) string {
 }
 
 func (o *ObservableCollection) Set(index int, val string) {
-    log.Printf("ObservableCollection.Set")
+    //log.Printf("ObservableCollection.Set")
     o.Collection[index] = val
     o.fireCollectionChanged()
 }
@@ -339,7 +339,7 @@ func (r *Repl) UpdateDocumentFromHistory(document *ObservableCollection, view *S
         document.Add(l)
         view.SetCurrentCharacter(0)
         view.SetCurrentLine(i)
-        view.Print(l)
+        view.lineRenderer(l)
     }
 
     line := lines[len(lines) - 1]
@@ -379,7 +379,7 @@ func (r *Repl) HandleBackspace(document *ObservableCollection, view *SubmissionV
     lineIndex := view.GetCurrentLine()
     line := document.Get(lineIndex)
     start := view.GetCurrentCharacter()
-    log.Printf("HandleBackspace len(line)=%d start=%d", len(line), start)
+    //log.Printf("HandleBackspace len(line)=%d start=%d", len(line), start)
     if len(line) == 0 {
         return
     }
@@ -457,13 +457,13 @@ func (r *Repl) HandleDownArrow(document *ObservableCollection, view *SubmissionV
 func (r *Repl) HandleTyping(document *ObservableCollection, view *SubmissionView, text string) {
     lineIndex := view.GetCurrentLine()
     start := view.GetCurrentCharacter()
-    log.Printf("handleTyping start=%d lineIndex=%d", start, lineIndex)
+    //log.Printf("handleTyping start=%d lineIndex=%d", start, lineIndex)
 
     line := document.Get(lineIndex)
     line =  line[:start] + text + line[start:]
     fmt.Printf("%s", line[start:])
 
-    log.Printf("handleTyping line=%s", string(line))
+    //log.Printf("handleTyping line=%s", string(line))
 
     document.Set(lineIndex, line)
     currentCharacter := view.GetCurrentCharacter() 
@@ -488,6 +488,7 @@ type SubmissionView struct {
 }
 
 func (s *SubmissionView) Print(text string) {
+    log.Printf("SubmissionView.Print %s", text)
     left, top := ConsoleGetCursorPos()
 
     fmt.Printf(text)
@@ -575,7 +576,6 @@ func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}, e *Notify
 }
 
 func ConsoleSetCursorPos(left, top int) {
-    log.Printf("ConsoleSetCursorPos left=%d top=%d", left, top)
     fmt.Printf("\033[%d;%dH", top, left)
 }
 
@@ -591,7 +591,7 @@ func ConsoleSetCursorVisibile(v bool) {
 func (s *SubmissionView) Render() {
     left := 1
     top := s.cursorTop
-    log.Printf("Render left=%d top=%d ", left, top)
+    log.Printf("SubmissionView.Render left=%d top=%d ", left, top)
 
     ConsoleSetCursorVisibile(false)
 
@@ -613,7 +613,6 @@ func (s *SubmissionView) Render() {
 
     numberOfBlankLines := s.renderedLineCount - lineCount
     if numberOfBlankLines > 0 {
-        log.Printf("Render blankLines=%d", numberOfBlankLines)
         blankLine := strings.Repeat(" ", ConsoleWindowWidth())
         for i := 0; i < numberOfBlankLines; i = i+1 {
             ConsoleSetCursorPos(0, s.cursorTop + lineCount + i)
@@ -647,7 +646,7 @@ func (s *SubmissionView) UpdateCursorPosition() {
     top := s.cursorTop + s.GetCurrentLine()
     left := 2 + s._currentCharacter
 
-    log.Printf("UpdateCursorPosition cursorTop=%d lineIndex=%d currentCharacter=%d left=%d top=%d", s.cursorTop, s.GetCurrentLine(), s._currentCharacter, left, top)
+    //log.Printf("UpdateCursorPosition cursorTop=%d lineIndex=%d currentCharacter=%d left=%d top=%d", s.cursorTop, s.GetCurrentLine(), s._currentCharacter, left, top)
 
     ConsoleSetCursorPos(left, top)
 }
@@ -657,7 +656,7 @@ func (s *SubmissionView) GetCurrentLine() int {
 }
 
 func (s *SubmissionView) SetCurrentLine(value int) {
-    log.Printf("SetCurrentLine old=%d new=%d", s._currentLine, value)
+    //log.Printf("SetCurrentLine old=%d new=%d", s._currentLine, value)
     if value != s._currentLine {
         s._currentLine  = value
 
@@ -675,7 +674,7 @@ func (s *SubmissionView) GetCurrentCharacter() int {
 }
 
 func (s *SubmissionView) SetCurrentCharacter(value int) {
-    log.Printf("SetCurrentCharacter old=%d new=%d", s._currentCharacter, value)
+    //log.Printf("SetCurrentCharacter old=%d new=%d", s._currentCharacter, value)
     if value != s._currentCharacter {
         s._currentCharacter  = value
         s.UpdateCursorPosition()
