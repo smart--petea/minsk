@@ -65,6 +65,8 @@ func (m *MinskRepl) RenderLine(line string) {
 
         Console.ResetColour()
     }
+
+    Console.Print(strings.Repeat(" ", Console.WindowWidth() - len(line)))
 }
 
 func (m *MinskRepl) EvaluateSubmission(text string) {
