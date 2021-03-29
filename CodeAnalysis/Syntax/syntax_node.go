@@ -5,6 +5,7 @@ import (
     "os"
     "fmt"
     "strings"
+    "log"
 
     "minsk/Util/Console"
     "minsk/CodeAnalysis/Text"
@@ -112,4 +113,25 @@ func ToString(node CoreSyntaxNode) string {
     WriteTo(writer, node)
 
     return writer.String()
+}
+
+func SyntaxNodeGetLastToken(node SyntaxNode) *SyntaxToken {
+    if syntaxToken, ok := node.(*SyntaxToken); ok {
+        log.Printf("SyntaxNodeGetLastToken return=%v", syntaxToken)
+        return syntaxToken
+    }
+
+    var lastChild, tmp interface{}
+    var ok bool
+    children := node.GetChildren()
+    lastChild, ok = <-children 
+    for ok {
+        tmp, ok = <-children
+        if ok {
+            lastChild = tmp
+        }
+    }
+
+    lastSyntaxToken := SyntaxNodeGetLastToken(lastChild.(SyntaxNode))
+    return lastSyntaxToken
 }

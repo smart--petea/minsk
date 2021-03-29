@@ -138,7 +138,7 @@ func (m *MinskRepl) IsCompleteSubmission(text string) bool {
     }
 
     syntaxTree := Syntax.SyntaxTreeParse(text)
-    if len(syntaxTree.GetDiagnostics()) > 0 {
+    if Syntax.SyntaxNodeGetLastToken(syntaxTree.Root.Statement).IsMissing() {
         return false
     }
 

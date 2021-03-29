@@ -15,6 +15,10 @@ type SyntaxToken struct {
     value interface{}
 }
 
+func (s *SyntaxToken) IsMissing() bool {
+    return s.Runes == nil
+}
+
 func (s *SyntaxToken) Kind() SyntaxKind.SyntaxKind {
     return s.kind
 }
