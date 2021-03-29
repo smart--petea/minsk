@@ -53,6 +53,7 @@ func (o *ObservableCollection) RemoveAt(index int) {
     } else if index == len(o.Collection)  - 1 {
         o.Collection = o.Collection[:index]
     }
+    o.fireCollectionChanged()
 }
 
 func (o *ObservableCollection) Get(index int) string {

@@ -4,7 +4,7 @@ import (
     "fmt"
     "bufio"
     "os"
-    "log"
+    //"log"
     "strings"
 
     "minsk/Util"
@@ -159,6 +159,10 @@ func (r *Repl) HandlePageUp(document *Util.ObservableCollection, view *Submissio
 }
 
 func (r *Repl) UpdateDocumentFromHistory(document *Util.ObservableCollection, view *SubmissionView) {
+    if len(r.submissionHistory) == 0 {
+        return 
+    }
+
     document.Clear()
 
     historyItem := r.submissionHistory[r.submissionHistoryIndex]
@@ -196,6 +200,14 @@ func (r *Repl) HandleDelete(document *Util.ObservableCollection, view *Submissio
     start := view.GetCurrentCharacter()
 
     if len(line) == 0 || start >= len(line) {
+        if document.Count() - 1 == lineIndex {
+            return
+        }
+
+        nextLine := document.Get(lineIndex + 1)
+        line = line + nextLine
+        document.Set(lineIndex, line)
+        document.RemoveAt(lineIndex + 1)
         return
     }
 
