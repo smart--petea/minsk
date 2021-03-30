@@ -8,6 +8,7 @@ import (
     "minsk/Util"
 
     "fmt"
+    "log"
     "reflect"
 )
 
@@ -111,6 +112,7 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
 }
 
 func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+    log.Printf("BindNameExpression")
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
@@ -136,6 +138,7 @@ func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) Bou
 }
 
 func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+    //log.Printf("BindLiteralExpression %+v", syntax)
     literalSyntax := syntax.(*Syntax.LiteralExpressionSyntax)
 
     var value interface{}
@@ -148,9 +151,10 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
     case SyntaxKind.IdentifierToken:
         value = string(literalSyntax.LiteralToken.Runes)
     default:
-        if val, ok := literalSyntax.Value().(int); ok {
-            value = val
-        }
+        //if val, ok := literalSyntax.Value().(int); ok {
+        //    value = val
+        //}
+        value = literalSyntax.Value()
     }
 
     return NewBoundLiteralExpression(value)

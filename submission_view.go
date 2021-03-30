@@ -39,7 +39,7 @@ func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}) {
 func (s *SubmissionView) Render() {
     left := 1
     top := s.cursorTop
-    log.Printf("SubmissionView.Render left=%d top=%d ", left, top)
+    log.Printf("Render left=%d top=%d ", left, top)
 
     Console.SetCursorVisibile(false)
 

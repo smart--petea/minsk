@@ -81,3 +81,8 @@ func (db *DiagnosticBag) ReportCannotAssign(span *Text.TextSpan, name string) {
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportUnterminatedString(span *Text.TextSpan) {
+    message := "Unterminated string literal."
+    db.report(span, message)
+}

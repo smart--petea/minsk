@@ -5,6 +5,8 @@ import (
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/CodeAnalysis/Text"
     "minsk/Util"
+
+//    "log"
 )
 
 type Parser struct {
@@ -96,15 +98,33 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
     switch p.Current().Kind() {
     case SyntaxKind.OpenParenthesisToken:
         return p.ParseParenthesizedExpression()
+
     case SyntaxKind.FalseKeyword,  SyntaxKind.TrueKeyword:
         return p.ParseBooleanLiteral()
+
     case SyntaxKind.NumberToken:
         return p.ParseNumberLiteral()
+
+    case SyntaxKind.StringToken:
+        return p.ParseStringLiteral()
+
     case SyntaxKind.IdentifierToken:
         return p.ParseNameExpression()
+
     default:
         return p.ParseNameExpression()
     }
+}
+
+func (p *Parser) ParseStringLiteral() ExpressionSyntax {
+    //log.Printf("ParseStringLiteral")
+    stringToken := p.MatchToken(SyntaxKind.StringToken)
+    if stringToken == nil {
+        //log.Printf("ParseStringLiteral nil token")
+        return nil
+    }
+
+    return NewLiteralExpressionSyntax(stringToken, stringToken.Value())
 }
 
 func (p *Parser) ParseNumberLiteral() ExpressionSyntax {

@@ -4,6 +4,7 @@ const (
     //tokens
     NumberToken SyntaxKind = "NumberToken"
     WhitespaceToken SyntaxKind = "WhitespaceToken"
+    StringToken SyntaxKind = "StringToken"
     PlusToken SyntaxKind = "PlusToken"
     EndOfFileToken SyntaxKind = "EndOfFileToken"
     MinusToken SyntaxKind = "MinusToken"
@@ -66,6 +67,7 @@ func GetValues() []SyntaxKind {
     return []SyntaxKind{
         NumberToken,
         WhitespaceToken,
+        StringToken,
         PlusToken,
         EndOfFileToken,
         MinusToken,

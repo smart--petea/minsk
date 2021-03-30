@@ -9,6 +9,8 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
 
+    "log"
+
     "reflect"
 )
 
@@ -87,6 +89,7 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
 }
 
 func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression) interface{} {
+    log.Printf("evaluateLiteralExpression %+v", l)
     return l.Value
 }
 

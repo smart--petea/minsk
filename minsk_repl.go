@@ -52,7 +52,7 @@ type MinskRepl struct {
 
 func (m *MinskRepl) RenderLine(line string) {
     tokens := Syntax.ParseTokens(line)
-    log.Printf("MinskRepl.RenderLine line=%s len(tokens)=%d", line, len(tokens))
+    log.Printf("RenderLine line=%s len(tokens)=%d", line, len(tokens))
     for _, token := range tokens {
         isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
         isNumber :=  token.Kind() == SyntaxKind.NumberToken
@@ -139,8 +139,23 @@ func (m *MinskRepl) EvaluateSubmission(text string) {
     }
 }
 
+func MinskReplLastTwoLinesAreBlank(text string) bool {
+    lines := strings.Split(text, "\n")
+    l := len(lines)
+
+    if l < 2 {
+        return false
+    }
+
+    return lines[l-1] == "" && lines[l-2] == ""
+}
+
 func (m *MinskRepl) IsCompleteSubmission(text string) bool {
     if len(text) == 0 {
+        return true
+    }
+
+    if MinskReplLastTwoLinesAreBlank(text) {
         return true
     }
 

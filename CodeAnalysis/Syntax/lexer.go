@@ -4,6 +4,7 @@ import (
     "unicode"
     "strconv"
     "reflect"
+    "strings"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
@@ -159,6 +160,9 @@ func (l *Lexer) Lex() *SyntaxToken {
             l.kind = SyntaxKind.GreaterToken
         }
 
+    case '"':
+        l.ReadString()
+
     case '0','1','2','3','4','5','6','7','8','9':
             l.ReadNumberToken() 
     case ' ','\t','\n','\r':
@@ -217,4 +221,42 @@ func (l *Lexer) ReadIdentifierOrKeyword() {
 
     runes := l.text.GetRunes(l.start, l.Position)
     l.kind = SyntaxFacts.GetKeywordKind(string(runes))
+}
+
+func (l *Lexer) ReadString() {
+    //Skip the current quote
+    l.Position = l.Position + 1
+    var sb strings.Builder
+    var done bool
+
+    for !done{
+        current := l.Current()
+        switch current {
+        case '"':
+            if l.Lookahead() == '"' {
+                l.Position = l.Position + 2
+                _, err := sb.WriteRune(current)
+                if err != nil {
+                    panic(err)
+                }
+            } else {
+                l.Position = l.Position + 1
+                done = true
+            }
+        case '\x00', '\r', '\n':
+            span := Text.NewTextSpan(l.start, 1)
+            l.ReportUnterminatedString(span)
+            done = true
+        default:
+            _, err := sb.WriteRune(current)
+            if err != nil {
+                panic(err)
+            }
+
+            l.Position = l.Position + 1
+        }
+    }
+
+    l.kind = SyntaxKind.StringToken
+    l.value = sb.String()
 }

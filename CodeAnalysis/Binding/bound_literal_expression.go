@@ -4,6 +4,8 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
     "reflect"
+
+    "log"
 )
 
 type BoundLiteralExpression struct {
@@ -13,6 +15,7 @@ type BoundLiteralExpression struct {
 }
 
 func NewBoundLiteralExpression(value interface{}) *BoundLiteralExpression {
+    log.Printf("NewBoundLiteralExpression %+v", value)
     return &BoundLiteralExpression{
         ChildrenProvider: Util.NewChildrenProvider(),
 
