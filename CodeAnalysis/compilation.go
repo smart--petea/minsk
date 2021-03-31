@@ -4,6 +4,7 @@ import (
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Binding"
     "minsk/CodeAnalysis/Lowering"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 
     "sync"
@@ -50,7 +51,7 @@ func (c *Compilation) ContinueWith(syntaxTree *Syntax.SyntaxTree) *Compilation {
     return newCompilation(previous, syntaxTree)
 }
 
-func (c *Compilation) Evaluate(variables map[*Util.VariableSymbol]interface{}) *EvaluationResult {
+func (c *Compilation) Evaluate(variables map[*Symbols.VariableSymbol]interface{}) *EvaluationResult {
     if len(c.SyntaxTree.GetDiagnostics()) > 0 {
         return NewEvaluationResult(c.SyntaxTree.GetDiagnostics(), nil)
     }

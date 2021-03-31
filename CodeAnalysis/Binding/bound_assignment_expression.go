@@ -4,16 +4,17 @@ import (
     "reflect"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
+    "minsk/CodeAnalysis/Symbols"
 )
 
 type BoundAssignmentExpression struct {
     *Util.ChildrenProvider
 
-    Variable *Util.VariableSymbol
+    Variable *Symbols.VariableSymbol
     Expression BoundExpression
 }
 
-func NewBoundAssignmentExpression(variable *Util.VariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
+func NewBoundAssignmentExpression(variable *Symbols.VariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
     return &BoundAssignmentExpression{
         ChildrenProvider: Util.NewChildrenProvider(expression),
 

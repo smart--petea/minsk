@@ -8,10 +8,10 @@ import (
 
     CA "minsk/CodeAnalysis"
     "minsk/CodeAnalysis/Syntax"
+    "minsk/CodeAnalysis/Symbols"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
     "minsk/Util/Console"
-    "minsk/Util"
 )
 
 func (m *MinskRepl) EvaluateMetaCommand(input string) {
@@ -34,7 +34,7 @@ func (m *MinskRepl) EvaluateMetaCommand(input string) {
         Console.Clear()
     case "#reset":
         m.previous = nil
-        m.variables = make(map[*Util.VariableSymbol]interface{})
+        m.variables = make(map[*Symbols.VariableSymbol]interface{})
     default:
         m.Repl.EvaluateMetaCommand(input)
     }
@@ -47,7 +47,7 @@ type MinskRepl struct {
     previous *CA.Compilation
     showTree bool
     showProgram bool
-    variables map[*Util.VariableSymbol]interface{}
+    variables map[*Symbols.VariableSymbol]interface{}
 }
 
 func (m *MinskRepl) RenderLine(line string) {
@@ -169,7 +169,7 @@ func (m *MinskRepl) IsCompleteSubmission(text string) bool {
 
 func NewMinskRepl() *MinskRepl {
     m := MinskRepl{
-        variables: make(map[*Util.VariableSymbol]interface{}),
+        variables: make(map[*Symbols.VariableSymbol]interface{}),
     }
     m.Repl.IsCompleteSubmission = m.IsCompleteSubmission
     m.Repl.EvaluateSubmission = m.EvaluateSubmission

@@ -2,6 +2,7 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
     "reflect"
 )
@@ -9,10 +10,10 @@ import (
 type BoundVariableExpression struct {
     *Util.ChildrenProvider
 
-    Variable *Util.VariableSymbol
+    Variable *Symbols.VariableSymbol
 }
 
-func NewBoundVariableExpression(variable *Util.VariableSymbol) *BoundVariableExpression {
+func NewBoundVariableExpression(variable *Symbols.VariableSymbol) *BoundVariableExpression {
     return &BoundVariableExpression{
         ChildrenProvider: Util.NewChildrenProvider(),
 

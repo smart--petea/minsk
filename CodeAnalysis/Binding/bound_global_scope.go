@@ -3,16 +3,17 @@ package Binding
 import (
     "minsk/Util"
     "minsk/CodeAnalysis/Syntax"
+    "minsk/CodeAnalysis/Symbols"
 )
 
 type BoundGlobalScope struct {
     Util.DiagnosticBag
     Previous *BoundGlobalScope
-    Variables []*Util.VariableSymbol
+    Variables []*Symbols.VariableSymbol
     Statement BoundStatement
 }
 
-func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Util.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
+func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Symbols.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
     return &BoundGlobalScope{
         Previous: previous,
         Variables: variables,

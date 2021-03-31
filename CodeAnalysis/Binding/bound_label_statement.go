@@ -8,10 +8,10 @@ import (
 type BoundLabelStatement struct {
     *Util.ChildrenProvider
 
-    Label *Util.LabelSymbol
+    Label *BoundLabel
 }
 
-func NewBoundLabelStatement(label *Util.LabelSymbol) *BoundLabelStatement {
+func NewBoundLabelStatement(label *BoundLabel) *BoundLabelStatement {
     return &BoundLabelStatement{
         ChildrenProvider: Util.NewChildrenProvider(),
 

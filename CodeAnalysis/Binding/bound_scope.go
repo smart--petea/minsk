@@ -1,23 +1,23 @@
 package Binding
 
 import (
-    "minsk/Util"
+    "minsk/CodeAnalysis/Symbols"
 )
 
 type BoundScope struct {
-    variables map[*Util.VariableSymbol]interface{}
+    variables map[*Symbols.VariableSymbol]interface{}
     Parent *BoundScope
 }
 
 func NewBoundScope(parent *BoundScope) *BoundScope {
     return &BoundScope{
-        variables: make(map[*Util.VariableSymbol]interface{}),
+        variables: make(map[*Symbols.VariableSymbol]interface{}),
         Parent: parent,
     }
 }
 
-func (bs *BoundScope) TryLookup(name string, out **Util.VariableSymbol) bool {
-    var variable *Util.VariableSymbol
+func (bs *BoundScope) TryLookup(name string, out **Symbols.VariableSymbol) bool {
+    var variable *Symbols.VariableSymbol
 
     for variable, _ = range bs.variables {
         if variable.Name == name {
@@ -33,8 +33,8 @@ func (bs *BoundScope) TryLookup(name string, out **Util.VariableSymbol) bool {
     return bs.Parent.TryLookup(name, out)
 }
 
-func (bs *BoundScope) TryDeclare(variable *Util.VariableSymbol) bool {
-    var tmp *Util.VariableSymbol
+func (bs *BoundScope) TryDeclare(variable *Symbols.VariableSymbol) bool {
+    var tmp *Symbols.VariableSymbol
 
     for tmp, _ = range bs.variables {
         if variable.Name == tmp.Name {
@@ -47,8 +47,8 @@ func (bs *BoundScope) TryDeclare(variable *Util.VariableSymbol) bool {
     return true
 }
 
-func (bs *BoundScope) GetDeclaredVariables() []*Util.VariableSymbol {
-    var d []*Util.VariableSymbol
+func (bs *BoundScope) GetDeclaredVariables() []*Symbols.VariableSymbol {
+    var d []*Symbols.VariableSymbol
     for variable, _ := range bs.variables {
         d = append(d, variable)
     }

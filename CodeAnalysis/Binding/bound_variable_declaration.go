@@ -2,17 +2,18 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 )
 
 type BoundVariableDeclaration struct {
     *Util.ChildrenProvider
 
-    Variable *Util.VariableSymbol
+    Variable *Symbols.VariableSymbol
     Initializer BoundExpression
 }
 
-func NewBoundVariableDeclaration(variable *Util.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
+func NewBoundVariableDeclaration(variable *Symbols.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
     return &BoundVariableDeclaration{
         ChildrenProvider: Util.NewChildrenProvider(initializer),
 

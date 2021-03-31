@@ -8,12 +8,12 @@ import (
 type BoundConditionalGotoStatement struct {
     *Util.ChildrenProvider
 
-    Label *Util.LabelSymbol
+    Label *BoundLabel
     Condition BoundExpression
     JumpIfFalse bool
 }
 
-func NewBoundConditionalGotoStatement(label *Util.LabelSymbol, condition BoundExpression, jumpIfFalse bool) *BoundConditionalGotoStatement {
+func NewBoundConditionalGotoStatement(label *BoundLabel, condition BoundExpression, jumpIfFalse bool) *BoundConditionalGotoStatement {
     return &BoundConditionalGotoStatement{
         ChildrenProvider: Util.NewChildrenProvider(condition),
 

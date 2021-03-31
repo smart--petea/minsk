@@ -2,19 +2,20 @@ package Binding
 
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 )
 
 type BoundForStatement struct {
     *Util.ChildrenProvider
 
-    Variable *Util.VariableSymbol
+    Variable *Symbols.VariableSymbol
     LowerBound BoundExpression
     UpperBound BoundExpression
     Body BoundStatement
 }
 
-func NewBoundForStatement(variable *Util.VariableSymbol, lowerBound BoundExpression, upperBound BoundExpression, body BoundStatement) *BoundForStatement {
+func NewBoundForStatement(variable *Symbols.VariableSymbol, lowerBound BoundExpression, upperBound BoundExpression, body BoundStatement) *BoundForStatement {
     return &BoundForStatement{
         ChildrenProvider: Util.NewChildrenProvider(lowerBound, upperBound, body),
 

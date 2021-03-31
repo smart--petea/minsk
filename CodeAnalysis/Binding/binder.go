@@ -4,6 +4,7 @@ import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Syntax"
     "minsk/Util"
 
@@ -90,7 +91,7 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
 
-    var variable *Util.VariableSymbol
+    var variable *Symbols.VariableSymbol
     if b.scope.TryLookup(name, &variable) == false {
         span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
         b.ReportUndefinedName(span, name)
@@ -122,7 +123,7 @@ func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpress
         return NewBoundLiteralExpression(0)
     }
 
-    var variable *Util.VariableSymbol
+    var variable *Symbols.VariableSymbol
     if b.scope.TryLookup(name, &variable) {
         return NewBoundVariableExpression(variable)
     }
@@ -217,7 +218,7 @@ func (b *Binder) BindForStatement(syntax Syntax.StatementSyntax) BoundStatement 
     b.scope = NewBoundScope(b.scope)
 
     name := string(forStatementSyntax.Identifier.Runes)
-    variable := Util.NewVariableSymbol(name, true, reflect.Int)
+    variable := Symbols.NewVariableSymbol(name, true, reflect.Int)
     if b.scope.TryDeclare(variable) == false {
         b.ReportVariableAlreadyDeclared(forStatementSyntax.Identifier.GetSpan(), name)
     }
@@ -263,7 +264,7 @@ func (b *Binder) BindVariableDeclaration(syntax Syntax.StatementSyntax) BoundSta
     name := string(variableDeclarationSyntax.Identifier.Runes)
     isReadOnly := variableDeclarationSyntax.Keyword.Kind() == SyntaxKind.LetKeyword
     initializer := b.BindExpression(variableDeclarationSyntax.Initializer)
-    variable := Util.NewVariableSymbol(name, isReadOnly, initializer.GetType())
+    variable := Symbols.NewVariableSymbol(name, isReadOnly, initializer.GetType())
 
     if !b.scope.TryDeclare(variable) {
         span := variableDeclarationSyntax.Identifier.GetSpan()

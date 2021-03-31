@@ -7,7 +7,7 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
-    "minsk/Util"
+    "minsk/CodeAnalysis/Symbols"
 
     "log"
 
@@ -16,11 +16,11 @@ import (
 
 type Evaluator struct {
         Root *Binding.BoundBlockStatement
-        variables map[*Util.VariableSymbol]interface{}
+        variables map[*Symbols.VariableSymbol]interface{}
         lastValue interface{}
 }
 
-func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Util.VariableSymbol]interface{}) *Evaluator {
+func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Symbols.VariableSymbol]interface{}) *Evaluator {
     return &Evaluator{
         Root: root,
         variables: variables,
@@ -28,7 +28,7 @@ func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Util.Variabl
 }
 
 func (e *Evaluator) Evaluate() interface{} {
-    labelToIndex := make(map[*Util.LabelSymbol]int)
+    labelToIndex := make(map[*Binding.BoundLabel]int)
 
     for i := range e.Root.Statements {
         if l, ok := e.Root.Statements[i].(*Binding.BoundLabelStatement); ok {

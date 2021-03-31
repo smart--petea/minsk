@@ -49,11 +49,11 @@ func lowererFlatten(statement Binding.BoundStatement) *Binding.BoundBlockStateme
     return Binding.NewBoundBlockStatement(builder)
 }
 
-func (l *Lowerer) GenerateLabel() *Util.LabelSymbol {
+func (l *Lowerer) GenerateLabel() *Binding.BoundLabel {
     name := fmt.Sprintf("Label%d", l.labelCount)
     l.labelCount = l.labelCount + 1
 
-    return Util.NewLabelSymbol(name)
+    return Binding.NewBoundLabel(name)
 }
 
 func (l *Lowerer) RewriteIfStatement(b Binding.BoundITreeRewriter, node *Binding.BoundIfStatement) Binding.BoundStatement {
