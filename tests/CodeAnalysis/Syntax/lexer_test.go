@@ -56,10 +56,42 @@ func getTokens() []testToken {
         {kind: SyntaxKind.NumberToken, text: "123"},
         {kind: SyntaxKind.IdentifierToken, text: "a"},
         {kind: SyntaxKind.IdentifierToken, text: "abc"},
+        {kind: SyntaxKind.StringToken, text: "\"Test\""},
+        {kind: SyntaxKind.StringToken, text: "\"Te\"\"st\""},
     }
 }
 
-func TestLexerAllTokens(t *testing.T) {
+func TestLexerLexesUnterminatedString(t *testing.T) {
+    text := "\"text"
+    tokens, diagnostics := Syntax.ParseTokensWithDiagnostics(text)
+
+    if len(tokens) != 1 {
+        t.Errorf("len(%+v) expected=1", tokens)
+    }
+
+    token := tokens[0]
+    if token.Kind() != SyntaxKind.StringToken {
+        t.Errorf("kind=%s, expected=%s", token.Kind(), SyntaxKind.StringToken)
+    }
+    if string(token.Runes) != text {
+        t.Errorf("runes=%s, expected=%s", string(token.Runes), text)
+    }
+
+    if len(diagnostics) != 1 {
+        t.Errorf("diagnostics len(%+v)=%d should be 1", diagnostics, len(diagnostics))
+    }
+    diagnostic := diagnostics[0]
+
+    if diagnostic.Span.Start != 0 || diagnostic.Span.Length != 1 {
+        t.Errorf("diagnostic.Span is (%d, %d), should be (%d, %d)", diagnostic.Span.Start, diagnostic.Span.Length, 0, 1)
+    }
+
+    if diagnostic.Message != "Unterminated string literal." {
+        t.Errorf("diagnostic.Message = %s, should be '%s'", diagnostic.Message, "Unterminated string literal.")
+    }
+}
+
+func TestLexerCoversAllTokens(t *testing.T) {
     var tokenKinds SyntaxKind.SyntaxKindSlice
     for _, kind := range SyntaxKind.GetValues() {
         if strings.HasSuffix(string(kind), "Keyword") || strings.HasSuffix(string(kind), "Token") {
@@ -106,7 +138,7 @@ func TestLexerTokenPairs(t *testing.T) {
     for _, tokenData0 := range tokensData {
         for _, tokenData1 := range tokensData {
             if requiresSeparator(tokenData0.kind, tokenData1.kind) {
-                fmt.Printf("109. %+v %+v \n", tokenData0.kind, tokenData1.kind)
+                //fmt.Printf("109. %+v %+v \n", tokenData0.kind, tokenData1.kind)
                 continue
             }
             fmt.Printf("112. %+v %+v \n", tokenData0.kind, tokenData1.kind)
@@ -199,6 +231,10 @@ func requiresSeparator(t1kind, t2kind SyntaxKind.SyntaxKind) bool {
         return true
     }
 
+    if t1kind == SyntaxKind.StringToken && t2kind == SyntaxKind.StringToken {
+        return true
+    }
+
     if t1kind == SyntaxKind.BangToken && t2kind == SyntaxKind.EqualsToken {
         return true
     }
@@ -232,7 +268,7 @@ func requiresSeparator(t1kind, t2kind SyntaxKind.SyntaxKind) bool {
     }
 
     if t1kind == SyntaxKind.AmpersandToken && t2kind == SyntaxKind.AmpersandAmpersandToken {
-        fmt.Printf("%+v%+v\n", t1kind, t2kind)
+        //fmt.Printf("%+v%+v\n", t1kind, t2kind)
         return true
     }
 
@@ -245,7 +281,7 @@ func requiresSeparator(t1kind, t2kind SyntaxKind.SyntaxKind) bool {
     }
 
     if t1kind == SyntaxKind.PipeToken && t2kind == SyntaxKind.PipePipeToken {
-        fmt.Printf("%+v%+v\n", t1kind, t2kind)
+        //fmt.Printf("%+v%+v\n", t1kind, t2kind)
         return true
     }
 

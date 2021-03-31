@@ -32,6 +32,12 @@ func SyntaxTreeParse(text string) *SyntaxTree {
 }
 
 func ParseTokens(text string) (tokens []*SyntaxToken) {
+    tokens, _ = ParseTokensWithDiagnostics(text)
+
+    return tokens
+}
+
+func ParseTokensWithDiagnostics(text string) (tokens []*SyntaxToken, diagnostics []*Util.Diagnostic) {
     sourceText := Text.SourceTextFrom(text)
     lexer := NewLexer(sourceText)
 
@@ -44,5 +50,5 @@ func ParseTokens(text string) (tokens []*SyntaxToken) {
         tokens = append(tokens, token)
     }
 
-    return tokens
+    return tokens,  lexer.GetDiagnostics()
 }
