@@ -1,11 +1,11 @@
 package Binding
 
 import (
-    "reflect"
+    "minsk/CodeAnalysis/Symbols"
 )
 
 type BoundExpression interface {
     BoundNode
 
-    GetType() reflect.Kind
+    GetType() *Symbols.TypeSymbol
 }

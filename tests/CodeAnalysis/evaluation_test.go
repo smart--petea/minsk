@@ -4,7 +4,7 @@ import (
     "testing"
     "minsk/CodeAnalysis/Syntax"
     CA "minsk/CodeAnalysis"
-    "minsk/Util"
+    "minsk/CodeAnalysis/Symbols"
     "fmt"
 )
 
@@ -257,7 +257,7 @@ func TestEvaluations(t *testing.T) {
     for _, test := range tests {
         syntaxTree := Syntax.SyntaxTreeParse(test.text)
         compilation := CA.NewCompilation(syntaxTree)
-        variables := make(map[*Util.VariableSymbol]interface{})
+        variables := make(map[*Symbols.VariableSymbol]interface{})
         result := compilation.Evaluate(variables)
 
         if len(result.Diagnostics) > 0 {
@@ -275,7 +275,7 @@ func assertDiagnostics(text, diagnosticText string, t *testing.T) {
     syntaxTree := Syntax.SyntaxTreeParse(annotatedText.Text)
     fmt.Printf("%s %d\n", annotatedText.Text, len(annotatedText.Text))
     compilation := CA.NewCompilation(syntaxTree)
-    variables := make(map[*Util.VariableSymbol]interface{})
+    variables := make(map[*Symbols.VariableSymbol]interface{})
     result := compilation.Evaluate(variables)
 
     expectedDiagnostics := AnnotatedTextUnindentLines(diagnosticText)

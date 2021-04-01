@@ -3,9 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
-
-    "reflect"
 )
 
 type BoundBinaryExpression struct {
@@ -30,7 +29,7 @@ func (b *BoundBinaryExpression) Kind() BoundNodeKind.BoundNodeKind {
    return BoundNodeKind.BinaryExpression 
 }
 
-func (b *BoundBinaryExpression) GetType() reflect.Kind {
+func (b *BoundBinaryExpression) GetType() *Symbols.TypeSymbol {
     return b.Op.ResultType
 }
 

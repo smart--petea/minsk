@@ -2,18 +2,16 @@ package Symbols
 
 import (
     "minsk/CodeAnalysis/Symbols/SymbolKind"
-
-    "reflect"
 )
 
 type VariableSymbol struct {
     *Symbol
 
-    Type reflect.Kind
+    Type *TypeSymbol
     IsReadOnly bool
 }
 
-func NewVariableSymbol(name string, isReadOnly bool, kind reflect.Kind) *VariableSymbol {
+func NewVariableSymbol(name string, isReadOnly bool, kind *TypeSymbol) *VariableSymbol {
     var v VariableSymbol
     v.Symbol = NewSymbol(name)
     v.Type = kind

@@ -3,22 +3,21 @@ package BoundUnaryOperator
 import (
     "minsk/CodeAnalysis/Binding/Kind/BoundUnaryOperatorKind"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
-
-    "reflect"
+    "minsk/CodeAnalysis/Symbols"
 )
 
 type BoundUnaryOperator struct {
         SyntaxKind SyntaxKind.SyntaxKind
         Kind BoundUnaryOperatorKind.BoundUnaryOperatorKind
-        OperandType reflect.Kind
-        ResultType reflect.Kind
+        OperandType *Symbols.TypeSymbol
+        ResultType *Symbols.TypeSymbol
 }
 
 func NewBoundUnaryOperator(
         syntaxKind SyntaxKind.SyntaxKind,
         kind BoundUnaryOperatorKind.BoundUnaryOperatorKind,
-        operandType reflect.Kind,
-        resultType reflect.Kind,
+        operandType *Symbols.TypeSymbol,
+        resultType *Symbols.TypeSymbol,
     ) *BoundUnaryOperator {
         return &BoundUnaryOperator{
             SyntaxKind: syntaxKind,
@@ -29,14 +28,14 @@ func NewBoundUnaryOperator(
 }
 
 var _operators = []*BoundUnaryOperator{
-    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, reflect.Bool, reflect.Bool),
-    NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, reflect.Int, reflect.Int),
-    NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, reflect.Int, reflect.Int),
-    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, reflect.Int, reflect.Int),
-    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, reflect.Bool, reflect.Bool),
+    NewBoundUnaryOperator(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool),
+    NewBoundUnaryOperator(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
+    NewBoundUnaryOperator(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
+    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
+    NewBoundUnaryOperator(SyntaxKind.TildeToken, BoundUnaryOperatorKind.OnesComplement, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool),
 }
 
-func Bind(syntaxKind SyntaxKind.SyntaxKind, operandType reflect.Kind) *BoundUnaryOperator {
+func Bind(syntaxKind SyntaxKind.SyntaxKind, operandType *Symbols.TypeSymbol) *BoundUnaryOperator {
     for _, op := range _operators {
         if op.SyntaxKind == syntaxKind && op.OperandType == operandType {
             return op

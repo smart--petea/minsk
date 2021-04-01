@@ -10,7 +10,6 @@ import (
 
     "fmt"
     "log"
-    "reflect"
 )
 
 type Binder struct {
@@ -50,7 +49,7 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
     }
 }
 
-func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, expectedType reflect.Kind) BoundExpression {
+func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, expectedType *Symbols.TypeSymbol) BoundExpression {
     result := b.BindExpression(syntax)
     if result.GetType() != expectedType {
         span := syntax.GetSpan()
@@ -212,13 +211,13 @@ func (b *Binder) BindBlockStatement(syntax Syntax.StatementSyntax) *BoundBlockSt
 func (b *Binder) BindForStatement(syntax Syntax.StatementSyntax) BoundStatement {
     forStatementSyntax := (syntax).(*Syntax.ForStatementSyntax)
 
-    lowerBound := b.BindExpressionWithType(forStatementSyntax.LowerBound, reflect.Int)
-    upperBound := b.BindExpressionWithType(forStatementSyntax.UpperBound, reflect.Int)
+    lowerBound := b.BindExpressionWithType(forStatementSyntax.LowerBound, Symbols.TypeSymbolInt)
+    upperBound := b.BindExpressionWithType(forStatementSyntax.UpperBound, Symbols.TypeSymbolInt)
 
     b.scope = NewBoundScope(b.scope)
 
     name := string(forStatementSyntax.Identifier.Runes)
-    variable := Symbols.NewVariableSymbol(name, true, reflect.Int)
+    variable := Symbols.NewVariableSymbol(name, true, Symbols.TypeSymbolInt)
     if b.scope.TryDeclare(variable) == false {
         b.ReportVariableAlreadyDeclared(forStatementSyntax.Identifier.GetSpan(), name)
     }
@@ -232,7 +231,7 @@ func (b *Binder) BindForStatement(syntax Syntax.StatementSyntax) BoundStatement 
 func (b *Binder) BindWhileStatement(syntax Syntax.StatementSyntax) BoundStatement {
     whileStatementSyntax := (syntax).(*Syntax.WhileStatementSyntax)
 
-    condition := b.BindExpressionWithType(whileStatementSyntax.Condition, reflect.Bool) 
+    condition := b.BindExpressionWithType(whileStatementSyntax.Condition, Symbols.TypeSymbolBool) 
     body := b.BindStatement(whileStatementSyntax.Body)
 
     return NewBoundWhileStatement(condition, body)
@@ -241,7 +240,7 @@ func (b *Binder) BindWhileStatement(syntax Syntax.StatementSyntax) BoundStatemen
 func (b *Binder) BindIfStatement(syntax Syntax.StatementSyntax) BoundStatement {
     ifStatementSyntax := (syntax).(*Syntax.IfStatementSyntax)
 
-    condition := b.BindExpressionWithType(ifStatementSyntax.Condition, reflect.Bool) 
+    condition := b.BindExpressionWithType(ifStatementSyntax.Condition, Symbols.TypeSymbolBool) 
     thenStatement := b.BindStatement(ifStatementSyntax.ThenStatement)
     var elseStatement BoundStatement
     if ifStatementSyntax.ElseClause != nil {

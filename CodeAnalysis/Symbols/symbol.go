@@ -15,3 +15,6 @@ func NewSymbol(name string) *Symbol {
     }
 }
 
+func (s *Symbol) String() string {
+    return s.Name
+}

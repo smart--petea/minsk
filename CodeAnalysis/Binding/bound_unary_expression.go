@@ -3,9 +3,8 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
-
-    "reflect"
 )
 
 type BoundUnaryExpression struct {
@@ -24,7 +23,7 @@ func NewBoundUnaryExpression(op *BoundUnaryOperator.BoundUnaryOperator, operand 
     }
 }
 
-func (b *BoundUnaryExpression) GetType() reflect.Kind {
+func (b *BoundUnaryExpression) GetType() *Symbols.TypeSymbol {
     return b.Op.ResultType
 }
 
@@ -40,11 +39,11 @@ func (b *BoundUnaryExpression) GetProperties() []*BoundNodeProperty {
         },
         {
             Name: "operand",
-            Value: reflect.TypeOf(b.Operand),
+            Value: b.Operand.GetType(),
         },
         {
             Name: "op",
-            Value: reflect.TypeOf(b.Op),
+            Value: b.Op.ResultType,
         },
     }
 }

@@ -10,8 +10,6 @@ import (
     "minsk/CodeAnalysis/Symbols"
 
     "log"
-
-    "reflect"
 )
 
 type Evaluator struct {
@@ -105,6 +103,7 @@ func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpre
 
 func (e *Evaluator) evaluateUnaryExpression(u *Binding.BoundUnaryExpression) interface{} {
     operand := e.evaluateExpression(u.Operand)
+    log.Printf("evaluateUnaryExpression %+v operand=%+v kind=%+v", operand, u.Operand, u.Op.Kind)
 
     switch u.Op.Kind {
     case BoundUnaryOperatorKind.Identity:
@@ -239,11 +238,11 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
     }
 }
 
-func equals(left, right interface{}, ttype reflect.Kind) bool {
+func equals(left, right interface{}, ttype *Symbols.TypeSymbol) bool {
     switch ttype {
-    case reflect.Bool:
+    case Symbols.TypeSymbolBool:
         return left.(bool) == right.(bool)
-    case reflect.Int:
+    case Symbols.TypeSymbolInt:
         return left.(int) == right.(int)
     default:
         return false

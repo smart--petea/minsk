@@ -4,9 +4,9 @@ import (
     "minsk/CodeAnalysis/Binding"
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 
-    "reflect"
     "fmt"
 )
 
@@ -155,7 +155,7 @@ func (*Lowerer) RewriteForStatement(b Binding.BoundITreeRewriter, node *Binding.
     variableExpression := Binding.NewBoundVariableExpression(node.Variable)
     condition := Binding.NewBoundBinaryExpression(
         variableExpression,
-        BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, reflect.Int, reflect.Int),
+        BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
         node.UpperBound,
     )
 
@@ -164,7 +164,7 @@ func (*Lowerer) RewriteForStatement(b Binding.BoundITreeRewriter, node *Binding.
             node.Variable,
             Binding.NewBoundBinaryExpression(
                 variableExpression,
-                BoundBinaryOperator.Bind(SyntaxKind.PlusToken, reflect.Int, reflect.Int),
+                BoundBinaryOperator.Bind(SyntaxKind.PlusToken, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
                 Binding.NewBoundLiteralExpression(1),
             ),
         ),

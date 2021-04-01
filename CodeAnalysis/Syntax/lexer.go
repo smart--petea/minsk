@@ -3,12 +3,12 @@ package Syntax
 import (
     "unicode"
     "strconv"
-    "reflect"
     "strings"
 
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/CodeAnalysis/Text"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 )
 
@@ -199,7 +199,7 @@ func (l *Lexer) ReadNumberToken() {
     runes := l.text.GetRunes(l.start, l.start + length)
     value, err := strconv.Atoi(string(runes))
     if err != nil {
-        l.ReportInvalidNumber(Text.NewTextSpan(l.start, length), runes, reflect.Int)
+        l.ReportInvalidNumber(Text.NewTextSpan(l.start, length), runes, Symbols.TypeSymbolInt)
     }
 
     l.value = value

@@ -4,7 +4,6 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
-    "reflect"
 )
 
 type BoundVariableExpression struct {
@@ -21,7 +20,7 @@ func NewBoundVariableExpression(variable *Symbols.VariableSymbol) *BoundVariable
     }
 }
 
-func (b *BoundVariableExpression) GetType() reflect.Kind {
+func (b *BoundVariableExpression) GetType() *Symbols.TypeSymbol {
     return b.Variable.Type
 }
 

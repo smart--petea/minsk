@@ -2,8 +2,8 @@ package Util
 
 import (
     "fmt"
-    "reflect"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Text"
 )
 
@@ -17,7 +17,7 @@ func (db *DiagnosticBag) report(span *Text.TextSpan, message string) {
     db.diagnostics = append(db.diagnostics, diagnostic)
 }
 
-func (db *DiagnosticBag) ReportInvalidNumber(span *Text.TextSpan, runes []rune, kind reflect.Kind) {
+func (db *DiagnosticBag) ReportInvalidNumber(span *Text.TextSpan, runes []rune, kind *Symbols.TypeSymbol) {
     message := fmt.Sprintf("The number %s isn't valid %s.", string(runes), kind)
 
     db.report(span, message)
@@ -46,13 +46,13 @@ func (db *DiagnosticBag) ReportUnexpectedToken(span *Text.TextSpan, actualKind S
     db.report(span, message)
 }
 
-func (db *DiagnosticBag) ReportUndefinedUnaryOperator(span *Text.TextSpan, operatorText []rune, operandType reflect.Kind) {
+func (db *DiagnosticBag) ReportUndefinedUnaryOperator(span *Text.TextSpan, operatorText []rune, operandType *Symbols.TypeSymbol) {
     message := fmt.Sprintf("Unary operator '%+v' is not defined for type '%s'.", string(operatorText), operandType)
 
     db.report(span, message)
 }
 
-func (db *DiagnosticBag) ReportUndefinedBinaryOperator(span *Text.TextSpan, operatorRunes []rune, leftType reflect.Kind, rightType reflect.Kind) {
+func (db *DiagnosticBag) ReportUndefinedBinaryOperator(span *Text.TextSpan, operatorRunes []rune, leftType *Symbols.TypeSymbol, rightType *Symbols.TypeSymbol) {
     message := fmt.Sprintf("Binary operator '%+v' is not defined for types '%s' and '%s'.", string(operatorRunes), leftType, rightType)
 
     db.report(span, message)
@@ -70,7 +70,7 @@ func (db *DiagnosticBag) ReportVariableAlreadyDeclared(span *Text.TextSpan, name
     db.report(span, message)
 }
 
-func (db *DiagnosticBag) ReportCannotConvert(span *Text.TextSpan, fromType, toType reflect.Kind) {
+func (db *DiagnosticBag) ReportCannotConvert(span *Text.TextSpan, fromType, toType *Symbols.TypeSymbol) {
     message := fmt.Sprintf("Cannot convert type '%s' to '%s'.", fromType, toType)
 
     db.report(span, message)

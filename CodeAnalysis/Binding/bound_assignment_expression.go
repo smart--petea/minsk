@@ -1,7 +1,6 @@
 package Binding
 
 import (
-    "reflect"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/Util"
     "minsk/CodeAnalysis/Symbols"
@@ -23,7 +22,7 @@ func NewBoundAssignmentExpression(variable *Symbols.VariableSymbol, expression B
     }
 }
 
-func (b *BoundAssignmentExpression) GetType() reflect.Kind {
+func (b *BoundAssignmentExpression) GetType() *Symbols.TypeSymbol {
     return b.Expression.GetType()
 }
 
@@ -31,7 +30,6 @@ func (b *BoundAssignmentExpression) Kind() BoundNodeKind.BoundNodeKind {
     return BoundNodeKind.AssignmentExpression
 }
 
-//todo
 func (b *BoundAssignmentExpression) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
