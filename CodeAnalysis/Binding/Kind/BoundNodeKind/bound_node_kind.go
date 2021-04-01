@@ -20,4 +20,5 @@ const (
     BinaryExpression  BoundNodeKind = "BinaryExpression"
     VariableExpression  BoundNodeKind = "VariableExpression"
     AssignmentExpression BoundNodeKind = "AssignmentExpression"
+    ErrorExpression BoundNodeKind = "ErrorExpression"
 )

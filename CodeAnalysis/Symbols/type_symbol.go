@@ -20,6 +20,7 @@ func (t *TypeSymbol) Kind() SymbolKind.SymbolKind {
 }
 
 var (
+    TypeSymbolError *TypeSymbol = newTypeSymbol("?")
     TypeSymbolInt *TypeSymbol = newTypeSymbol("int")
     TypeSymbolBool *TypeSymbol = newTypeSymbol("bool")
     TypeSymbolString *TypeSymbol = newTypeSymbol("string")

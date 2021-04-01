@@ -187,7 +187,7 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
         span := syntaxToken.GetSpan()
         b.ReportUndefinedBinaryOperator(span, syntaxToken.Runes, boundLeft.GetType(), boundRight.GetType())
 
-        return boundLeft;
+        return NewBoundErrorExpression()
     }
 
     return NewBoundBinaryExpression(boundLeft, boundOperator, boundRight)
