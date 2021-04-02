@@ -34,6 +34,8 @@ func (*BoundTreeRewriter) RewriteStatement(b BoundITreeRewriter, node BoundState
 
 func (*BoundTreeRewriter) RewriteExpression(b BoundITreeRewriter, node BoundExpression) BoundExpression {
     switch n := node.(type) {
+        case *BoundErrorExpression:
+            return b.RewriteErrorExpression(b, n)
         case *BoundUnaryExpression:
             return b.RewriteUnaryExpression(b, n)
         case *BoundLiteralExpression:
@@ -122,6 +124,10 @@ func (*BoundTreeRewriter) RewriteVariableDeclaration(b BoundITreeRewriter, node 
     }
 
     return NewBoundVariableDeclaration(node.Variable, initializer)
+}
+
+func (*BoundTreeRewriter) RewriteErrorExpression(b BoundITreeRewriter, node *BoundErrorExpression) BoundExpression {
+    return node
 }
 
 func (*BoundTreeRewriter) RewriteUnaryExpression(b BoundITreeRewriter, node *BoundUnaryExpression) BoundExpression {

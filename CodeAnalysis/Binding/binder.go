@@ -9,7 +9,6 @@ import (
     "minsk/Util"
 
     "fmt"
-    "log"
 )
 
 type Binder struct {
@@ -49,11 +48,13 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
     }
 }
 
-func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, expectedType *Symbols.TypeSymbol) BoundExpression {
+func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetType *Symbols.TypeSymbol) BoundExpression {
     result := b.BindExpression(syntax)
-    if result.GetType() != expectedType {
+    if targetType != Symbols.TypeSymbolError &&
+        result.GetType() != Symbols.TypeSymbolError &&
+        result.GetType() != targetType {
         span := syntax.GetSpan()
-        b.ReportCannotConvert(span, result.GetType(), expectedType)
+        b.ReportCannotConvert(span, result.GetType(), targetType)
     }
 
     return result
@@ -112,14 +113,13 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
 }
 
 func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    log.Printf("BindNameExpression")
     nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
     name := string(nameExpressionSyntax.IdentifierToken.Runes)
 
     if len(name) == 0 {
         //This means the token was inserted by the parser. We already reported
         //error so we can just return an error expression.
-        return NewBoundLiteralExpression(0)
+        return NewBoundErrorExpression()
     }
 
     var variable *Symbols.VariableSymbol
@@ -163,13 +163,18 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
 func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     unarySyntax := syntax.(*Syntax.UnaryExpressionSyntax)
     boundOperand := b.BindExpression(unarySyntax.Operand)
+    if boundOperand.GetType() == Symbols.TypeSymbolError {
+        return NewBoundErrorExpression()
+    }
+
     boundOperator := BoundUnaryOperator.Bind(unarySyntax.OperatorNode.Kind(), boundOperand.GetType()) 
 
     if boundOperator == nil {
         syntaxToken := unarySyntax.OperatorNode.(*Syntax.SyntaxToken)
         span := syntaxToken.GetSpan()
         b.ReportUndefinedUnaryOperator(span, syntaxToken.Runes, boundOperand.GetType())
-        return boundOperand;
+
+        return NewBoundErrorExpression()
     }
 
     return NewBoundUnaryExpression(boundOperator, boundOperand)
@@ -180,6 +185,11 @@ func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpre
 
     boundLeft := b.BindExpression(binarySyntax.Left)
     boundRight := b.BindExpression(binarySyntax.Right)
+
+    if boundLeft.GetType() == Symbols.TypeSymbolError || boundRight.GetType() == Symbols.TypeSymbolError {
+        return NewBoundErrorExpression()
+    }
+
     boundOperator := BoundBinaryOperator.Bind(binarySyntax.OperatorNode.Kind(), boundLeft.GetType(), boundRight.GetType()) 
 
     if boundOperator == nil {
@@ -216,11 +226,7 @@ func (b *Binder) BindForStatement(syntax Syntax.StatementSyntax) BoundStatement 
 
     b.scope = NewBoundScope(b.scope)
 
-    name := string(forStatementSyntax.Identifier.Runes)
-    variable := Symbols.NewVariableSymbol(name, true, Symbols.TypeSymbolInt)
-    if b.scope.TryDeclare(variable) == false {
-        b.ReportVariableAlreadyDeclared(forStatementSyntax.Identifier.GetSpan(), name)
-    }
+    variable := b.BindVariable(forStatementSyntax.Identifier, true, Symbols.TypeSymbolInt)
 
     body := b.BindStatement(forStatementSyntax.Body)
 
@@ -257,18 +263,28 @@ func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundSta
     return NewBoundExpressionStatement(expression)
 }
 
-func (b *Binder) BindVariableDeclaration(syntax Syntax.StatementSyntax) BoundStatement {
-    variableDeclarationSyntax := (syntax).(*Syntax.VariableDeclarationSyntax)
+func (b *Binder) BindVariableDeclaration(statementSyntax Syntax.StatementSyntax) BoundStatement {
+    syntax := (statementSyntax).(*Syntax.VariableDeclarationSyntax)
 
-    name := string(variableDeclarationSyntax.Identifier.Runes)
-    isReadOnly := variableDeclarationSyntax.Keyword.Kind() == SyntaxKind.LetKeyword
-    initializer := b.BindExpression(variableDeclarationSyntax.Initializer)
-    variable := Symbols.NewVariableSymbol(name, isReadOnly, initializer.GetType())
-
-    if !b.scope.TryDeclare(variable) {
-        span := variableDeclarationSyntax.Identifier.GetSpan()
-        b.ReportVariableAlreadyDeclared(span, name)
-    }
+    isReadOnly := syntax.Keyword.Kind() == SyntaxKind.LetKeyword
+    initializer := b.BindExpression(syntax.Initializer)
+    variable := b.BindVariable(syntax.Identifier, isReadOnly, initializer.GetType())
 
     return NewBoundVariableDeclaration(variable, initializer)
 }
+
+func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, ttype *Symbols.TypeSymbol) *Symbols.VariableSymbol {
+    name := string(identifier.Runes)
+    if name == "" {
+        name = "?"
+    }
+    variable := Symbols.NewVariableSymbol(name, isReadOnly, ttype)
+    declare := !identifier.IsMissing()
+
+    if declare && b.scope.TryDeclare(variable) == false {
+        b.ReportVariableAlreadyDeclared(identifier.GetSpan(), name)
+    }
+
+    return variable
+}
+

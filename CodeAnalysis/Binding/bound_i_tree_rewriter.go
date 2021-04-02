@@ -14,6 +14,7 @@ type BoundITreeRewriter interface {
     RewriteForStatement(BoundITreeRewriter, *BoundForStatement) BoundStatement 
     RewriteVariableDeclaration(BoundITreeRewriter, *BoundVariableDeclaration) BoundStatement 
     RewriteUnaryExpression(BoundITreeRewriter, *BoundUnaryExpression) BoundExpression 
+    RewriteErrorExpression(BoundITreeRewriter, *BoundErrorExpression) BoundExpression 
     RewriteLiteralExpression(BoundITreeRewriter, *BoundLiteralExpression) BoundExpression 
     RewriteBinaryExpression(BoundITreeRewriter, *BoundBinaryExpression) BoundExpression 
     RewriteVariableExpression(BoundITreeRewriter, *BoundVariableExpression) BoundExpression 
