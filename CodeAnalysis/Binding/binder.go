@@ -112,22 +112,21 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     return NewBoundAssignmentExpression(variable, boundExpression)
 }
 
-func (b *Binder) BindNameExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    nameExpressionSyntax := syntax.(*Syntax.NameExpressionSyntax)
-    name := string(nameExpressionSyntax.IdentifierToken.Runes)
-
-    if len(name) == 0 {
+func (b *Binder) BindNameExpression(expressionSyntax Syntax.ExpressionSyntax) BoundExpression {
+    syntax := expressionSyntax.(*Syntax.NameExpressionSyntax)
+    if syntax.IdentifierToken.IsMissing() {
         //This means the token was inserted by the parser. We already reported
         //error so we can just return an error expression.
         return NewBoundErrorExpression()
     }
 
+    name := string(syntax.IdentifierToken.Runes)
     var variable *Symbols.VariableSymbol
     if b.scope.TryLookup(name, &variable) {
         return NewBoundVariableExpression(variable)
     }
 
-    span := nameExpressionSyntax.IdentifierToken.GetSpan()
+    span := syntax.IdentifierToken.GetSpan()
     b.ReportUndefinedName(span, name)
     return NewBoundLiteralExpression(0)
 }
