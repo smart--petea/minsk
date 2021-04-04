@@ -56,6 +56,7 @@ func (m *MinskRepl) RenderLine(line string) {
     for _, token := range tokens {
         isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
         isNumber :=  token.Kind() == SyntaxKind.NumberToken
+        isString :=  token.Kind() == SyntaxKind.StringToken
         isIdentifier :=  token.Kind() == SyntaxKind.IdentifierToken
 
         if isKeyword {
@@ -64,6 +65,8 @@ func (m *MinskRepl) RenderLine(line string) {
             Console.ForegroundColour(Console.COLOUR_DARK_YELLOW)
         } else if isNumber {
             Console.ForegroundColour(Console.COLOUR_CYAN)
+        } else if isString {
+            Console.ForegroundColour(Console.COLOUR_MAGENTA)
         } else {
             Console.ForegroundColour(Console.COLOUR_GRAY)
         }
@@ -101,7 +104,7 @@ func (m *MinskRepl) EvaluateSubmission(text string) {
     result := compilation.Evaluate(m.variables)
 
     if len(result.Diagnostics) == 0  {
-        Console.ForegroundColour(Console.COLOUR_MAGENTA)
+        Console.ForegroundColour(Console.COLOUR_WHITE)
         fmt.Println(result.Value)
         Console.ResetColour()
 
