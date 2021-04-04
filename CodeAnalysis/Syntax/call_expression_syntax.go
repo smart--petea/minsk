@@ -9,16 +9,21 @@ import (
 //print("hello")
 type CallExpressionSyntax struct {
     *Util.ChildrenProvider
+
+    Identifier: *SyntaxToken,
+    Arguments: *SeparatedSyntaxList,
 }
 
 func (a *CallExpressionSyntax) Value() interface{} {
     return nil
 }
 
-func NewCallExpressionSyntax() *CallExpressionSyntax {
+func NewCallExpressionSyntax(identifier *SyntaxToken, arguments  *SeparatedSyntaxList) *CallExpressionSyntax {
     return &CallExpressionSyntax{
-        ChildrenProvider: Util.NewChildrenProvider(),
+        ChildrenProvider: Util.NewChildrenProvider(identifier, arguments.GetWithSeparators()...),
 
+        Identifier: identifier,
+        Arguments: arguments,
     }
 }
 
