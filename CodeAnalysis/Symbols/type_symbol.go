@@ -24,4 +24,5 @@ var (
     TypeSymbolInt *TypeSymbol = newTypeSymbol("int")
     TypeSymbolBool *TypeSymbol = newTypeSymbol("bool")
     TypeSymbolString *TypeSymbol = newTypeSymbol("string")
+    TypeSymbolVoid *TypeSymbol = newTypeSymbol("void")
 )

@@ -56,6 +56,7 @@ const (
 
     //expressions
     AssignmentExpression SyntaxKind = "AssignmentExpression" 
+    CallExpression SyntaxKind = "CallExpression" 
     BinaryExpression SyntaxKind = "BinaryExpression" 
     LiteralExpression SyntaxKind = "LiteralExpression" 
     NameExpression SyntaxKind = "NameExpression" 
@@ -87,6 +88,7 @@ func GetValues() []SyntaxKind {
         ToKeyword,
         FalseKeyword,
         AssignmentExpression, 
+        CallExpression, 
         BinaryExpression, 
         LiteralExpression, 
         NameExpression, 
