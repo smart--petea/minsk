@@ -52,6 +52,8 @@ var _operators = []*BoundBinaryOperator{
     NewBoundBinaryOperator(SyntaxKind.HatToken, BoundBinaryOperatorKind.BitwiseXor, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool),
     NewBoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equals, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool),
     NewBoundBinaryOperator(SyntaxKind.BangEqualsToken, BoundBinaryOperatorKind.NotEquals, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool, Symbols.TypeSymbolBool),
+
+    NewBoundBinaryOperator(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, Symbols.TypeSymbolString, Symbols.TypeSymbolString, Symbols.TypeSymbolString),
 }
 
 func Bind(syntaxKind SyntaxKind.SyntaxKind, leftType *Symbols.TypeSymbol, rightType *Symbols.TypeSymbol) *BoundBinaryOperator {

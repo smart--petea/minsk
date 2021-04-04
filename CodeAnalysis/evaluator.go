@@ -138,7 +138,11 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
 
     switch b.Op.Kind {
     case BoundBinaryOperatorKind.Addition:
-        return left.(int) + right.(int)
+        if b.GetType() == Symbols.TypeSymbolInt {
+            return left.(int) + right.(int)
+        } else {
+            return left.(string) + right.(string)
+        }
 
     case BoundBinaryOperatorKind.Subtraction:
         return left.(int) - right.(int)
@@ -150,7 +154,7 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
         return left.(int) / right.(int)
 
     case BoundBinaryOperatorKind.BitwiseAnd:
-        if _, ok := left.(int); ok {
+        if b.GetType() == Symbols.TypeSymbolInt {
             return left.(int) & right.(int)
         }
 
@@ -170,7 +174,7 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
         return false
 
     case BoundBinaryOperatorKind.BitwiseOr:
-        if _, ok := left.(int); ok {
+        if b.GetType() == Symbols.TypeSymbolInt {
             return left.(int) | right.(int)
         }
 
@@ -190,7 +194,7 @@ func (e *Evaluator) evaluateBinaryExpression(b *Binding.BoundBinaryExpression) i
         return false
 
     case BoundBinaryOperatorKind.BitwiseXor:
-        if _, ok := left.(int); ok {
+        if b.GetType() == Symbols.TypeSymbolInt {
             return left.(int) ^ right.(int)
         }
 
