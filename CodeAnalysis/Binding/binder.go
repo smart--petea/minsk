@@ -5,6 +5,7 @@ import (
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     "minsk/CodeAnalysis/Syntax"
     "minsk/Util"
 
@@ -79,6 +80,9 @@ func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression 
 
     case SyntaxKind.BinaryExpression:
         return b.BindBinaryExpression(syntax)
+
+    case SyntaxKind.CallExpression:
+        return b.BindCallExpression(syntax)
 
     default:
         panic(fmt.Sprintf("Unexpected syntax %s", syntax.Kind()))
@@ -177,6 +181,47 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
     }
 
     return NewBoundUnaryExpression(boundOperator, boundOperand)
+}
+
+func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) BoundExpression {
+    syntax := expressionSyntax.(*Syntax.CallExpressionSyntax)
+
+    var boundArguments []BoundExpression
+    for argument := range syntax.Arguments.GetEnumerator() {
+        boundArgument := b.BindExpression(argument)
+        boundArguments = append(boundArguments, boundArgument)
+    }
+
+    functionName := string(syntax.Identifier.Runes)
+    var function *Symbols.FunctionSymbol
+    for f := range BuiltinFunctions.GetAll() {
+        if f.Name == functionName {
+            function = f
+            break
+        }
+    }
+
+    if function == nil {
+        b.ReportUndefinedFunction(syntax.Identifier.GetSpan(), functionName)
+        return NewBoundErrorExpression()
+    }
+
+    if syntax.Arguments.Count() != len(function.Parameter) {
+        b.ReportWrongArgumentCount(syntax.Identifier.GetSpan(), functionName, len(function.Parameter), syntax.Arguments.Count())
+        return NewBoundErrorExpression()
+    }
+
+    for i := 0; i < syntax.Arguments.Count(); i = i + 1 {
+        argument := boundArguments[i]
+        parameter := function.Parameter[i]
+
+        if argument.GetType() != parameter.Type {
+            //todo
+        }
+    }
+
+    b.ReportBadCharacter(syntax.Identifier.GetSpan().Start, 'X')
+    return NewBoundErrorExpression()
 }
 
 func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {

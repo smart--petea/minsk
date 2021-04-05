@@ -12,7 +12,7 @@ func newParameterSymbol(name string, ttype *TypeSymbol) *ParameterSymbol {
     var parameterSymbol ParameterSymbol
 
     isReadOnly := true
-    parameterSymbol.VariableSymbol = newVariableSymbol(name, isReadOnly, ttype)
+    parameterSymbol.VariableSymbol = NewVariableSymbol(name, isReadOnly, ttype)
 
     return &parameterSymbol
 }

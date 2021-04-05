@@ -86,3 +86,15 @@ func (db *DiagnosticBag) ReportUnterminatedString(span *Text.TextSpan) {
     message := "Unterminated string literal."
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportUndefinedFunction(span *Text.TextSpan, name string) {
+    message := fmt.Sprintf("Function  '%s' doesn't exist.", name)
+
+    db.report(span, message)
+}
+
+func (db *DiagnosticBag) ReportWrongArgumentCount(span *Text.TextSpan, name string, expectedCount int, actualCount int) {
+    message := fmt.Sprintf("Function '%s' requires %d arguments but was given %d.", name, expectedCount, actualCount)
+
+    db.report(span, message)
+}

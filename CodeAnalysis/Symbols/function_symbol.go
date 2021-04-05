@@ -8,15 +8,17 @@ type FunctionSymbol struct {
     *Symbol
 
     Parameter []*ParameterSymbol
+    Name string
     Type *TypeSymbol
 }
 
 func newFunctionSymbol(name string, parameter []*ParameterSymbol, ttype *TypeSymbol) *FunctionSymbol {
-    var functionSymbol functionSymbol
+    var functionSymbol FunctionSymbol
 
     functionSymbol.Symbol = NewSymbol(name)
-    functionSymbol.Parameter = Parameter
+    functionSymbol.Parameter = parameter
     functionSymbol.Type = ttype
+    functionSymbol.Name = name
 
     return &functionSymbol
 }

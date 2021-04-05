@@ -15,6 +15,7 @@ const (
     OpenBraceToken SyntaxKind = "OpenBraceToken"
     CloseBraceToken SyntaxKind = "CloseBraceToken"
     BangToken SyntaxKind = "BangToken"
+    Comma SyntaxKind = "Comma"
     BadToken SyntaxKind = "BadToken"
     IdentifierToken SyntaxKind = "IdentifierToken"
     AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
@@ -77,6 +78,7 @@ func GetValues() []SyntaxKind {
         OpenParenthesisToken,
         CloseParenthesisToken,
         BangToken,
+        Comma,
         BadToken,
         IdentifierToken,
         AmpersandAmpersandToken,

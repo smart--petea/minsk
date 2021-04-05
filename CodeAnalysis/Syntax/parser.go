@@ -109,10 +109,10 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
         return p.ParseStringLiteral()
 
     case SyntaxKind.IdentifierToken:
-        return p.ParseNameExpression()
+        return p.ParseNameOrCallExpression()
 
     default:
-        return p.ParseNameExpression()
+        return p.ParseNameOrCallExpression()
     }
 }
 
@@ -162,9 +162,43 @@ func (p *Parser) ParseNameExpression() ExpressionSyntax {
     return NewNameExpressionSyntax(identifierToken)
 }
 
+func (p *Parser) ParseNameOrCallExpression() ExpressionSyntax {
+    if p.Peek(0).Kind() == SyntaxKind.IdentifierToken && p.Peek(1).Kind() == SyntaxKind.OpenParenthesisToken {
+        return p.ParseCallExpression()
+    }
+
+    return p.ParseNameExpression()
+}
+
 func (p *Parser) ParseExpression() ExpressionSyntax {
     return p.ParseAssignmentExpression()
 }
+
+func (p *Parser) ParseCallExpression() ExpressionSyntax {
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    openParenthesisToken := p.MatchToken(SyntaxKind.OpenParenthesisToken)
+    arguments := p.ParseArguments()
+    closeParenthesisToken := p.MatchToken(SyntaxKind.CloseParenthesisToken)
+
+    return NewCallExpressionSyntax(identifier, openParenthesisToken, arguments, closeParenthesisToken)
+}
+
+func (p *Parser) ParseArguments() *SeparatedSyntaxList {
+    var nodeAndSeparators []SyntaxNode
+
+    for p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
+        expression := p.ParseExpression()
+        nodeAndSeparators = append(nodeAndSeparators, expression)
+
+        if p.Current().Kind() != SyntaxKind.CloseParenthesisToken {
+            comma := p.MatchToken(SyntaxKind.Comma)
+            nodeAndSeparators = append(nodeAndSeparators, comma)
+        }
+    }
+
+    return NewSeparatedSyntaxList(nodeAndSeparators)
+}
+
 
 func (p *Parser) ParseAssignmentExpression() ExpressionSyntax {
     if p.Peek(0).Kind() == SyntaxKind.IdentifierToken && p.Peek(1).Kind() == SyntaxKind.EqualsToken {

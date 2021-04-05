@@ -92,6 +92,10 @@ func (l *Lexer) Lex() *SyntaxToken {
         l.Next()
         l.kind = SyntaxKind.TildeToken
 
+    case ',':
+        l.Next()
+        l.kind = SyntaxKind.Comma
+
     case '^':
         l.Next()
         l.kind = SyntaxKind.HatToken

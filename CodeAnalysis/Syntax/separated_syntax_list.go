@@ -1,36 +1,49 @@
 package Syntax
 
 type SeparatedSyntaxList struct {
-    separatorsAndNodes []SyntaxNode
+    nodesAndSeparators []SyntaxNode
 }
 
-func NewSeparatedSyntaxList(separatorsAndNodes []SyntaxNode) *SeparatedSyntaxList {
+func NewSeparatedSyntaxList(nodesAndSeparators []SyntaxNode) *SeparatedSyntaxList {
     return &SeparatedSyntaxList{
-        separatorsAndNodes: separatorsAndNodes,
+
+        nodesAndSeparators: nodesAndSeparators,
     }
 }
 
 func (s *SeparatedSyntaxList) Count() int {
-    return (len(s.separatorsAndNodes) + 1) / 2
+    return (len(s.nodesAndSeparators) + 1) / 2
 }
 
+//class index operator
 func (s *SeparatedSyntaxList) Get(index int) SyntaxNode {
-    return s.separatorsAndNodes[index * 2]
+    return s.nodesAndSeparators[index * 2]
 }
 
 func (s *SeparatedSyntaxList) GetSeparator(index int) *SyntaxToken {
-    return s.separatorsAndNodes[index * 2 + 1]
+    syntaxToken, ok := s.nodesAndSeparators[index * 2 + 1].(*SyntaxToken)
+    if !ok {
+        panic("Can't transform syntaxNode to syntaxToken")
+    }
+    return syntaxToken
 }
 
-func (s *SeparatedSyntaxList) GetWithSeparators(index int) []SyntaxNode {
-    return s.separatorsAndNodes
+func (s *SeparatedSyntaxList) GetWithSeparators() []SyntaxNode {
+    return s.nodesAndSeparators
 }
 
-func (s *SeparatedSyntaxList) GetEnumerator(index int) <-chan SyntaxNode {
+//get arguments without comma
+func (s *SeparatedSyntaxList) GetEnumerator() <-chan SyntaxNode {
     c := make(chan SyntaxNode)
 
     go func() {
-        for _, s := range s.separatorsAndNodes {
+        defer close(c)
+
+        for i, s := range s.nodesAndSeparators {
+            if i % 2 == 1 {
+                continue
+            }
+
             c<-s
         }
     }()
