@@ -8,6 +8,7 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
 
     "log"
 )
@@ -81,8 +82,24 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
             return e.evaluateUnaryExpression(root.(*Binding.BoundUnaryExpression))
         case BoundNodeKind.BinaryExpression:
             return e.evaluateBinaryExpression(root.(*Binding.BoundBinaryExpression))
+        case BoundNodeKind.CallExpression:
+            return e.evaluateCallExpression(root.(*Binding.BoundCallExpression))
         default:
             panic(fmt.Sprintf("Unexpected node %s", root.Kind()))
+    }
+}
+
+func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) interface{} {
+    if node.Function == BuiltinFunctions.Input {
+        var x string
+        fmt.Scanf("%s", &x)
+        return x
+    } else if node.Function == BuiltinFunctions.Print {
+        message, _ := e.evaluateExpression(node.Arguments[0]).(string)
+        fmt.Println(message)
+        return nil
+    } else {
+        panic(fmt.Sprintf("Unexpected function %s", node.Function))
     }
 }
 

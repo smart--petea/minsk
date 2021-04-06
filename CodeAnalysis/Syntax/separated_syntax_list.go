@@ -21,6 +21,10 @@ func (s *SeparatedSyntaxList) Get(index int) SyntaxNode {
 }
 
 func (s *SeparatedSyntaxList) GetSeparator(index int) *SyntaxToken {
+    if index == len(s.nodesAndSeparators) {
+        return nil
+    }
+
     syntaxToken, ok := s.nodesAndSeparators[index * 2 + 1].(*SyntaxToken)
     if !ok {
         panic("Can't transform syntaxNode to syntaxToken")

@@ -19,4 +19,5 @@ type BoundITreeRewriter interface {
     RewriteBinaryExpression(BoundITreeRewriter, *BoundBinaryExpression) BoundExpression 
     RewriteVariableExpression(BoundITreeRewriter, *BoundVariableExpression) BoundExpression 
     RewriteAssignmentExpression(BoundITreeRewriter, *BoundAssignmentExpression) BoundExpression 
+    RewriteCallExpression(BoundITreeRewriter,*BoundCallExpression) BoundExpression
 }

@@ -10,6 +10,7 @@ import (
     "minsk/Util"
 
     "fmt"
+//    "log"
 )
 
 type Binder struct {
@@ -216,12 +217,12 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
         parameter := function.Parameter[i]
 
         if argument.GetType() != parameter.Type {
-            //todo
+            b.ReportWrongArgumentType(syntax.Identifier.GetSpan(), parameter.Name, parameter.Type, argument.GetType())
+            return NewBoundErrorExpression()
         }
     }
 
-    b.ReportBadCharacter(syntax.Identifier.GetSpan().Start, 'X')
-    return NewBoundErrorExpression()
+    return NewBoundCallExpression(function, boundArguments)
 }
 
 func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {

@@ -4,11 +4,11 @@ import (
     "minsk/CodeAnalysis/Symbols"
 )
 
-var Print *FunctionSymbol = newFunctionSymbol("print", []*ParameterSymbol{newParameterSymbol("text", TypeSymbol.String)}, Symbols.TypeSymbolVoid)
-var Input *FunctionSymbol = newFunctionSymbol("input", nil, Symbols.TypeSymbolString)
+var Print *Symbols.FunctionSymbol = Symbols.NewFunctionSymbol("print", []*Symbols.ParameterSymbol{Symbols.NewParameterSymbol("text", Symbols.TypeSymbolString)}, Symbols.TypeSymbolVoid)
+var Input *Symbols.FunctionSymbol = Symbols.NewFunctionSymbol("input", nil, Symbols.TypeSymbolString)
 
-func GetAll() <-chan *FunctionSymbol {
-    c := make(chan *FunctionSymbol)
+func GetAll() <-chan *Symbols.FunctionSymbol {
+    c := make(chan *Symbols.FunctionSymbol)
 
     go func () {
         defer close(c)

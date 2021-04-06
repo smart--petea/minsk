@@ -8,7 +8,7 @@ type ParameterSymbol struct {
     *VariableSymbol
 }
 
-func newParameterSymbol(name string, ttype *TypeSymbol) *ParameterSymbol {
+func NewParameterSymbol(name string, ttype *TypeSymbol) *ParameterSymbol {
     var parameterSymbol ParameterSymbol
 
     isReadOnly := true

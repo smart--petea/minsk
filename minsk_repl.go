@@ -4,7 +4,7 @@ import (
     "fmt"
     "os"
     "strings"
-    "log"
+//    "log"
 
     CA "minsk/CodeAnalysis"
     "minsk/CodeAnalysis/Syntax"
@@ -52,7 +52,7 @@ type MinskRepl struct {
 
 func (m *MinskRepl) RenderLine(line string) {
     tokens := Syntax.ParseTokens(line)
-    log.Printf("RenderLine line=%s len(tokens)=%d", line, len(tokens))
+//    log.Printf("RenderLine line=%s len(tokens)=%d", line, len(tokens))
     for _, token := range tokens {
         isKeyword := strings.HasSuffix(string(token.Kind()), "Keyword")
         isNumber :=  token.Kind() == SyntaxKind.NumberToken
@@ -104,9 +104,11 @@ func (m *MinskRepl) EvaluateSubmission(text string) {
     result := compilation.Evaluate(m.variables)
 
     if len(result.Diagnostics) == 0  {
-        Console.ForegroundColour(Console.COLOUR_WHITE)
-        fmt.Println(result.Value)
-        Console.ResetColour()
+        if result.Value != nil {
+            Console.ForegroundColour(Console.COLOUR_WHITE)
+            fmt.Println(result.Value)
+            Console.ResetColour()
+        }
 
         m.previous = compilation
     } else {

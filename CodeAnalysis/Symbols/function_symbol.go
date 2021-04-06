@@ -12,7 +12,7 @@ type FunctionSymbol struct {
     Type *TypeSymbol
 }
 
-func newFunctionSymbol(name string, parameter []*ParameterSymbol, ttype *TypeSymbol) *FunctionSymbol {
+func NewFunctionSymbol(name string, parameter []*ParameterSymbol, ttype *TypeSymbol) *FunctionSymbol {
     var functionSymbol FunctionSymbol
 
     functionSymbol.Symbol = NewSymbol(name)

@@ -98,3 +98,9 @@ func (db *DiagnosticBag) ReportWrongArgumentCount(span *Text.TextSpan, name stri
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportWrongArgumentType(span *Text.TextSpan, name string, expectedType *Symbols.TypeSymbol, actualType *Symbols.TypeSymbol) {
+    message := fmt.Sprintf("Parameter '%s' requires a value of type '%s' but was given a value of type '%s'", name, expectedType, actualType)
+
+    db.report(span, message)
+}

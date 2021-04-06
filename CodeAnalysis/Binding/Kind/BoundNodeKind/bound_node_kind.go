@@ -21,4 +21,5 @@ const (
     VariableExpression  BoundNodeKind = "VariableExpression"
     AssignmentExpression BoundNodeKind = "AssignmentExpression"
     ErrorExpression BoundNodeKind = "ErrorExpression"
+    CallExpression BoundNodeKind = "CallExpression"
 )

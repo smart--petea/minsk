@@ -3,7 +3,7 @@ package minsk
 import (
     "minsk/Util"
     "minsk/Util/Console"
-    "log"
+//    "log"
     "fmt"
     "strings"
 )
@@ -38,8 +38,8 @@ func (s *SubmissionView) SubmissionDocumentChanged(sender interface{}) {
 
 func (s *SubmissionView) Render() {
     left := 1
-    top := s.cursorTop
-    log.Printf("Render left=%d top=%d ", left, top)
+    //top := s.cursorTop
+//    log.Printf("Render left=%d top=%d ", left, top)
 
     Console.SetCursorVisibile(false)
 
