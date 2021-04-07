@@ -104,3 +104,9 @@ func (db *DiagnosticBag) ReportWrongArgumentType(span *Text.TextSpan, name strin
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportExpressionMustHaveValue(span *Text.TextSpan) {
+    message := "Expression must have a value." 
+
+    db.report(span, message)
+}

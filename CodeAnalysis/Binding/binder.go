@@ -51,7 +51,7 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 }
 
 func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetType *Symbols.TypeSymbol) BoundExpression {
-    result := b.BindExpression(syntax)
+    result := b.BindExpression(syntax, false)
     if targetType != Symbols.TypeSymbolError &&
         result.GetType() != Symbols.TypeSymbolError &&
         result.GetType() != targetType {
@@ -62,7 +62,17 @@ func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetTy
     return result
 }
 
-func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
+func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax, canBeVoid bool) BoundExpression {
+    result := b.BindExpressionInternal(syntax)
+    if !canBeVoid && result.GetType() == Symbols.TypeSymbolVoid {
+        b.ReportExpressionMustHaveValue(syntax.GetSpan())
+        return NewBoundErrorExpression()
+    }
+
+    return result
+}
+
+func (b *Binder) BindExpressionInternal(syntax Syntax.ExpressionSyntax) BoundExpression {
     switch syntax.Kind() {
     case SyntaxKind.ParenthesizedExpression:
         return b.BindParenthesizedExpression(syntax)
@@ -94,7 +104,7 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     assignmentExpressionSyntax := syntax.(*Syntax.AssignmentExpressionSyntax)
 
     name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
-    boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression)
+    boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression, false)
 
     var variable *Symbols.VariableSymbol
     if b.scope.TryLookup(name, &variable) == false {
@@ -138,7 +148,7 @@ func (b *Binder) BindNameExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
 
 func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     pS := syntax.(*Syntax.ParenthesizedExpressionSyntax)
-    return b.BindExpression(pS.Expression)
+    return b.BindExpression(pS.Expression, false)
 }
 
 func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
@@ -166,7 +176,7 @@ func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpr
 
 func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     unarySyntax := syntax.(*Syntax.UnaryExpressionSyntax)
-    boundOperand := b.BindExpression(unarySyntax.Operand)
+    boundOperand := b.BindExpression(unarySyntax.Operand, false)
     if boundOperand.GetType() == Symbols.TypeSymbolError {
         return NewBoundErrorExpression()
     }
@@ -189,7 +199,7 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
 
     var boundArguments []BoundExpression
     for argument := range syntax.Arguments.GetEnumerator() {
-        boundArgument := b.BindExpression(argument)
+        boundArgument := b.BindExpression(argument, false)
         boundArguments = append(boundArguments, boundArgument)
     }
 
@@ -228,8 +238,8 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
 func (b *Binder) BindBinaryExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
     binarySyntax := (syntax).(*Syntax.BinaryExpressionSyntax)
 
-    boundLeft := b.BindExpression(binarySyntax.Left)
-    boundRight := b.BindExpression(binarySyntax.Right)
+    boundLeft := b.BindExpression(binarySyntax.Left, false)
+    boundRight := b.BindExpression(binarySyntax.Right, false)
 
     if boundLeft.GetType() == Symbols.TypeSymbolError || boundRight.GetType() == Symbols.TypeSymbolError {
         return NewBoundErrorExpression()
@@ -303,7 +313,9 @@ func (b *Binder) BindIfStatement(syntax Syntax.StatementSyntax) BoundStatement {
 
 func (b *Binder) BindExpressionStatement(syntax Syntax.StatementSyntax) BoundStatement {
     expressionStatementSyntax := (syntax).(*Syntax.ExpressionStatementSyntax)
-    expression := b.BindExpression(expressionStatementSyntax.Expression)
+
+    canBeVoid := true
+    expression := b.BindExpression(expressionStatementSyntax.Expression, canBeVoid)
 
     return NewBoundExpressionStatement(expression)
 }
@@ -312,7 +324,7 @@ func (b *Binder) BindVariableDeclaration(statementSyntax Syntax.StatementSyntax)
     syntax := (statementSyntax).(*Syntax.VariableDeclarationSyntax)
 
     isReadOnly := syntax.Keyword.Kind() == SyntaxKind.LetKeyword
-    initializer := b.BindExpression(syntax.Initializer)
+    initializer := b.BindExpression(syntax.Initializer, false)
     variable := b.BindVariable(syntax.Identifier, isReadOnly, initializer.GetType())
 
     return NewBoundVariableDeclaration(variable, initializer)
