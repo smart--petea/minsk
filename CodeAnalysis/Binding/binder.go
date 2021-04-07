@@ -5,7 +5,6 @@ import (
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Symbols"
-    "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     "minsk/CodeAnalysis/Syntax"
     "minsk/Util"
 
@@ -107,7 +106,7 @@ func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundE
     boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression, false)
 
     var variable *Symbols.VariableSymbol
-    if b.scope.TryLookup(name, &variable) == false {
+    if b.scope.TryLookupVariable(name, &variable) == false {
         span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
         b.ReportUndefinedName(span, name)
         return boundExpression
@@ -137,7 +136,7 @@ func (b *Binder) BindNameExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
 
     name := string(syntax.IdentifierToken.Runes)
     var variable *Symbols.VariableSymbol
-    if b.scope.TryLookup(name, &variable) {
+    if b.scope.TryLookupVariable(name, &variable) {
         return NewBoundVariableExpression(variable)
     }
 
@@ -203,16 +202,9 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
         boundArguments = append(boundArguments, boundArgument)
     }
 
-    functionName := string(syntax.Identifier.Runes)
     var function *Symbols.FunctionSymbol
-    for f := range BuiltinFunctions.GetAll() {
-        if f.Name == functionName {
-            function = f
-            break
-        }
-    }
-
-    if function == nil {
+    functionName := string(syntax.Identifier.Runes)
+    if b.scope.TryLookupFunction(functionName, &function) == false {
         b.ReportUndefinedFunction(syntax.Identifier.GetSpan(), functionName)
         return NewBoundErrorExpression()
     }
@@ -338,7 +330,7 @@ func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, t
     variable := Symbols.NewVariableSymbol(name, isReadOnly, ttype)
     declare := !identifier.IsMissing()
 
-    if declare && b.scope.TryDeclare(variable) == false {
+    if declare && b.scope.TryDeclareVariable(variable) == false {
         b.ReportVariableAlreadyDeclared(identifier.GetSpan(), name)
     }
 

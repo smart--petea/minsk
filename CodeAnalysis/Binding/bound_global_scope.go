@@ -4,6 +4,7 @@ import (
     "minsk/Util"
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
 )
 
 type BoundGlobalScope struct {
@@ -43,17 +44,28 @@ func CreateParentScopes(previous *BoundGlobalScope) *BoundScope {
         previous = previous.Previous
     }
 
-    var parent *BoundScope
+    parent := CreateRootScope()
+
     for stack.Count() > 0 {
         previous = stack.Pop().(*BoundGlobalScope)
 
         scope := NewBoundScope(parent)
         for _, v := range previous.Variables {
-            scope.TryDeclare(v)
+            scope.TryDeclareVariable(v)
         }
 
         parent = scope
     }
 
     return parent
+}
+
+func CreateRootScope() *BoundScope {
+    result :=  NewBoundScope(nil)
+
+    for f := range BuiltinFunctions.GetAll() {
+        result.TryDeclareFunction(f)
+    }
+
+    return result
 }
