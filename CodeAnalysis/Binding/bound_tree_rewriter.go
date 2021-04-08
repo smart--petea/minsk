@@ -48,6 +48,8 @@ func (*BoundTreeRewriter) RewriteExpression(b BoundITreeRewriter, node BoundExpr
             return b.RewriteAssignmentExpression(b, n)
         case *BoundCallExpression:
             return b.RewriteCallExpression(b, n)
+        case *BoundConversionExpression:
+            return b.RewriteConversionExpression(b, n)
         default:
             panic(fmt.Sprintf("Unexpected node: %s", node.Kind()))
     }
@@ -157,6 +159,15 @@ func (*BoundTreeRewriter) RewriteBinaryExpression(b BoundITreeRewriter, node *Bo
 
 func (*BoundTreeRewriter) RewriteVariableExpression(b BoundITreeRewriter, node *BoundVariableExpression) BoundExpression {
     return node
+}
+
+func (*BoundTreeRewriter) RewriteConversionExpression(b BoundITreeRewriter, node *BoundConversionExpression) BoundExpression {
+    expression := b.RewriteExpression(b, node.Expression)
+    if expression == node.Expression {
+        return node
+    }
+
+    return NewBoundConversionExpression(node.GetType(), expression)
 }
 
 func (*BoundTreeRewriter) RewriteCallExpression(b BoundITreeRewriter, node *BoundCallExpression) BoundExpression {

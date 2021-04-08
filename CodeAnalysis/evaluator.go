@@ -10,6 +10,7 @@ import (
     "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     "minsk/Util"
+    "minsk/Util/Convert"
 
     "log"
 )
@@ -87,8 +88,23 @@ func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{}
             return e.evaluateBinaryExpression(root.(*Binding.BoundBinaryExpression))
         case BoundNodeKind.CallExpression:
             return e.evaluateCallExpression(root.(*Binding.BoundCallExpression))
+        case BoundNodeKind.ConversionExpression:
+            return e.evaluateConversionExpression(root.(*Binding.BoundConversionExpression))
         default:
             panic(fmt.Sprintf("Unexpected node %s", root.Kind()))
+    }
+}
+
+func (e *Evaluator) evaluateConversionExpression(node *Binding.BoundConversionExpression) interface{} {
+    value := e.evaluateExpression(node.Expression)
+    if node.GetType() == Symbols.TypeSymbolBool {
+        return Convert.ToBoolean(value)
+    } else if node.GetType() == Symbols.TypeSymbolInt {
+        return Convert.ToInt(value)
+    } else if node.GetType() == Symbols.TypeSymbolString {
+        return Convert.ToString(value)
+    } else {
+        panic(fmt.Sprintf("Unexpected type %s", node.GetType()))
     }
 }
 

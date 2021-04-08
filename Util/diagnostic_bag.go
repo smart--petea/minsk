@@ -110,3 +110,5 @@ func (db *DiagnosticBag) ReportExpressionMustHaveValue(span *Text.TextSpan) {
 
     db.report(span, message)
 }
+
+

@@ -17,6 +17,7 @@ const (
     //Expressions
     UnaryExpression BoundNodeKind = "UnaryExpression"
     LiteralExpression BoundNodeKind = "LiteralExpression"
+    ConversionExpression BoundNodeKind = "ConversionExpression"
     BinaryExpression  BoundNodeKind = "BinaryExpression"
     VariableExpression  BoundNodeKind = "VariableExpression"
     AssignmentExpression BoundNodeKind = "AssignmentExpression"

@@ -3,6 +3,7 @@ package Binding
 import (
     "minsk/CodeAnalysis/Binding/BoundUnaryOperator"
     "minsk/CodeAnalysis/Binding/BoundBinaryOperator"
+    "minsk/CodeAnalysis/Binding/Conversion"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Syntax"
@@ -193,8 +194,40 @@ func (b *Binder) BindUnaryExpression(syntax Syntax.ExpressionSyntax) BoundExpres
     return NewBoundUnaryExpression(boundOperator, boundOperand)
 }
 
+func (b *Binder)  LookupType(name string) *Symbols.TypeSymbol {
+    switch name {
+    case "bool":
+        return Symbols.TypeSymbolBool
+    case "int":
+        return Symbols.TypeSymbolInt
+    case "string":
+        return Symbols.TypeSymbolString
+    default:
+        return nil
+    }
+}
+
+func (b *Binder) BindConversion(ttype *Symbols.TypeSymbol, syntax Syntax.ExpressionSyntax) BoundExpression {
+    expression := b.BindExpression(syntax, false)
+    conversion := Conversion.ConversionClassify(expression.GetType(), ttype)
+
+    if !conversion.Exists {
+        b.ReportCannotConvert(syntax.GetSpan(), expression.GetType(), ttype)
+        return NewBoundErrorExpression()
+    }
+
+    return NewBoundConversionExpression(ttype, expression)
+}
+
 func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) BoundExpression {
     syntax := expressionSyntax.(*Syntax.CallExpressionSyntax)
+
+    if syntax.Arguments.Count() == 1 {
+        ttype := b.LookupType(string(syntax.Identifier.Runes)) 
+        if ttype != nil {
+            return b.BindConversion(ttype, syntax.Arguments.Get(0))
+        }
+    }
 
     var boundArguments []BoundExpression
     for argument := range syntax.Arguments.GetEnumerator() {
