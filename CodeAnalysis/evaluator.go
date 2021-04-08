@@ -9,14 +9,17 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
+    "minsk/Util"
 
     "log"
 )
 
 type Evaluator struct {
         Root *Binding.BoundBlockStatement
+
         variables map[*Symbols.VariableSymbol]interface{}
         lastValue interface{}
+        random *Util.Random
 }
 
 func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Symbols.VariableSymbol]interface{}) *Evaluator {
@@ -98,6 +101,17 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
         message, _ := e.evaluateExpression(node.Arguments[0]).(string)
         fmt.Println(message)
         return nil
+    } else if node.Function == BuiltinFunctions.Rnd {
+        max, ok := e.evaluateExpression(node.Arguments[0]).(int)
+        if !ok {
+            panic("Arguments 0 can't be converted in int")
+        }
+
+        if e.random == nil {
+            e.random = Util.NewRandom()
+        }
+
+        return e.random.Next(max)
     } else {
         panic(fmt.Sprintf("Unexpected function %s", node.Function))
     }
