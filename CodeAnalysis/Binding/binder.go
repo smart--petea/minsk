@@ -51,15 +51,7 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 }
 
 func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetType *Symbols.TypeSymbol) BoundExpression {
-    result := b.BindExpression(syntax, false)
-    if targetType != Symbols.TypeSymbolError &&
-        result.GetType() != Symbols.TypeSymbolError &&
-        result.GetType() != targetType {
-        span := syntax.GetSpan()
-        b.ReportCannotConvert(span, result.GetType(), targetType)
-    }
-
-    return result
+    return BindConversion(targetType, syntax)
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax, canBeVoid bool) BoundExpression {
@@ -212,9 +204,16 @@ func (b *Binder) BindConversion(ttype *Symbols.TypeSymbol, syntax Syntax.Express
     conversion := Conversion.ConversionClassify(expression.GetType(), ttype)
 
     if !conversion.Exists {
-        b.ReportCannotConvert(syntax.GetSpan(), expression.GetType(), ttype)
+        if expression.GetType() != Symbols.TypeSymbolError && ttype != Symbols.TypeSymbolError {
+            b.ReportCannotConvert(syntax.GetSpan(), expression.GetType(), ttype)
+        }
         return NewBoundErrorExpression()
     }
+
+    if conversion.IsIdentity {
+        return expression
+    }
+
 
     return NewBoundConversionExpression(ttype, expression)
 }
