@@ -155,7 +155,7 @@ func (*Lowerer) RewriteForStatement(b Binding.BoundITreeRewriter, node *Binding.
     variableExpression := Binding.NewBoundVariableExpression(node.Variable)
     condition := Binding.NewBoundBinaryExpression(
         variableExpression,
-        BoundBinaryOperator.Bind(SyntaxKind.LessOrEqualsToken, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
+        BoundBinaryOperator.Bind(SyntaxKind.LessToken, Symbols.TypeSymbolInt, Symbols.TypeSymbolInt),
         node.UpperBound,
     )
 
