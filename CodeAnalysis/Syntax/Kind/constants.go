@@ -46,6 +46,8 @@ const (
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
+    GlobalStatement SyntaxKind = "GlobalStatement"
+    Member SyntaxKind = "Member"
     TypeClause SyntaxKind = "TypeClause"
     ElseClause SyntaxKind = "ElseClause"
 
