@@ -7,6 +7,7 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Syntax"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util"
 
     "fmt"
@@ -51,7 +52,7 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 }
 
 func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetType *Symbols.TypeSymbol) BoundExpression {
-    return BindConversion(targetType, syntax)
+    return b.BindConversion(syntax, targetType)
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax, canBeVoid bool) BoundExpression {
@@ -92,31 +93,26 @@ func (b *Binder) BindExpressionInternal(syntax Syntax.ExpressionSyntax) BoundExp
     }
 }
 
-func (b *Binder) BindAssignmentExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    assignmentExpressionSyntax := syntax.(*Syntax.AssignmentExpressionSyntax)
+func (b *Binder) BindAssignmentExpression(assignmentExpressionSyntax Syntax.ExpressionSyntax) BoundExpression {
+    syntax := assignmentExpressionSyntax.(*Syntax.AssignmentExpressionSyntax)
 
-    name := string(assignmentExpressionSyntax.IdentifierToken.Runes)
-    boundExpression := b.BindExpression(assignmentExpressionSyntax.Expression, false)
+    name := string(syntax.IdentifierToken.Runes)
+    boundExpression := b.BindExpression(syntax.Expression, false)
 
     var variable *Symbols.VariableSymbol
     if b.scope.TryLookupVariable(name, &variable) == false {
-        span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
+        span := syntax.IdentifierToken.GetSpan()
         b.ReportUndefinedName(span, name)
         return boundExpression
     }
 
     if variable.IsReadOnly {
-        span := assignmentExpressionSyntax.EqualsToken.GetSpan()
+        span := syntax.EqualsToken.GetSpan()
         b.ReportCannotAssign(span, name)
     }
 
-    if boundExpression.GetType() != variable.Type {
-        span := assignmentExpressionSyntax.IdentifierToken.GetSpan()
-        b.ReportCannotConvert(span, boundExpression.GetType(), variable.Type)
-        return boundExpression
-    }
-
-    return NewBoundAssignmentExpression(variable, boundExpression)
+    convertedExpression := b.BindConversionInner(syntax.Expression.GetSpan(), boundExpression, variable.Type)
+    return NewBoundAssignmentExpression(variable, convertedExpression)
 }
 
 func (b *Binder) BindNameExpression(expressionSyntax Syntax.ExpressionSyntax) BoundExpression {
@@ -199,13 +195,17 @@ func (b *Binder)  LookupType(name string) *Symbols.TypeSymbol {
     }
 }
 
-func (b *Binder) BindConversion(ttype *Symbols.TypeSymbol, syntax Syntax.ExpressionSyntax) BoundExpression {
+func (b *Binder) BindConversion(syntax Syntax.ExpressionSyntax, ttype *Symbols.TypeSymbol) BoundExpression {
     expression := b.BindExpression(syntax, false)
+    return b.BindConversionInner(syntax.GetSpan(), expression, ttype)
+}
+
+func (b *Binder) BindConversionInner(diagnosticSpan *Text.TextSpan, expression BoundExpression, ttype *Symbols.TypeSymbol) BoundExpression {
     conversion := Conversion.ConversionClassify(expression.GetType(), ttype)
 
     if !conversion.Exists {
         if expression.GetType() != Symbols.TypeSymbolError && ttype != Symbols.TypeSymbolError {
-            b.ReportCannotConvert(syntax.GetSpan(), expression.GetType(), ttype)
+            b.ReportCannotConvert(diagnosticSpan, expression.GetType(), ttype)
         }
         return NewBoundErrorExpression()
     }
@@ -224,7 +224,7 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
     if syntax.Arguments.Count() == 1 {
         ttype := b.LookupType(string(syntax.Identifier.Runes)) 
         if ttype != nil {
-            return b.BindConversion(ttype, syntax.Arguments.Get(0))
+            return b.BindConversion(syntax.Arguments.Get(0), ttype)
         }
     }
 
