@@ -15,7 +15,8 @@ const (
     OpenBraceToken SyntaxKind = "OpenBraceToken"
     CloseBraceToken SyntaxKind = "CloseBraceToken"
     BangToken SyntaxKind = "BangToken"
-    Comma SyntaxKind = "Comma"
+    CommaToken SyntaxKind = "CommaToken"
+    ColonToken SyntaxKind = "ColonToken"
     BadToken SyntaxKind = "BadToken"
     IdentifierToken SyntaxKind = "IdentifierToken"
     AmpersandAmpersandToken SyntaxKind = "AmpersandAmpersandToken"
@@ -45,13 +46,14 @@ const (
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
+    TypeClause SyntaxKind = "TypeClause"
+    ElseClause SyntaxKind = "ElseClause"
 
     //Statements
     BlockStatement SyntaxKind = "BlockStatement"
     VariableDeclaration SyntaxKind = "VariableDeclaration"
     ExpressionStatement SyntaxKind = "ExpressionStatement"
     IfStatement SyntaxKind = "IfStatement"
-    ElseClause SyntaxKind = "ElseClause"
     WhileStatement SyntaxKind = "WhileStatement"
     ForStatement SyntaxKind = "ForStatement"
 
@@ -78,7 +80,8 @@ func GetValues() []SyntaxKind {
         OpenParenthesisToken,
         CloseParenthesisToken,
         BangToken,
-        Comma,
+        CommaToken,
+        ColonToken,
         BadToken,
         IdentifierToken,
         AmpersandAmpersandToken,

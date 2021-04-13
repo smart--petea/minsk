@@ -112,3 +112,14 @@ func (db *DiagnosticBag) ReportExpressionMustHaveValue(span *Text.TextSpan) {
 }
 
 
+func (db *DiagnosticBag) ReportUndefinedType(span *Text.TextSpan, name string) {
+    message := fmt.Sprintf("Type '%s' doesn't exists.", name) 
+
+    db.report(span, message)
+}
+
+func (db *DiagnosticBag) ReportCannotConvertImplicitly(span *Text.TextSpan, fromType, toType *Symbols.TypeSymbol) {
+    message := fmt.Sprintf("Cannot convert type '%s' to '%s'. An explicit conversion exists (are you missing a cast?)", fromType, toType)
+
+    db.report(span, message)
+}

@@ -52,7 +52,7 @@ func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
 }
 
 func (b *Binder) BindExpressionWithType(syntax Syntax.ExpressionSyntax, targetType *Symbols.TypeSymbol) BoundExpression {
-    return b.BindConversion(syntax, targetType)
+    return b.BindConversion(syntax, targetType, false)
 }
 
 func (b *Binder) BindExpression(syntax Syntax.ExpressionSyntax, canBeVoid bool) BoundExpression {
@@ -111,7 +111,7 @@ func (b *Binder) BindAssignmentExpression(assignmentExpressionSyntax Syntax.Expr
         b.ReportCannotAssign(span, name)
     }
 
-    convertedExpression := b.BindConversionInner(syntax.Expression.GetSpan(), boundExpression, variable.Type)
+    convertedExpression := b.BindConversionInner(syntax.Expression.GetSpan(), boundExpression, variable.Type, false)
     return NewBoundAssignmentExpression(variable, convertedExpression)
 }
 
@@ -195,12 +195,12 @@ func (b *Binder)  LookupType(name string) *Symbols.TypeSymbol {
     }
 }
 
-func (b *Binder) BindConversion(syntax Syntax.ExpressionSyntax, ttype *Symbols.TypeSymbol) BoundExpression {
+func (b *Binder) BindConversion(syntax Syntax.ExpressionSyntax, ttype *Symbols.TypeSymbol, allowExplicit bool) BoundExpression {
     expression := b.BindExpression(syntax, false)
-    return b.BindConversionInner(syntax.GetSpan(), expression, ttype)
+    return b.BindConversionInner(syntax.GetSpan(), expression, ttype, allowExplicit)
 }
 
-func (b *Binder) BindConversionInner(diagnosticSpan *Text.TextSpan, expression BoundExpression, ttype *Symbols.TypeSymbol) BoundExpression {
+func (b *Binder) BindConversionInner(diagnosticSpan *Text.TextSpan, expression BoundExpression, ttype *Symbols.TypeSymbol, allowExplicit bool) BoundExpression {
     conversion := Conversion.ConversionClassify(expression.GetType(), ttype)
 
     if !conversion.Exists {
@@ -208,6 +208,10 @@ func (b *Binder) BindConversionInner(diagnosticSpan *Text.TextSpan, expression B
             b.ReportCannotConvert(diagnosticSpan, expression.GetType(), ttype)
         }
         return NewBoundErrorExpression()
+    }
+
+    if !allowExplicit && conversion.IsExplicit {
+        b.ReportCannotConvertImplicitly(diagnosticSpan, expression.GetType(), ttype)
     }
 
     if conversion.IsIdentity {
@@ -224,7 +228,8 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
     if syntax.Arguments.Count() == 1 {
         ttype := b.LookupType(string(syntax.Identifier.Runes)) 
         if ttype != nil {
-            return b.BindConversion(syntax.Arguments.Get(0), ttype)
+            allowExplicit := true
+            return b.BindConversion(syntax.Arguments.Get(0), ttype, allowExplicit)
         }
     }
 
@@ -348,10 +353,30 @@ func (b *Binder) BindVariableDeclaration(statementSyntax Syntax.StatementSyntax)
     syntax := (statementSyntax).(*Syntax.VariableDeclarationSyntax)
 
     isReadOnly := syntax.Keyword.Kind() == SyntaxKind.LetKeyword
+    ttype := b.BindTypeClause(syntax.TypeClause)
     initializer := b.BindExpression(syntax.Initializer, false)
-    variable := b.BindVariable(syntax.Identifier, isReadOnly, initializer.GetType())
 
-    return NewBoundVariableDeclaration(variable, initializer)
+    variableType := ttype
+    if variableType == nil {
+        variableType = initializer.GetType()
+    }
+
+    variable := b.BindVariable(syntax.Identifier, isReadOnly, variableType)
+    convertedInitializer := b.BindConversionInner(syntax.Initializer.GetSpan(), initializer, variableType, false)
+    return NewBoundVariableDeclaration(variable, convertedInitializer)
+}
+
+func (b *Binder) BindTypeClause(syntax *Syntax.TypeClauseSyntax) *Symbols.TypeSymbol {
+    if syntax == nil {
+        return nil
+    }
+
+    ttype := b.LookupType(string(syntax.Identifier.Runes))
+    if ttype == nil {
+        b.ReportUndefinedType(syntax.Identifier.GetSpan(), string(syntax.Identifier.Runes))
+    }
+
+    return ttype
 }
 
 func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, ttype *Symbols.TypeSymbol) *Symbols.VariableSymbol {

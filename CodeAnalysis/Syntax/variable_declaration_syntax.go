@@ -11,6 +11,7 @@ type VariableDeclarationSyntax struct {
 
     Keyword *SyntaxToken
     Identifier *SyntaxToken
+    TypeClause *TypeClauseSyntax
     EqualsToken *SyntaxToken
     Initializer ExpressionSyntax
 }
@@ -19,12 +20,13 @@ func (v *VariableDeclarationSyntax) Kind() SyntaxKind.SyntaxKind {
     return SyntaxKind.VariableDeclaration
 }
 
-func NewVariableDeclarationSyntax(keyword, identifier, equalsToken  *SyntaxToken, initializer ExpressionSyntax) *VariableDeclarationSyntax {
+func NewVariableDeclarationSyntax(keyword, identifier *SyntaxToken, typeClause *TypeClauseSyntax, equalsToken  *SyntaxToken, initializer ExpressionSyntax) *VariableDeclarationSyntax {
     return &VariableDeclarationSyntax{
-        ChildrenProvider: Util.NewChildrenProvider(keyword, identifier, equalsToken, initializer),
+        ChildrenProvider: Util.NewChildrenProvider(keyword, identifier, typeClause, equalsToken, initializer),
 
         Keyword: keyword,
         Identifier: identifier,
+        TypeClause: typeClause,
         EqualsToken: equalsToken,
         Initializer: initializer,
     }

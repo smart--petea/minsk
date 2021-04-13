@@ -73,8 +73,10 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return "/"
     case SyntaxKind.BangToken:
         return "!"
-    case SyntaxKind.Comma:
+    case SyntaxKind.CommaToken:
         return ","
+    case SyntaxKind.ColonToken:
+        return ":"
     case SyntaxKind.EqualsToken:
         return "="
     case SyntaxKind.LessToken:

@@ -88,13 +88,17 @@ func (l *Lexer) Lex() *SyntaxToken {
         l.Next()
         l.kind = SyntaxKind.CloseBraceToken
 
+    case ':':
+        l.Next()
+        l.kind = SyntaxKind.ColonToken
+
     case '~':
         l.Next()
         l.kind = SyntaxKind.TildeToken
 
     case ',':
         l.Next()
-        l.kind = SyntaxKind.Comma
+        l.kind = SyntaxKind.CommaToken
 
     case '^':
         l.Next()

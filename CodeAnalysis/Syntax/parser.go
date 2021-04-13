@@ -191,7 +191,7 @@ func (p *Parser) ParseArguments() *SeparatedSyntaxList {
         nodeAndSeparators = append(nodeAndSeparators, expression)
 
         if p.Current().Kind() != SyntaxKind.CloseParenthesisToken {
-            comma := p.MatchToken(SyntaxKind.Comma)
+            comma := p.MatchToken(SyntaxKind.CommaToken)
             nodeAndSeparators = append(nodeAndSeparators, comma)
         }
     }
@@ -266,9 +266,25 @@ func (p *Parser) ParseVariableDeclaration() *VariableDeclarationSyntax {
 
     keyword := p.MatchToken(expected)
     identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    typeClause := p.ParseOptionalTypeClause()
     equals := p.MatchToken(SyntaxKind.EqualsToken)
     initializer := p.ParseExpression()
-    return NewVariableDeclarationSyntax(keyword, identifier, equals, initializer)
+    return NewVariableDeclarationSyntax(keyword, identifier, typeClause, equals, initializer)
+}
+
+func (p *Parser) ParseOptionalTypeClause() *TypeClauseSyntax {
+    if p.Current().Kind() != SyntaxKind.ColonToken {
+        return nil
+    }
+
+    return p.ParseTypeClause()
+}
+
+func (p *Parser) ParseTypeClause() *TypeClauseSyntax {
+    colonToken := p.MatchToken(SyntaxKind.ColonToken) 
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken) 
+
+    return NewTypeClauseSyntax(colonToken, identifier)
 }
 
 func (p *Parser) ParseIfStatement() *IfStatementSyntax {
