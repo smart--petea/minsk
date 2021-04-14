@@ -46,8 +46,10 @@ const (
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"
-    GlobalStatement SyntaxKind = "GlobalStatement"
     Member SyntaxKind = "Member"
+    GlobalStatement SyntaxKind = "GlobalStatement"
+    FunctionDeclaration SyntaxKind = "FunctionDeclaration"
+    Parameter SyntaxKind = "Parameter"
     TypeClause SyntaxKind = "TypeClause"
     ElseClause SyntaxKind = "ElseClause"
 

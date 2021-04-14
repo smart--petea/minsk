@@ -64,10 +64,37 @@ func NewParser(text *Text.SourceText) *Parser {
 }
 
 func (p *Parser) ParseCompilationUnit() *CompilationUnitSyntax {
-    statement  := p.ParseStatement()
+    members  := p.ParseMembers()
     endOfFileToken := p.MatchToken(SyntaxKind.EndOfFileToken)
 
-    return NewCompilationUnitSyntax(statement, endOfFileToken)
+    return NewCompilationUnitSyntax(members, endOfFileToken)
+}
+
+
+func (p *Parser) ParseMembers() []MemberSyntax {
+    var members []MemberSyntax
+
+    openBraceToken := p.MatchToken(SyntaxKind.OpenBraceToken)
+    for p.Current().Kind() != SyntaxKind.EndOfFileToken {
+        startToken := p.Current()
+
+        statement := p.ParseStatement()
+        members = append(members, statement)
+
+        //If ParseStatement() did not consume any tokens,
+        //we need to skip the current token and continue.
+        //In order to avoid an infinite loop.
+        //
+        // We do not need to report and error, because we'll
+        //already tried to parse an expression statement 
+        //and reported one.
+        if p.Current() == startToken {
+            p.NextToken()
+        }
+    }
+    //closeBraceToken := p.MatchToken(SyntaxKind.CloseBraceToken)
+
+    return members
 }
 
 func (p *Parser) NextToken() *SyntaxToken {

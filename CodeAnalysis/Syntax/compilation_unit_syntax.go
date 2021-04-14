@@ -8,15 +8,15 @@ import (
 type CompilationUnitSyntax struct {
     *Util.ChildrenProvider
 
-    Statement StatementSyntax
+    Members []MemberSyntax
     EndOfFileToken *SyntaxToken
 }
 
-func NewCompilationUnitSyntax(statement StatementSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
+func NewCompilationUnitSyntax(members []MemberSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
-        ChildrenProvider: Util.NewChildrenProvider(statement),
+        ChildrenProvider: Util.NewChildrenProvider(members...),
 
-        Statement: statement,
+        Members: members,
         EndOfFileToken: endOfFileToken,
     }
 }
@@ -26,5 +26,5 @@ func (c *CompilationUnitSyntax) Kind() SyntaxKind.SyntaxKind {
 }
 
 func (c *CompilationUnitSyntax) Value() interface{} {
-    return c.Statement.Value()
+    return nil
 }
