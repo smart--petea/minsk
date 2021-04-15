@@ -10,13 +10,15 @@ import (
 type BoundGlobalScope struct {
     Util.DiagnosticBag
     Previous *BoundGlobalScope
+    Functions []*Symbols.FunctionSymbol
     Variables []*Symbols.VariableSymbol
     Statement BoundStatement
 }
 
-func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Symbols.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
+func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Symbols.VariableSymbol, functions []*Symbols.FunctionSymbol, statement BoundStatement) *BoundGlobalScope {
     return &BoundGlobalScope{
         Previous: previous,
+        Functions: functions,
         Variables: variables,
         Statement: statement,
     }
@@ -25,10 +27,23 @@ func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Symbols.Variab
 func BoundGlobalScopeFromCompilationUnitSyntax(previous *BoundGlobalScope, syntax *Syntax.CompilationUnitSyntax) *BoundGlobalScope {
     parentScope := CreateParentScopes(previous)
     binder := NewBinder(parentScope)
-    statement := binder.BindStatement(syntax.Statement)
+
+    for _, function := range syntax.Members.OfType(SyntaxKind.FunctionDeclarationSyntax) {
+        binder.BindFunctionDeclaration(function)
+    }
+
+    var statementBuilder []BoundStatement
+
+    for _, globalStatement := range syntax.Members.OfType(SyntaxKind.GlobalStatementSynax) {
+        s := bind.BindStatement(globalStatement.Statement)
+        statementBuilder = append(statementBuilder, s)
+    }
+
+    statement := NewBoundBlockStatement(statementBuilder)
+    functions := binder.scope.GetDeclaredFunctions()
     variables := binder.scope.GetDeclaredVariables()
 
-    boundGlobalScope := NewBoundGlobalScope(previous, variables, statement)
+    boundGlobalScope := NewBoundGlobalScope(previous, functions, variables, statement)
     boundGlobalScope.AddDiagnosticsRange(binder.GetDiagnostics())
     if previous != nil {
         boundGlobalScope.AddDiagnosticsRange(previous.GetDiagnostics())
@@ -48,8 +63,12 @@ func CreateParentScopes(previous *BoundGlobalScope) *BoundScope {
 
     for stack.Count() > 0 {
         previous = stack.Pop().(*BoundGlobalScope)
-
         scope := NewBoundScope(parent)
+
+        for _, f := range previous.Functions {
+            scope.TryDeclareFunction(f)
+        }
+
         for _, v := range previous.Variables {
             scope.TryDeclareVariable(v)
         }

@@ -123,3 +123,15 @@ func (db *DiagnosticBag) ReportCannotConvertImplicitly(span *Text.TextSpan, from
 
     db.report(span, message)
 }
+
+func (db *DiagnosticBag) ReportParameterAlreadyDeclared(span *Text.TextSpan, parameterName string) {
+    message := fmt.Sprintf("A parameter with the name '%s' already exists.")
+
+    db.report(span, message)
+}
+
+func (db *DiagnosticBag) XXX_ReportFunctionsAreUnsupported(span *Text.TextSpan) {
+    message := "Functions with return values are unsupported."
+
+    db.report(span, message)
+}

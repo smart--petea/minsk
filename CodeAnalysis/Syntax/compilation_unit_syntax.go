@@ -8,11 +8,11 @@ import (
 type CompilationUnitSyntax struct {
     *Util.ChildrenProvider
 
-    Members []MemberSyntax
+    Members MemberSyntaxSlice
     EndOfFileToken *SyntaxToken
 }
 
-func NewCompilationUnitSyntax(members []MemberSyntax, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
+func NewCompilationUnitSyntax(members MemberSyntaxSlice, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
         ChildrenProvider: Util.NewChildrenProvider(members...),
 

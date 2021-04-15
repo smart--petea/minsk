@@ -74,12 +74,11 @@ func (p *Parser) ParseCompilationUnit() *CompilationUnitSyntax {
 func (p *Parser) ParseMembers() []MemberSyntax {
     var members []MemberSyntax
 
-    openBraceToken := p.MatchToken(SyntaxKind.OpenBraceToken)
     for p.Current().Kind() != SyntaxKind.EndOfFileToken {
         startToken := p.Current()
 
-        statement := p.ParseStatement()
-        members = append(members, statement)
+        member := p.ParseStatement()
+        members = append(members, member)
 
         //If ParseStatement() did not consume any tokens,
         //we need to skip the current token and continue.
@@ -95,6 +94,54 @@ func (p *Parser) ParseMembers() []MemberSyntax {
     //closeBraceToken := p.MatchToken(SyntaxKind.CloseBraceToken)
 
     return members
+}
+
+func (p *Parser) ParseMember() MemberSyntax {
+    if p.Current().Kind() == SyntaxKind.FunctionKeyword {
+        return p.ParseFunctionDeclaration()
+    }
+
+    return p.ParseGlobalStatement()
+}
+
+func (p *Parser) ParseFunctionDeclaration() MemberSyntax {
+    functionKeyword := p.MatchToken(SyntaxKind.FunctionKeyword)
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    openParenthesisToken := p.MatchToken(SyntaxKind.OpenParenthesisToken)
+    parameters := p.ParseParameterList()
+    closeParenthesisToken := p.MatchToken(SyntaxKind.CloseParenthesisToken)
+    ttype = p.ParseOptionalTypeClause();
+    return NewFunctionDeclarationSyntax(functionKeyword, identifier, openParenthesisToken, parameters, closeParenthesisToken, ttype, body)
+}
+
+func (p *Parser) ParseParameterList() *SeparatedSyntaxList {
+}
+
+func (p *Parser) ParseOptionalTypeClause() *TypeClauseSyntax {
+    var nodeAndSeparators []ParameterSyntax
+
+    for p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
+        parameter := p.ParseParameter()
+        nodeAndSeparators = append(nodeAndSeparators, parameter)
+
+        if p.Current().Kind() != SyntaxKind.CloseParenthesisToken {
+            comma := p.MatchToken(SyntaxKind.CommaToken)
+            nodeAndSeparators = append(nodeAndSeparators, comma)
+        }
+    }
+
+    return NewSeparatedSyntaxList(nodeAndSeparators)
+}
+
+func (p *Parser) ParseParameter() *ParameterSyntax {
+    identifier := p.MatchToken(SyntaxKind.IdentifierToken)
+    ttype := p.ParseTypeClause()
+    return NewParameterSyntax(identifier, ttype)
+}
+
+func (p *Parser) ParseGlobalStatement() MemberSyntax {
+    statement : p.ParseStatement()
+    return NewGlobalStatementSyntax(statement)
 }
 
 func (p *Parser) NextToken() *SyntaxToken {

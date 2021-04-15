@@ -43,6 +43,7 @@ const (
     VarKeyword SyntaxKind = "VarKeyword"
     WhileKeyword SyntaxKind = "WhileKeyword"
     ForKeyword SyntaxKind = "ForKeyword"
+    FunctionKeyword SyntaxKind = "FunctionKeyword"
 
     //Nodes
     CompilationUnit SyntaxKind = "CompilationUnit"

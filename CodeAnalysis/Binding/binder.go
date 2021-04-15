@@ -394,3 +394,33 @@ func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, t
     return variable
 }
 
+func (b *Binder) BindFunctionDeclaration(function *Syntax.FunctionDeclarationSyntax) {
+    var parameters []*ParameterSymbol
+    seenParameterNames := NewHashSetString()
+
+    for _, parameterSyntax := range syntax.Parameters {
+        parameterName := string(parameterSyntax.Identifier.Runes)
+        parameterType := b.BindTypeClause(parameterSyntax.GetType())
+
+        if !seenParameterNames.Add(parameterName) {
+            b.ReportParameterAlreadyDeclared(parameterSyntax.GetSpan(), parameterName) 
+        } else {
+            parameter := NewParameterSymbol(parameterName, parameterType)
+            parameters = append(parameters, parameter)
+        }
+    }
+
+    ttype := Symbols.TypeSymbolVoid
+    if syntax.Type != nil {
+        ttype = syntax.Type
+    }
+
+    if ttype != Symbols.TypeSymbolVoid {
+        b.XXX_ReportFunctionsAreUnsupported(syntax.Type.GetSpan()))
+    }
+
+    function := NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype)
+    if !b.scope.TryDeclareFunction(function) {
+        b.ReportSymbolAlreadyDeclared(syntax.Identifier.GetSpan(), function.Name)
+    }
+}

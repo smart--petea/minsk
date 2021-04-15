@@ -56,6 +56,8 @@ func GetKeywordKind(text string) SyntaxKind.SyntaxKind {
         return SyntaxKind.WhileKeyword
     case "for":
         return SyntaxKind.ForKeyword
+    case "function":
+        return SyntaxKind.FunctionKeyword
     default:
         return SyntaxKind.IdentifierToken
     }
@@ -129,6 +131,8 @@ func GetText(kind SyntaxKind.SyntaxKind) string {
         return "while"
     case SyntaxKind.ForKeyword:
         return "for"
+    case SyntaxKind.FunctionKeyword:
+        return "function"
     default:
         return ""
     }

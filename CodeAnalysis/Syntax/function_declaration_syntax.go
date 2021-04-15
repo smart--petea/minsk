@@ -14,9 +14,10 @@ type FunctionDeclarationSyntax struct {
     Parameters *SeparatedSyntaxList
     CloseParenthesisToken *SyntaxToken
     Type *TypeClauseSyntax
+    Body *BlockStatementSyntax
 }
 
-func NewFunctionDeclarationSyntax(functionKeyword *SyntaxToken, identifier *SyntaxToken, openParenthesisToken *SyntaxToken, parameters *SeparatedSyntaxList, closeParenthesisToken *SyntaxToken, ttype *TypeClauseSyntax) *FunctionDeclarationSyntax {
+func NewFunctionDeclarationSyntax(functionKeyword *SyntaxToken, identifier *SyntaxToken, openParenthesisToken *SyntaxToken, parameters *SeparatedSyntaxList, closeParenthesisToken *SyntaxToken, ttype *TypeClauseSyntax, body *BlockStatementSyntax) *FunctionDeclarationSyntax {
     var children []interface{}
     children = append(children, interface{}(functionKeyword))
     children = append(children, interface{}(identifier))
@@ -26,6 +27,8 @@ func NewFunctionDeclarationSyntax(functionKeyword *SyntaxToken, identifier *Synt
     }
     children = append(children, interface{}(closeParenthesisToken))
     children = append(children, interface{}(ttype))
+    children = append(children, interface{}(body))
+
     return &FunctionDeclarationSyntax{
         ChildrenProvider: Util.NewChildrenProvider(children...),
 
@@ -35,6 +38,7 @@ func NewFunctionDeclarationSyntax(functionKeyword *SyntaxToken, identifier *Synt
         Parameters: parameters,
         CloseParenthesisToken: closeParenthesisToken,
         Type: ttype,
+        Body: body,
     }
 }
 
@@ -43,5 +47,5 @@ func (g *FunctionDeclarationSyntax) Kind() SyntaxKind.SyntaxKind {
 }
 
 func (g *FunctionDeclarationSyntax) Value() interface{} {
-    return nil
+    return g.Body.Value()
 }
