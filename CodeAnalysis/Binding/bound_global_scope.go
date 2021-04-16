@@ -5,6 +5,7 @@ import (
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Symbols"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
+    SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type BoundGlobalScope struct {
@@ -15,7 +16,7 @@ type BoundGlobalScope struct {
     Statement BoundStatement
 }
 
-func NewBoundGlobalScope(previous *BoundGlobalScope, variables []*Symbols.VariableSymbol, functions []*Symbols.FunctionSymbol, statement BoundStatement) *BoundGlobalScope {
+func NewBoundGlobalScope(previous *BoundGlobalScope, functions []*Symbols.FunctionSymbol, variables []*Symbols.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
     return &BoundGlobalScope{
         Previous: previous,
         Functions: functions,
@@ -28,14 +29,16 @@ func BoundGlobalScopeFromCompilationUnitSyntax(previous *BoundGlobalScope, synta
     parentScope := CreateParentScopes(previous)
     binder := NewBinder(parentScope)
 
-    for _, function := range syntax.Members.OfType(SyntaxKind.FunctionDeclarationSyntax) {
+    for _, memberSyntax := range syntax.Members.OfType(SyntaxKind.FunctionDeclaration) {
+        function := memberSyntax.(*Syntax.FunctionDeclarationSyntax)
         binder.BindFunctionDeclaration(function)
     }
 
     var statementBuilder []BoundStatement
 
-    for _, globalStatement := range syntax.Members.OfType(SyntaxKind.GlobalStatementSynax) {
-        s := bind.BindStatement(globalStatement.Statement)
+    for _, memberSyntax := range syntax.Members.OfType(SyntaxKind.GlobalStatement) {
+        globalStatement := memberSyntax.(*Syntax.GlobalStatementSyntax)
+        s := binder.BindStatement(globalStatement.Statement)
         statementBuilder = append(statementBuilder, s)
     }
 

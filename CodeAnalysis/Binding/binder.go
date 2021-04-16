@@ -388,38 +388,39 @@ func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, t
     declare := !identifier.IsMissing()
 
     if declare && b.scope.TryDeclareVariable(variable) == false {
-        b.ReportVariableAlreadyDeclared(identifier.GetSpan(), name)
+        b.ReportSymbolAlreadyDeclared(identifier.GetSpan(), name)
     }
 
     return variable
 }
 
-func (b *Binder) BindFunctionDeclaration(function *Syntax.FunctionDeclarationSyntax) {
+func (b *Binder) BindFunctionDeclaration(syntax *Syntax.FunctionDeclarationSyntax) {
     var parameters []*Symbols.ParameterSymbol
-    seenParameterNames := NewHashSetString()
+    seenParameterNames := Util.NewHashSetString()
 
-    for _, parameterSyntax := range syntax.Parameters {
+    for  syntaxNode := range syntax.Parameters.GetEnumerator() {
+        parameterSyntax := syntaxNode.(*Syntax.ParameterSyntax)
         parameterName := string(parameterSyntax.Identifier.Runes)
-        parameterType := b.BindTypeClause(parameterSyntax.GetType())
+        parameterType := b.BindTypeClause(parameterSyntax.Type)
 
         if !seenParameterNames.Add(parameterName) {
             b.ReportParameterAlreadyDeclared(parameterSyntax.GetSpan(), parameterName) 
         } else {
-            parameter := NewParameterSymbol(parameterName, parameterType)
+            parameter := Symbols.NewParameterSymbol(parameterName, parameterType)
             parameters = append(parameters, parameter)
         }
     }
 
-    ttype := Symbols.TypeSymbolVoid
-    if syntax.Type != nil {
-        ttype = syntax.Type
+    ttype := b.BindTypeClause(syntax.Type)
+    if ttype == nil {
+        ttype = Symbols.TypeSymbolVoid
     }
 
     if ttype != Symbols.TypeSymbolVoid {
         b.XXX_ReportFunctionsAreUnsupported(syntax.Type.GetSpan())
     }
 
-    function := NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype)
+    function := Symbols.NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype)
     if !b.scope.TryDeclareFunction(function) {
         b.ReportSymbolAlreadyDeclared(syntax.Identifier.GetSpan(), function.Name)
     }

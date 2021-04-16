@@ -10,7 +10,7 @@ type ParameterSyntax struct {
     *Util.ChildrenProvider
 
     Identifier *SyntaxToken
-    Ttype *TypeClauseSyntax
+    Type *TypeClauseSyntax
 }
 
 func NewParameterSyntax(identifier *SyntaxToken, ttype *TypeClauseSyntax) *ParameterSyntax {
@@ -18,7 +18,7 @@ func NewParameterSyntax(identifier *SyntaxToken, ttype *TypeClauseSyntax) *Param
         ChildrenProvider: Util.NewChildrenProvider(identifier, ttype),
 
         Identifier: identifier,
-        Ttype: ttype,
+        Type: ttype,
     }
 }
 

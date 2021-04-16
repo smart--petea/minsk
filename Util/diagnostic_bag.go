@@ -64,8 +64,8 @@ func (db *DiagnosticBag) ReportUndefinedName(span *Text.TextSpan, name string) {
     db.report(span, message)
 }
 
-func (db *DiagnosticBag) ReportVariableAlreadyDeclared(span *Text.TextSpan, name string) {
-    message := fmt.Sprintf("Variable %s is already declared", name)
+func (db *DiagnosticBag) ReportSymbolAlreadyDeclared(span *Text.TextSpan, name string) {
+    message := fmt.Sprintf("Symbol %s is already declared", name)
 
     db.report(span, message)
 }
