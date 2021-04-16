@@ -2,6 +2,7 @@ package Syntax
 
 import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
+    "minsk/CodeAnalysis/Text"
     "minsk/Util"
 )
 
@@ -23,7 +24,7 @@ func NewFunctionDeclarationSyntax(functionKeyword *SyntaxToken, identifier *Synt
     children = append(children, interface{}(identifier))
     children = append(children, interface{}(openParenthesisToken))
     for _, parameter := range parameters.GetWithSeparators() {
-        children = append(children, interface{}(paramter))
+        children = append(children, interface{}(parameter))
     }
     children = append(children, interface{}(closeParenthesisToken))
     children = append(children, interface{}(ttype))
@@ -48,4 +49,8 @@ func (g *FunctionDeclarationSyntax) Kind() SyntaxKind.SyntaxKind {
 
 func (g *FunctionDeclarationSyntax) Value() interface{} {
     return g.Body.Value()
+}
+
+func (g *FunctionDeclarationSyntax) GetSpan() *Text.TextSpan {
+    return SyntaxNodeToTextSpan(g)
 }

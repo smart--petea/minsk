@@ -14,7 +14,7 @@ type CompilationUnitSyntax struct {
 
 func NewCompilationUnitSyntax(members MemberSyntaxSlice, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
     return &CompilationUnitSyntax{
-        ChildrenProvider: Util.NewChildrenProvider(members...),
+        ChildrenProvider: Util.NewChildrenProvider(members.ToEmptyInterfaceSlice()...),
 
         Members: members,
         EndOfFileToken: endOfFileToken,

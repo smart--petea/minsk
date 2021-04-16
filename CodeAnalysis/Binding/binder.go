@@ -395,7 +395,7 @@ func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, t
 }
 
 func (b *Binder) BindFunctionDeclaration(function *Syntax.FunctionDeclarationSyntax) {
-    var parameters []*ParameterSymbol
+    var parameters []*Symbols.ParameterSymbol
     seenParameterNames := NewHashSetString()
 
     for _, parameterSyntax := range syntax.Parameters {
@@ -416,7 +416,7 @@ func (b *Binder) BindFunctionDeclaration(function *Syntax.FunctionDeclarationSyn
     }
 
     if ttype != Symbols.TypeSymbolVoid {
-        b.XXX_ReportFunctionsAreUnsupported(syntax.Type.GetSpan()))
+        b.XXX_ReportFunctionsAreUnsupported(syntax.Type.GetSpan())
     }
 
     function := NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype)

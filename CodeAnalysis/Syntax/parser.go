@@ -77,7 +77,7 @@ func (p *Parser) ParseMembers() []MemberSyntax {
     for p.Current().Kind() != SyntaxKind.EndOfFileToken {
         startToken := p.Current()
 
-        member := p.ParseStatement()
+        member := p.ParseStatement().(MemberSyntax)
         members = append(members, member)
 
         //If ParseStatement() did not consume any tokens,
@@ -110,15 +110,13 @@ func (p *Parser) ParseFunctionDeclaration() MemberSyntax {
     openParenthesisToken := p.MatchToken(SyntaxKind.OpenParenthesisToken)
     parameters := p.ParseParameterList()
     closeParenthesisToken := p.MatchToken(SyntaxKind.CloseParenthesisToken)
-    ttype = p.ParseOptionalTypeClause();
+    ttype := p.ParseOptionalTypeClause();
+    body := p.ParseBlockStatement()
     return NewFunctionDeclarationSyntax(functionKeyword, identifier, openParenthesisToken, parameters, closeParenthesisToken, ttype, body)
 }
 
 func (p *Parser) ParseParameterList() *SeparatedSyntaxList {
-}
-
-func (p *Parser) ParseOptionalTypeClause() *TypeClauseSyntax {
-    var nodeAndSeparators []ParameterSyntax
+    var nodeAndSeparators []SyntaxNode
 
     for p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
         parameter := p.ParseParameter()
@@ -140,7 +138,7 @@ func (p *Parser) ParseParameter() *ParameterSyntax {
 }
 
 func (p *Parser) ParseGlobalStatement() MemberSyntax {
-    statement : p.ParseStatement()
+    statement := p.ParseStatement()
     return NewGlobalStatementSyntax(statement)
 }
 

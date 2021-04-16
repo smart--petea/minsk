@@ -1,5 +1,5 @@
 package Syntax
 
-type MemberSyntax struct {
+type MemberSyntax interface {
     SyntaxNode
 }

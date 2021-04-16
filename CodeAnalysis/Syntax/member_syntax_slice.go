@@ -9,7 +9,7 @@ type MemberSyntaxSlice []MemberSyntax
 func (n MemberSyntaxSlice) OfType(kind SyntaxKind.SyntaxKind) MemberSyntaxSlice {
     var result MemberSyntaxSlice
     for _, node := range n {
-        if n.Kind() == kind {
+        if node.Kind() == kind {
             result = append(result, node)
         }
     }
@@ -19,8 +19,18 @@ func (n MemberSyntaxSlice) OfType(kind SyntaxKind.SyntaxKind) MemberSyntaxSlice 
 
 func (n MemberSyntaxSlice) Single() MemberSyntax {
     if n == nil {
-        return n
+        var p MemberSyntax
+        return p
     }
 
     return n[0]
+}
+
+func (n MemberSyntaxSlice) ToEmptyInterfaceSlice() []interface{} {
+    var c []interface{}
+    for _, i := range n {
+        c = append(c, i)
+    }
+
+    return c
 }
