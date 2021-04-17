@@ -13,8 +13,11 @@ type CompilationUnitSyntax struct {
 }
 
 func NewCompilationUnitSyntax(members MemberSyntaxSlice, endOfFileToken *SyntaxToken) *CompilationUnitSyntax {
+    children := members.ToEmptyInterfaceSlice()
+    children = append(children, endOfFileToken)
+
     return &CompilationUnitSyntax{
-        ChildrenProvider: Util.NewChildrenProvider(members.ToEmptyInterfaceSlice()...),
+        ChildrenProvider: Util.NewChildrenProvider(children...),
 
         Members: members,
         EndOfFileToken: endOfFileToken,
