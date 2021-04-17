@@ -4,6 +4,7 @@ import (
     "minsk/Util"
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Lowering"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
@@ -25,9 +26,9 @@ func NewBoundGlobalScope(previous *BoundGlobalScope, functions []*Symbols.Functi
     }
 }
 
-func BoundGlobalScopeFromCompilationUnitSyntax(previous *BoundGlobalScope, syntax *Syntax.CompilationUnitSyntax) *BoundGlobalScope {
+func BoundGlobalScopeBindGlobalScope(previous *BoundGlobalScope, syntax *Syntax.CompilationUnitSyntax) *BoundGlobalScope {
     parentScope := CreateParentScopes(previous)
-    binder := NewBinder(parentScope)
+    binder := NewBinder(parentScope, nil)
 
     for _, memberSyntax := range syntax.Members.OfType(SyntaxKind.FunctionDeclaration) {
         function := memberSyntax.(*Syntax.FunctionDeclarationSyntax)
@@ -90,4 +91,16 @@ func CreateRootScope() *BoundScope {
     }
 
     return result
+}
+
+func BoundGlobalScopeBindProgram(globalScope *BoundGlobalScope) *BindProgram {
+    parentScope := CreateParentScopes(globalScope)
+    functionBodies := make(map[*Symbols.FunctionSymbol]*BoundBlockStatement)
+
+    for _, function := range globalScope.Functions {
+        binder := NewBinder(parentScope, function)
+        body := binder.BindStatement(function.Declaration.Body)
+        loweredBody := Lowering.LowererLower(body)
+        functionBodies[function] = loweredBody
+    }
 }

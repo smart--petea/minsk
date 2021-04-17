@@ -39,7 +39,7 @@ func (c *Compilation) GlobalScope() *Binding.BoundGlobalScope {
                 previousGlobalScope = c.Previous.GlobalScope()
             }
 
-            c.globalScope = Binding.BoundGlobalScopeFromCompilationUnitSyntax(previousGlobalScope, c.SyntaxTree.Root)
+            c.globalScope = Binding.BoundGlobalScopeBoundGlobalScope(previousGlobalScope, c.SyntaxTree.Root)
         })
     }
 

@@ -18,11 +18,13 @@ type Binder struct {
     Util.DiagnosticBag 
 
     scope *BoundScope
+    function *Symbols.FunctionSymbol
 }
 
-func NewBinder(parent *BoundScope) *Binder {
+func NewBinder(parent *BoundScope, function *Symbols.FunctionSymbol) *Binder {
     return &Binder{
         scope: NewBoundScope(parent),
+        function: function,
     }
 }
 
@@ -420,7 +422,7 @@ func (b *Binder) BindFunctionDeclaration(syntax *Syntax.FunctionDeclarationSynta
         b.XXX_ReportFunctionsAreUnsupported(syntax.Type.GetSpan())
     }
 
-    function := Symbols.NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype)
+    function := Symbols.NewFunctionSymbol(string(syntax.Identifier.Runes), parameters, ttype, syntax)
     if !b.scope.TryDeclareFunction(function) {
         b.ReportSymbolAlreadyDeclared(syntax.Identifier.GetSpan(), function.Name)
     }

@@ -16,29 +16,32 @@ import (
 type Evaluator struct {
         Root *Binding.BoundBlockStatement
 
-        variables map[*Symbols.VariableSymbol]interface{}
+        globals Symbols.MapVariableSymbol
+        locals *Symbols.StackMapVariableSymbol
+
         lastValue interface{}
         random *Util.Random
 }
 
-func NewEvaluator(root *Binding.BoundBlockStatement, variables map[*Symbols.VariableSymbol]interface{}) *Evaluator {
+func NewEvaluator(root *Binding.BoundBlockStatement, globals Symbols.MapVariableSymbol) *Evaluator {
     return &Evaluator{
         Root: root,
-        variables: variables,
+        globals: globals,
+        locals: Symbols.NewStackMapVariableSymbol(),
     }
 }
 
-func (e *Evaluator) Evaluate() interface{} {
+func (e *Evaluator) evaluateStatement(body *Binding.BoundBlockStatement) interface{} {
     labelToIndex := make(map[*Binding.BoundLabel]int)
 
-    for i := range e.Root.Statements {
-        if l, ok := e.Root.Statements[i].(*Binding.BoundLabelStatement); ok {
+    for i := range body.Statements {
+        if l, ok := body.Statements[i].(*Binding.BoundLabelStatement); ok {
             labelToIndex[l.Label] = i + 1
         }
     }
 
-    for index := 0; index < len(e.Root.Statements); {
-        s := e.Root.Statements[index]
+    for index := 0; index < len(body.Statements); {
+        s := body.Statements[index]
         switch s.Kind() {
             case BoundNodeKind.VariableDeclaration:
                 e.evaluateVariableDeclaration(s.(*Binding.BoundVariableDeclaration))
@@ -70,6 +73,10 @@ func (e *Evaluator) Evaluate() interface{} {
     }
 
     return e.lastValue
+}
+
+func (e *Evaluator) Evaluate() interface{} {
+    return e.evaluateStatement(e.Root)
 }
 
 func (e *Evaluator) evaluateExpression(root Binding.BoundExpression) interface{} {
@@ -127,7 +134,17 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
 
         return e.random.Next(max)
     } else {
-        panic(fmt.Sprintf("Unexpected function %s", node.Function))
+        locals := Symbols.NewMapVariableSymbol()
+
+        args := make([]interface{}, len(node.Arguments))
+        for i, _ := range node.Arguments {
+            parameter := node.Function.Parameters[i]
+            value = e.evaluateExpression(node.Arguments)
+            locals.Add(parameter, value)
+        }
+
+        e.locals.Push(locals)
+        return e.Evaluate(node.Function)
     }
 }
 
@@ -136,12 +153,22 @@ func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression)
 }
 
 func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpression) interface{} {
-    return e.variables[v.Variable]
+    if e.locals.Count() > 0 {
+        locals := e.locals.Peek()
+
+        var value interface{}
+        if locals.TryGetValue(v.Variable, &value) {
+            return value
+        }
+    }
+
+    return e.globals[v.Variable]
 }
 
 func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpression) interface{} {
+    //TODO: We need to store locals in our stack frame, not in the global dictionary
     value := e.evaluateExpression(a.Expression)
-    e.variables[a.Variable] = value
+    e.globals[a.Variable] = value
     return value
 }
 
@@ -302,6 +329,6 @@ func (e *Evaluator) evaluateExpressionStatement(node *Binding.BoundExpressionSta
 
 func (e *Evaluator) evaluateVariableDeclaration(node *Binding.BoundVariableDeclaration) {
     value := e.evaluateExpression(node.Initializer)
-    e.variables[node.Variable] = value
+    e.globals[node.Variable] = value
     e.lastValue = value
 }
