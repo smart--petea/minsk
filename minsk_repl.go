@@ -4,7 +4,6 @@ import (
     "fmt"
     "os"
     "strings"
-//    "log"
 
     CA "minsk/CodeAnalysis"
     "minsk/CodeAnalysis/Syntax"
@@ -165,7 +164,7 @@ func (m *MinskRepl) IsCompleteSubmission(text string) bool {
     }
 
     syntaxTree := Syntax.SyntaxTreeParse(text)
-    if Syntax.SyntaxNodeGetLastToken(syntaxTree.Root.Statement).IsMissing() {
+    if Syntax.SyntaxNodeGetLastToken(syntaxTree.Root.Members.Last()).IsMissing() {
         return false
     }
 

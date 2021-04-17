@@ -34,3 +34,12 @@ func (n MemberSyntaxSlice) ToEmptyInterfaceSlice() []interface{} {
 
     return c
 }
+
+func (n MemberSyntaxSlice) Last() MemberSyntax {
+    if n == nil {
+        var p MemberSyntax
+        return p
+    }
+
+    return n[len(n) - 1]
+}

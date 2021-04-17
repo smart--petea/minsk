@@ -5,7 +5,6 @@ import (
     "os"
     "fmt"
     "strings"
-    "log"
 
     "minsk/Util/Console"
     "minsk/CodeAnalysis/Text"
@@ -117,7 +116,6 @@ func ToString(node CoreSyntaxNode) string {
 
 func SyntaxNodeGetLastToken(node SyntaxNode) *SyntaxToken {
     if syntaxToken, ok := node.(*SyntaxToken); ok {
-        log.Printf("SyntaxNodeGetLastToken return=%v", syntaxToken)
         return syntaxToken
     }
 

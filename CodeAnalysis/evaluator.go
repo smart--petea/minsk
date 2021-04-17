@@ -11,8 +11,6 @@ import (
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     "minsk/Util"
     "minsk/Util/Convert"
-
-    "log"
 )
 
 type Evaluator struct {
@@ -134,7 +132,6 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
 }
 
 func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression) interface{} {
-    log.Printf("evaluateLiteralExpression %+v", l)
     return l.Value
 }
 
@@ -150,7 +147,6 @@ func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpre
 
 func (e *Evaluator) evaluateUnaryExpression(u *Binding.BoundUnaryExpression) interface{} {
     operand := e.evaluateExpression(u.Operand)
-    log.Printf("evaluateUnaryExpression %+v operand=%+v kind=%+v", operand, u.Operand, u.Op.Kind)
 
     switch u.Op.Kind {
     case BoundUnaryOperatorKind.Identity:

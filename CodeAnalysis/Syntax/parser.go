@@ -5,8 +5,6 @@ import (
     SyntaxFacts "minsk/CodeAnalysis/Syntax/SyntaxFacts"
     "minsk/CodeAnalysis/Text"
     "minsk/Util"
-
-//    "log"
 )
 
 type Parser struct {
@@ -77,7 +75,7 @@ func (p *Parser) ParseMembers() []MemberSyntax {
     for p.Current().Kind() != SyntaxKind.EndOfFileToken {
         startToken := p.Current()
 
-        member := p.ParseStatement().(MemberSyntax)
+        member := p.ParseMember()
         members = append(members, member)
 
         //If ParseStatement() did not consume any tokens,
@@ -189,10 +187,8 @@ func (p *Parser) ParsePrimaryExpression() ExpressionSyntax {
 }
 
 func (p *Parser) ParseStringLiteral() ExpressionSyntax {
-    //log.Printf("ParseStringLiteral")
     stringToken := p.MatchToken(SyntaxKind.StringToken)
     if stringToken == nil {
-        //log.Printf("ParseStringLiteral nil token")
         return nil
     }
 
