@@ -60,8 +60,13 @@ func (c *Compilation) Evaluate(variables map[*Symbols.VariableSymbol]interface{}
         return NewEvaluationResult(c.GlobalScope().GetDiagnostics(), nil)
     }
 
+    program := Binding.BoundGlobalScopeBindProgram(c.GlobalScope())
+    if len(program.GetDiagnostics()) {
+        return NewEvaluationResult(program.GetDiagnostics(), nil)
+    }
+
     statement := c.GetStatement()
-    evaluator := NewEvaluator(statement, variables)
+    evaluator := NewEvaluator(program.FunctionBodies, statement, variables)
     value := evaluator.Evaluate()
     return NewEvaluationResult([]*Util.Diagnostic{}, value)
 }

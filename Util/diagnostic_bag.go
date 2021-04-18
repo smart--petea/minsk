@@ -11,6 +11,10 @@ type DiagnosticBag struct {
     diagnostics []*Diagnostic
 }
 
+func NewDiagnosticBag() *DiagnosticBag {
+    return &DiagnosticBag{}
+}
+
 func (db *DiagnosticBag) report(span *Text.TextSpan, message string) {
     diagnostic := NewDiagnostic(span, message)
 
@@ -36,8 +40,8 @@ func (db *DiagnosticBag) GetDiagnostics() []*Diagnostic {
     return cp 
 }
 
-func (db *DiagnosticBag) AddDiagnosticsRange(diagnostics []*Diagnostic) {
-    db.diagnostics = append(db.diagnostics, diagnostics...)
+func (db *DiagnosticBag) AddRange(diagnosticBag *DiagnosticBag) {
+    db.diagnostics = append(db.diagnostics, diagnosticBag.GetDiagnostics()...)
 }
 
 func (db *DiagnosticBag) ReportUnexpectedToken(span *Text.TextSpan, actualKind SyntaxKind.SyntaxKind, expectedKind SyntaxKind.SyntaxKind) {

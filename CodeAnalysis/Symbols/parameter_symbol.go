@@ -5,14 +5,14 @@ import (
 )
 
 type ParameterSymbol struct {
-    *VariableSymbol
+    *LocalVariableSymbol
 }
 
 func NewParameterSymbol(name string, ttype *TypeSymbol) *ParameterSymbol {
     var parameterSymbol ParameterSymbol
 
     isReadOnly := true
-    parameterSymbol.VariableSymbol = NewVariableSymbol(name, isReadOnly, ttype)
+    parameterSymbol.LocalVariableSymbol = NewLocalVariableSymbol(name, isReadOnly, ttype)
 
     return &parameterSymbol
 }

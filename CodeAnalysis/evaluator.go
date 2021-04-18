@@ -21,13 +21,15 @@ type Evaluator struct {
 
         lastValue interface{}
         random *Util.Random
+        functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement
 }
 
-func NewEvaluator(root *Binding.BoundBlockStatement, globals Symbols.MapVariableSymbol) *Evaluator {
+func NewEvaluator(functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement, root *Binding.BoundBlockStatement, globals Symbols.MapVariableSymbol) *Evaluator {
     return &Evaluator{
         Root: root,
         globals: globals,
         locals: Symbols.NewStackMapVariableSymbol(),
+        functionBodies: functionBodies,
     }
 }
 
@@ -144,7 +146,9 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
         }
 
         e.locals.Push(locals)
-        return e.Evaluate(node.Function)
+        statement := e.functionBodies[node.Function]
+
+        return e.EvaluateStatement(statement)
     }
 }
 

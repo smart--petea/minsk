@@ -92,15 +92,3 @@ func CreateRootScope() *BoundScope {
 
     return result
 }
-
-func BoundGlobalScopeBindProgram(globalScope *BoundGlobalScope) *BindProgram {
-    parentScope := CreateParentScopes(globalScope)
-    functionBodies := make(map[*Symbols.FunctionSymbol]*BoundBlockStatement)
-
-    for _, function := range globalScope.Functions {
-        binder := NewBinder(parentScope, function)
-        body := binder.BindStatement(function.Declaration.Body)
-        loweredBody := Lowering.LowererLower(body)
-        functionBodies[function] = loweredBody
-    }
-}
