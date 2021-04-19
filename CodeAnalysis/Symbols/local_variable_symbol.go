@@ -9,12 +9,12 @@ type LocalVariableSymbol struct {
 }
 
 func NewLocalVariableSymbol(name string, isReadOnly bool, kind *TypeSymbol) *LocalVariableSymbol {
-    var v VariableSymbol
-    v.VariableSymbol = NewVariableSymbol(name, isReadOnly, kind)
+    var l LocalVariableSymbol
+    l.VariableSymbol = NewVariableSymbol(name, isReadOnly, kind)
 
-    return &v
+    return &l
 }
 
-func (v *LocalVariableSymbol) Kind() SymbolKind.SymbolKind {
+func (l *LocalVariableSymbol) Kind() SymbolKind.SymbolKind {
     return SymbolKind.LocalVariable
 }

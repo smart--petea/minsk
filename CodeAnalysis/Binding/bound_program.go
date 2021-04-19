@@ -1,22 +1,21 @@
 package Binding
 
 import (
-    "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Symbols"
     "minsk/Util"
 )
 
 type BoundProgram struct {
     GlobalScope *BoundGlobalScope
-    Diagnostics *DiagnosticBag
+    Diagnostics *Util.DiagnosticBag
     FunctionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement
 }
 
-func NewBoundProgram(globalScope *BoundGlobalScope, diagnostics *DiagnosticBag, functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement) *BoundProgram {
+func NewBoundProgram(globalScope *BoundGlobalScope, diagnostics *Util.DiagnosticBag, functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement) *BoundProgram {
     return &BoundProgram{
-        ChildrenProvider: Util.NewChildrenProvider(),
+        //ChildrenProvider: Util.NewChildrenProvider(),
 
-        GlobalScope: globalScope
+        GlobalScope: globalScope,
         Diagnostics: diagnostics,
         FunctionBodies: functionBodies,
     }

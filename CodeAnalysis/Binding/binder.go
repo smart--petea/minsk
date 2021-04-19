@@ -11,11 +11,10 @@ import (
     "minsk/Util"
 
     "fmt"
-//    "log"
 )
 
 type Binder struct {
-    Util.DiagnosticBag 
+    *Util.DiagnosticBag 
 
     scope *BoundScope
     function *Symbols.FunctionSymbol
@@ -386,8 +385,14 @@ func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, t
     if name == "" {
         name = "?"
     }
-    variable := Symbols.NewVariableSymbol(name, isReadOnly, ttype)
     declare := !identifier.IsMissing()
+
+    var variable *Symbols.VariableSymbol
+    if b.function == nil {
+        variable = Symbols.NewGlobalVariableSymbol(name, isReadOnly, ttype)
+    } else {
+        variable = Symbols.NewLocalVariableSymbol(name, isReadOnly, ttype)
+    }
 
     if declare && b.scope.TryDeclareVariable(variable) == false {
         b.ReportSymbolAlreadyDeclared(identifier.GetSpan(), name)
@@ -428,20 +433,26 @@ func (b *Binder) BindFunctionDeclaration(syntax *Syntax.FunctionDeclarationSynta
     }
 }
 
-func BinderBindProgram(globalScope *BoundGlobalScope) *BoundProgram {
+type ILowererLower interface {
+    LowererLower(BoundStatement) *BoundBlockStatement
+}
+
+func BinderBindProgram(globalScope *BoundGlobalScope, lowerer ILowererLower) *BoundProgram {
     parentScope := CreateParentScopes(globalScope)
     functionBodies := make(map[*Symbols.FunctionSymbol]*BoundBlockStatement)
     diagnostics := Util.NewDiagnosticBag()
 
     for _, function := range globalScope.Functions {
         binder := NewBinder(parentScope, function)
-        body := binder.BindStatement(function.Declaration.Body)
-        loweredBody := Lowering.LowererLower(body)
+
+        functionDeclaration := function.Declaration.(*Syntax.FunctionDeclarationSyntax)
+        body := binder.BindStatement(functionDeclaration.Body)
+        loweredBody := lowerer.LowererLower(body)
         functionBodies[function] = loweredBody
 
         diagnostics.AddRange(binder.DiagnosticBag)
     }
 
-    boundProgram := NewBoundProgram(global, diagnostics, functionBodies)
+    boundProgram := NewBoundProgram(globalScope, diagnostics, functionBodies)
     return boundProgram
 }

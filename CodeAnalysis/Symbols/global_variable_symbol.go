@@ -9,12 +9,12 @@ type GlobalVariableSymbol struct {
 }
 
 func NewGlobalVariableSymbol(name string, isReadOnly bool, kind *TypeSymbol) *GlobalVariableSymbol {
-    var v VariableSymbol
-    v.VariableSymbol = NewVariableSymbol(name, isReadOnly, kind)
+    var g GlobalVariableSymbol
+    g.VariableSymbol = NewVariableSymbol(name, isReadOnly, kind)
 
-    return &v
+    return &g
 }
 
-func (v *GlobalVariableSymbol) Kind() SymbolKind.SymbolKind {
+func (g *GlobalVariableSymbol) Kind() SymbolKind.SymbolKind {
     return SymbolKind.GlobalVariable
 }

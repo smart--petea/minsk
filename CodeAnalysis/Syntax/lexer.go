@@ -13,7 +13,7 @@ import (
 )
 
 type Lexer struct {
-    Util.DiagnosticBag 
+    *Util.DiagnosticBag 
 
     Position int
     start int

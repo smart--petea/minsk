@@ -8,7 +8,7 @@ import (
 )
 
 type Parser struct {
-    Util.DiagnosticBag 
+    *Util.DiagnosticBag 
 
     Tokens []SyntaxToken
     Position int
@@ -57,7 +57,7 @@ func NewParser(text *Text.SourceText) *Parser {
         Tokens: tokens,
     }
 
-    parser.AddDiagnosticsRange(lexer.GetDiagnostics())
+    parser.DiagnosticBag.AddRange(lexer.DiagnosticBag)
     return parser
 }
 

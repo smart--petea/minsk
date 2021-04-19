@@ -4,7 +4,7 @@ import (
     "testing"
     "minsk/CodeAnalysis/Syntax"
     CA "minsk/CodeAnalysis"
-    "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Syntax/Symbols"
     "fmt"
 )
 

@@ -4,13 +4,13 @@ import (
     "minsk/Util"
     "minsk/CodeAnalysis/Syntax"
     "minsk/CodeAnalysis/Symbols"
-    "minsk/CodeAnalysis/Lowering"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
 )
 
 type BoundGlobalScope struct {
-    Util.DiagnosticBag
+    *Util.DiagnosticBag
+
     Previous *BoundGlobalScope
     Functions []*Symbols.FunctionSymbol
     Variables []*Symbols.VariableSymbol
@@ -48,9 +48,9 @@ func BoundGlobalScopeBindGlobalScope(previous *BoundGlobalScope, syntax *Syntax.
     variables := binder.scope.GetDeclaredVariables()
 
     boundGlobalScope := NewBoundGlobalScope(previous, functions, variables, statement)
-    boundGlobalScope.AddDiagnosticsRange(binder.GetDiagnostics())
+    boundGlobalScope.DiagnosticBag.AddRange(binder.DiagnosticBag)
     if previous != nil {
-        boundGlobalScope.AddDiagnosticsRange(previous.GetDiagnostics())
+        boundGlobalScope.DiagnosticBag.AddRange(previous.DiagnosticBag)
     }
 
     return boundGlobalScope
@@ -92,3 +92,4 @@ func CreateRootScope() *BoundScope {
 
     return result
 }
+

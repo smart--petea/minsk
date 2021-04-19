@@ -2,7 +2,6 @@ package Symbols
 
 import (
     "minsk/CodeAnalysis/Symbols/SymbolKind"
-    "minsk/CodeAnalysis/Syntax"
 )
 
 type FunctionSymbol struct {
@@ -11,11 +10,11 @@ type FunctionSymbol struct {
     Parameter []*ParameterSymbol
     Name string
     Type *TypeSymbol
-    Declaration *Syntax.FunctionDeclarationSyntax
+    Declaration interface{} //*Syntax.FunctionDeclarationSyntax it could solved through interfaces
 }
 
 //declaration is optional. Should be provided as nil if not required
-func NewFunctionSymbol(name string, parameter []*ParameterSymbol, ttype *TypeSymbol, declaration *Syntax.FunctionDeclarationSyntax) *FunctionSymbol {
+func NewFunctionSymbol(name string, parameter []*ParameterSymbol, ttype *TypeSymbol, declaration interface{}) *FunctionSymbol {
     var functionSymbol FunctionSymbol
 
     functionSymbol.Symbol = NewSymbol(name)

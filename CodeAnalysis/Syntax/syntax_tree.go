@@ -21,7 +21,7 @@ func newSyntaxTree(sourceText *Text.SourceText) *SyntaxTree {
         Root: root,
         Text: sourceText,
     }
-    syntaxTree.AddDiagnosticsRange(parser.GetDiagnostics())
+    syntaxTree.DiagnosticBag.AddRange(parser.DiagnosticBag)
 
     return syntaxTree
 }

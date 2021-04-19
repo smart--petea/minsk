@@ -157,22 +157,24 @@ func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression)
 }
 
 func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpression) interface{} {
-    if e.locals.Count() > 0 {
+    if v.Variable.Kind != SymbolKind.GlobalVariable {
         locals := e.locals.Peek()
-
-        var value interface{}
-        if locals.TryGetValue(v.Variable, &value) {
-            return value
-        }
+        return locals[v.Variable]
+    } else {
+        return e.globals[v.Variable]
     }
-
-    return e.globals[v.Variable]
 }
 
 func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpression) interface{} {
-    //TODO: We need to store locals in our stack frame, not in the global dictionary
     value := e.evaluateExpression(a.Expression)
-    e.globals[a.Variable] = value
+
+    if a.Variable.Kind == SymbolKind.GlobalVariable {
+        e.globals[a.Variable] = value
+    } else {
+        locals := e.locals.Peek()
+        locals[a.Variable] = value
+    }
+
     return value
 }
 
