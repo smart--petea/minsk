@@ -7,19 +7,27 @@ import (
 type VariableSymbol struct {
     *Symbol
 
-    Type *TypeSymbol
-    IsReadOnly bool
+    ttype *TypeSymbol
+    isReadOnly bool
 }
 
-func NewVariableSymbol(name string, isReadOnly bool, kind *TypeSymbol) *VariableSymbol {
+func NewVariableSymbol(name string, isReadOnly bool, ttype *TypeSymbol) *VariableSymbol {
     var v VariableSymbol
     v.Symbol = NewSymbol(name)
-    v.Type = kind
-    v.IsReadOnly = isReadOnly
+    v.ttype = ttype
+    v.isReadOnly = isReadOnly
 
     return &v
 }
 
 func (v *VariableSymbol) Kind() SymbolKind.SymbolKind {
     return SymbolKind.Variable
+}
+
+func (v *VariableSymbol) GetType() *TypeSymbol {
+    return v.ttype
+}
+
+func (v *VariableSymbol) IsReadOnly() bool {
+    return v.isReadOnly
 }

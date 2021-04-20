@@ -9,11 +9,11 @@ import (
 type BoundAssignmentExpression struct {
     *Util.ChildrenProvider
 
-    Variable *Symbols.VariableSymbol
+    Variable Symbols.IVariableSymbol
     Expression BoundExpression
 }
 
-func NewBoundAssignmentExpression(variable *Symbols.VariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
+func NewBoundAssignmentExpression(variable Symbols.IVariableSymbol, expression BoundExpression) *BoundAssignmentExpression {
     return &BoundAssignmentExpression{
         ChildrenProvider: Util.NewChildrenProvider(expression),
 
@@ -38,7 +38,7 @@ func (b *BoundAssignmentExpression) GetProperties() []*BoundNodeProperty {
         },
         {
             Name: "variable",
-            Value: b.Variable.Name,
+            Value: b.Variable.GetName(),
         },
     }
 }

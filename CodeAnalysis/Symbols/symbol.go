@@ -5,16 +5,20 @@ import (
 )
 
 type Symbol struct {
-    Name  string
+    name  string
     Kind func() SymbolKind.SymbolKind
 }
 
 func NewSymbol(name string) *Symbol {
     return &Symbol{
-        Name: name,
+        name: name,
     }
 }
 
 func (s *Symbol) String() string {
-    return s.Name
+    return s.name
+}
+
+func (s *Symbol) GetName() string {
+    return s.name
 }

@@ -33,7 +33,7 @@ func (m *MinskRepl) EvaluateMetaCommand(input string) {
         Console.Clear()
     case "#reset":
         m.previous = nil
-        m.variables = make(map[*Symbols.VariableSymbol]interface{})
+        m.variables = Symbols.NewMapVariableSymbol()
     default:
         m.Repl.EvaluateMetaCommand(input)
     }
@@ -46,7 +46,7 @@ type MinskRepl struct {
     previous *CA.Compilation
     showTree bool
     showProgram bool
-    variables map[*Symbols.VariableSymbol]interface{}
+    variables Symbols.MapVariableSymbol
 }
 
 func (m *MinskRepl) RenderLine(line string) {
@@ -173,7 +173,7 @@ func (m *MinskRepl) IsCompleteSubmission(text string) bool {
 
 func NewMinskRepl() *MinskRepl {
     m := MinskRepl{
-        variables: make(map[*Symbols.VariableSymbol]interface{}),
+        variables: Symbols.NewMapVariableSymbol(),
     }
     m.Repl.IsCompleteSubmission = m.IsCompleteSubmission
     m.Repl.EvaluateSubmission = m.EvaluateSubmission

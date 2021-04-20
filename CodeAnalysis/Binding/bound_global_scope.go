@@ -13,12 +13,14 @@ type BoundGlobalScope struct {
 
     Previous *BoundGlobalScope
     Functions []*Symbols.FunctionSymbol
-    Variables []*Symbols.VariableSymbol
+    Variables []Symbols.IVariableSymbol
     Statement BoundStatement
 }
 
-func NewBoundGlobalScope(previous *BoundGlobalScope, functions []*Symbols.FunctionSymbol, variables []*Symbols.VariableSymbol, statement BoundStatement) *BoundGlobalScope {
+func NewBoundGlobalScope(previous *BoundGlobalScope, functions []*Symbols.FunctionSymbol, variables []Symbols.IVariableSymbol, statement BoundStatement) *BoundGlobalScope {
     return &BoundGlobalScope{
+        DiagnosticBag: Util.NewDiagnosticBag(),
+
         Previous: previous,
         Functions: functions,
         Variables: variables,

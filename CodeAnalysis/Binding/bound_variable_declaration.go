@@ -9,11 +9,11 @@ import (
 type BoundVariableDeclaration struct {
     *Util.ChildrenProvider
 
-    Variable *Symbols.VariableSymbol
+    Variable Symbols.IVariableSymbol
     Initializer BoundExpression
 }
 
-func NewBoundVariableDeclaration(variable *Symbols.VariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
+func NewBoundVariableDeclaration(variable Symbols.IVariableSymbol, initializer BoundExpression) *BoundVariableDeclaration {
     return &BoundVariableDeclaration{
         ChildrenProvider: Util.NewChildrenProvider(initializer),
 
@@ -30,7 +30,7 @@ func (b *BoundVariableDeclaration) GetProperties() []*BoundNodeProperty {
     return []*BoundNodeProperty{
         {
             Name: "variable",
-            Value: b.Variable.Name,
+            Value: b.Variable.GetName(),
         },
     }
 }

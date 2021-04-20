@@ -53,6 +53,8 @@ func NewParser(text *Text.SourceText) *Parser {
     }
 
     parser := &Parser{
+        DiagnosticBag: Util.NewDiagnosticBag(),
+
         Text: text,
         Tokens: tokens,
     }

@@ -9,10 +9,10 @@ import (
 type BoundVariableExpression struct {
     *Util.ChildrenProvider
 
-    Variable *Symbols.VariableSymbol
+    Variable Symbols.IVariableSymbol
 }
 
-func NewBoundVariableExpression(variable *Symbols.VariableSymbol) *BoundVariableExpression {
+func NewBoundVariableExpression(variable Symbols.IVariableSymbol) *BoundVariableExpression {
     return &BoundVariableExpression{
         ChildrenProvider: Util.NewChildrenProvider(),
 
@@ -21,7 +21,7 @@ func NewBoundVariableExpression(variable *Symbols.VariableSymbol) *BoundVariable
 }
 
 func (b *BoundVariableExpression) GetType() *Symbols.TypeSymbol {
-    return b.Variable.Type
+    return b.Variable.GetType()
 }
 
 func (b *BoundVariableExpression) Kind() BoundNodeKind.BoundNodeKind {
@@ -36,7 +36,7 @@ func (b *BoundVariableExpression) GetProperties() []*BoundNodeProperty {
         },
         {
             Name: "variable",
-            Value: b.Variable.Name,
+            Value: b.Variable.GetName(),
         },
     }
 }

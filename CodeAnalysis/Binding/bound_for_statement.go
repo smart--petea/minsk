@@ -9,13 +9,13 @@ import (
 type BoundForStatement struct {
     *Util.ChildrenProvider
 
-    Variable *Symbols.VariableSymbol
+    Variable Symbols.IVariableSymbol
     LowerBound BoundExpression
     UpperBound BoundExpression
     Body BoundStatement
 }
 
-func NewBoundForStatement(variable *Symbols.VariableSymbol, lowerBound BoundExpression, upperBound BoundExpression, body BoundStatement) *BoundForStatement {
+func NewBoundForStatement(variable Symbols.IVariableSymbol, lowerBound BoundExpression, upperBound BoundExpression, body BoundStatement) *BoundForStatement {
     return &BoundForStatement{
         ChildrenProvider: Util.NewChildrenProvider(lowerBound, upperBound, body),
 

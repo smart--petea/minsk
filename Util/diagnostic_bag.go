@@ -115,7 +115,6 @@ func (db *DiagnosticBag) ReportExpressionMustHaveValue(span *Text.TextSpan) {
     db.report(span, message)
 }
 
-
 func (db *DiagnosticBag) ReportUndefinedType(span *Text.TextSpan, name string) {
     message := fmt.Sprintf("Type '%s' doesn't exists.", name) 
 

@@ -24,6 +24,8 @@ type Lexer struct {
 
 func NewLexer(text *Text.SourceText) *Lexer {
     return &Lexer{
+        DiagnosticBag: Util.NewDiagnosticBag(),
+
         text: text,
     }
 }

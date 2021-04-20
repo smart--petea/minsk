@@ -39,7 +39,7 @@ func (c *Compilation) GlobalScope() *Binding.BoundGlobalScope {
                 previousGlobalScope = c.Previous.GlobalScope()
             }
 
-            c.globalScope = Binding.BoundGlobalScopeBoundGlobalScope(previousGlobalScope, c.SyntaxTree.Root)
+            c.globalScope = Binding.BoundGlobalScopeBindGlobalScope(previousGlobalScope, c.SyntaxTree.Root)
         })
     }
 
@@ -51,7 +51,7 @@ func (c *Compilation) ContinueWith(syntaxTree *Syntax.SyntaxTree) *Compilation {
     return newCompilation(previous, syntaxTree)
 }
 
-func (c *Compilation) Evaluate(variables map[*Symbols.VariableSymbol]interface{}) *EvaluationResult {
+func (c *Compilation) Evaluate(variables Symbols.MapVariableSymbol) *EvaluationResult {
     if len(c.SyntaxTree.GetDiagnostics()) > 0 {
         return NewEvaluationResult(c.SyntaxTree.GetDiagnostics(), nil)
     }
@@ -60,8 +60,8 @@ func (c *Compilation) Evaluate(variables map[*Symbols.VariableSymbol]interface{}
         return NewEvaluationResult(c.GlobalScope().GetDiagnostics(), nil)
     }
 
-    program := Binding.BoundGlobalScopeBindProgram(c.GlobalScope())
-    if len(program.GetDiagnostics()) {
+    program := Binding.BinderBindProgram(c.GlobalScope(), Lowering.LowererLower )
+    if len(program.GetDiagnostics()) > 0 {
         return NewEvaluationResult(program.GetDiagnostics(), nil)
     }
 

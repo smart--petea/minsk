@@ -5,7 +5,7 @@ import (
 )
 
 type BoundScope struct {
-    variables map[*Symbols.VariableSymbol]interface{}
+    variables map[Symbols.IVariableSymbol]interface{}
     functions map[*Symbols.FunctionSymbol]interface{}
 
     Parent *BoundScope
@@ -17,11 +17,11 @@ func NewBoundScope(parent *BoundScope) *BoundScope {
     }
 }
 
-func (bs *BoundScope) TryLookupVariable(name string, out **Symbols.VariableSymbol) bool {
-    var variable *Symbols.VariableSymbol
+func (bs *BoundScope) TryLookupVariable(name string, out *Symbols.IVariableSymbol) bool {
+    var variable Symbols.IVariableSymbol
 
     for variable, _ = range bs.variables {
-        if variable.Name == name {
+        if variable.GetName() == name {
             *out = variable
             return true
         }
@@ -34,14 +34,14 @@ func (bs *BoundScope) TryLookupVariable(name string, out **Symbols.VariableSymbo
     return bs.Parent.TryLookupVariable(name, out)
 }
 
-func (bs *BoundScope) TryDeclareVariable(variable *Symbols.VariableSymbol) bool {
+func (bs *BoundScope) TryDeclareVariable(variable Symbols.IVariableSymbol) bool {
     if bs.variables == nil {
-        bs.variables = make(map[*Symbols.VariableSymbol]interface{})
+        bs.variables = make(map[Symbols.IVariableSymbol]interface{})
     }
 
-    var tmp *Symbols.VariableSymbol
+    var tmp Symbols.IVariableSymbol
     for tmp, _ = range bs.variables {
-        if variable.Name == tmp.Name {
+        if variable.GetName() == tmp.GetName() {
             return false
         }
     }
@@ -85,8 +85,8 @@ func (bs *BoundScope) TryDeclareFunction(function *Symbols.FunctionSymbol) bool 
     return true
 }
 
-func (bs *BoundScope) GetDeclaredVariables() []*Symbols.VariableSymbol {
-    var d []*Symbols.VariableSymbol
+func (bs *BoundScope) GetDeclaredVariables() []Symbols.IVariableSymbol {
+    var d []Symbols.IVariableSymbol
     for variable, _ := range bs.variables {
         d = append(d, variable)
     }

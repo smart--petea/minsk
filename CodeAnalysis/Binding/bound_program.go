@@ -6,17 +6,21 @@ import (
 )
 
 type BoundProgram struct {
+    *Util.DiagnosticBag
+
     GlobalScope *BoundGlobalScope
-    Diagnostics *Util.DiagnosticBag
     FunctionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement
 }
 
 func NewBoundProgram(globalScope *BoundGlobalScope, diagnostics *Util.DiagnosticBag, functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement) *BoundProgram {
+    if diagnostics == nil {
+        diagnostics = Util.NewDiagnosticBag()
+    }
+
     return &BoundProgram{
-        //ChildrenProvider: Util.NewChildrenProvider(),
+        DiagnosticBag: diagnostics,
 
         GlobalScope: globalScope,
-        Diagnostics: diagnostics,
         FunctionBodies: functionBodies,
     }
 }

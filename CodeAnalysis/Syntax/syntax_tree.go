@@ -7,7 +7,7 @@ import (
 )
 
 type SyntaxTree struct {
-    Util.DiagnosticBag
+    *Util.DiagnosticBag
 
     Root *CompilationUnitSyntax
     Text *Text.SourceText
@@ -18,6 +18,8 @@ func newSyntaxTree(sourceText *Text.SourceText) *SyntaxTree {
     root := parser.ParseCompilationUnit()
 
     syntaxTree := &SyntaxTree {
+        DiagnosticBag: Util.NewDiagnosticBag(),
+
         Root: root,
         Text: sourceText,
     }
@@ -50,5 +52,5 @@ func ParseTokensWithDiagnostics(text string) (tokens []*SyntaxToken, diagnostics
         tokens = append(tokens, token)
     }
 
-    return tokens,  lexer.GetDiagnostics()
+    return tokens, lexer.GetDiagnostics()
 }

@@ -21,10 +21,18 @@ type Binder struct {
 }
 
 func NewBinder(parent *BoundScope, function *Symbols.FunctionSymbol) *Binder {
-    return &Binder{
+    b := &Binder{
+        DiagnosticBag: Util.NewDiagnosticBag(),
+
         scope: NewBoundScope(parent),
         function: function,
     }
+
+    for _, parameter := range function.Parameter {
+        b.scope.TryDeclareVariable(parameter)
+    }
+
+    return b
 }
 
 func (b *Binder) BindStatement(syntax Syntax.StatementSyntax) BoundStatement {
@@ -100,19 +108,19 @@ func (b *Binder) BindAssignmentExpression(assignmentExpressionSyntax Syntax.Expr
     name := string(syntax.IdentifierToken.Runes)
     boundExpression := b.BindExpression(syntax.Expression, false)
 
-    var variable *Symbols.VariableSymbol
+    var variable Symbols.IVariableSymbol
     if b.scope.TryLookupVariable(name, &variable) == false {
         span := syntax.IdentifierToken.GetSpan()
         b.ReportUndefinedName(span, name)
         return boundExpression
     }
 
-    if variable.IsReadOnly {
+    if variable.IsReadOnly() {
         span := syntax.EqualsToken.GetSpan()
         b.ReportCannotAssign(span, name)
     }
 
-    convertedExpression := b.BindConversionInner(syntax.Expression.GetSpan(), boundExpression, variable.Type, false)
+    convertedExpression := b.BindConversionInner(syntax.Expression.GetSpan(), boundExpression, variable.GetType(), false)
     return NewBoundAssignmentExpression(variable, convertedExpression)
 }
 
@@ -125,7 +133,7 @@ func (b *Binder) BindNameExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
     }
 
     name := string(syntax.IdentifierToken.Runes)
-    var variable *Symbols.VariableSymbol
+    var variable Symbols.IVariableSymbol
     if b.scope.TryLookupVariable(name, &variable) {
         return NewBoundVariableExpression(variable)
     }
@@ -256,8 +264,8 @@ func (b *Binder) BindCallExpression(expressionSyntax Syntax.ExpressionSyntax) Bo
         argument := boundArguments[i]
         parameter := function.Parameter[i]
 
-        if argument.GetType() != parameter.Type {
-            b.ReportWrongArgumentType(syntax.Identifier.GetSpan(), parameter.Name, parameter.Type, argument.GetType())
+        if argument.GetType() != parameter.GetType() {
+            b.ReportWrongArgumentType(syntax.Arguments.Get(i).GetSpan(), parameter.GetName(), parameter.GetType(), argument.GetType())
             return NewBoundErrorExpression()
         }
     }
@@ -380,14 +388,14 @@ func (b *Binder) BindTypeClause(syntax *Syntax.TypeClauseSyntax) *Symbols.TypeSy
     return ttype
 }
 
-func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, ttype *Symbols.TypeSymbol) *Symbols.VariableSymbol {
+func (b *Binder) BindVariable(identifier *Syntax.SyntaxToken, isReadOnly bool, ttype *Symbols.TypeSymbol) Symbols.IVariableSymbol {
     name := string(identifier.Runes)
     if name == "" {
         name = "?"
     }
     declare := !identifier.IsMissing()
 
-    var variable *Symbols.VariableSymbol
+    var variable Symbols.IVariableSymbol
     if b.function == nil {
         variable = Symbols.NewGlobalVariableSymbol(name, isReadOnly, ttype)
     } else {
@@ -433,11 +441,7 @@ func (b *Binder) BindFunctionDeclaration(syntax *Syntax.FunctionDeclarationSynta
     }
 }
 
-type ILowererLower interface {
-    LowererLower(BoundStatement) *BoundBlockStatement
-}
-
-func BinderBindProgram(globalScope *BoundGlobalScope, lowerer ILowererLower) *BoundProgram {
+func BinderBindProgram(globalScope *BoundGlobalScope, lowerer func(BoundStatement) *BoundBlockStatement) *BoundProgram {
     parentScope := CreateParentScopes(globalScope)
     functionBodies := make(map[*Symbols.FunctionSymbol]*BoundBlockStatement)
     diagnostics := Util.NewDiagnosticBag()
@@ -447,7 +451,7 @@ func BinderBindProgram(globalScope *BoundGlobalScope, lowerer ILowererLower) *Bo
 
         functionDeclaration := function.Declaration.(*Syntax.FunctionDeclarationSyntax)
         body := binder.BindStatement(functionDeclaration.Body)
-        loweredBody := lowerer.LowererLower(body)
+        loweredBody := lowerer(body)
         functionBodies[function] = loweredBody
 
         diagnostics.AddRange(binder.DiagnosticBag)

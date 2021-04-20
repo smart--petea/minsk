@@ -8,6 +8,7 @@ import (
     "minsk/CodeAnalysis/Binding/Kind/BoundBinaryOperatorKind"
     "minsk/CodeAnalysis/Binding/Kind/BoundNodeKind"
     "minsk/CodeAnalysis/Symbols"
+    "minsk/CodeAnalysis/Symbols/SymbolKind"
     "minsk/CodeAnalysis/Symbols/BuiltinFunctions"
     "minsk/Util"
     "minsk/Util/Convert"
@@ -21,10 +22,10 @@ type Evaluator struct {
 
         lastValue interface{}
         random *Util.Random
-        functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement
+        functionBodies map[*Symbols.FunctionSymbol]*Binding.BoundBlockStatement
 }
 
-func NewEvaluator(functionBodies map[*Symbols.FunctionSymbol]*BoundBlockStatement, root *Binding.BoundBlockStatement, globals Symbols.MapVariableSymbol) *Evaluator {
+func NewEvaluator(functionBodies map[*Symbols.FunctionSymbol]*Binding.BoundBlockStatement, root *Binding.BoundBlockStatement, globals Symbols.MapVariableSymbol) *Evaluator {
     return &Evaluator{
         Root: root,
         globals: globals,
@@ -138,17 +139,16 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
     } else {
         locals := Symbols.NewMapVariableSymbol()
 
-        args := make([]interface{}, len(node.Arguments))
         for i, _ := range node.Arguments {
-            parameter := node.Function.Parameters[i]
-            value = e.evaluateExpression(node.Arguments)
+            parameter := node.Function.Parameter[i]
+            value := e.evaluateExpression(node.Arguments[i])
             locals.Add(parameter, value)
         }
 
         e.locals.Push(locals)
         statement := e.functionBodies[node.Function]
 
-        return e.EvaluateStatement(statement)
+        return e.evaluateStatement(statement)
     }
 }
 
@@ -157,7 +157,7 @@ func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression)
 }
 
 func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpression) interface{} {
-    if v.Variable.Kind != SymbolKind.GlobalVariable {
+    if v.Variable.Kind() != SymbolKind.GlobalVariable {
         locals := e.locals.Peek()
         return locals[v.Variable]
     } else {
@@ -168,7 +168,7 @@ func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpressio
 func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpression) interface{} {
     value := e.evaluateExpression(a.Expression)
 
-    if a.Variable.Kind == SymbolKind.GlobalVariable {
+    if a.Variable.Kind() == SymbolKind.GlobalVariable {
         e.globals[a.Variable] = value
     } else {
         locals := e.locals.Peek()
