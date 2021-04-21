@@ -147,8 +147,9 @@ func (e *Evaluator) evaluateCallExpression(node *Binding.BoundCallExpression) in
 
         e.locals.Push(locals)
         statement := e.functionBodies[node.Function]
-
-        return e.evaluateStatement(statement)
+        result := e.evaluateStatement(statement)
+        e.locals.Pop()
+        return result
     }
 }
 
@@ -157,24 +158,17 @@ func (e *Evaluator) evaluateLiteralExpression(l *Binding.BoundLiteralExpression)
 }
 
 func (e *Evaluator) evaluateVariableExpression(v *Binding.BoundVariableExpression) interface{} {
-    if v.Variable.Kind() != SymbolKind.GlobalVariable {
+    if v.Variable.Kind() == SymbolKind.GlobalVariable {
+        return e.globals[v.Variable]
+    } else {
         locals := e.locals.Peek()
         return locals[v.Variable]
-    } else {
-        return e.globals[v.Variable]
     }
 }
 
 func (e *Evaluator) evaluateAssignmentExpression(a *Binding.BoundAssignmentExpression) interface{} {
     value := e.evaluateExpression(a.Expression)
-
-    if a.Variable.Kind() == SymbolKind.GlobalVariable {
-        e.globals[a.Variable] = value
-    } else {
-        locals := e.locals.Peek()
-        locals[a.Variable] = value
-    }
-
+    e.assign(a.Variable, value)
     return value
 }
 
@@ -335,6 +329,15 @@ func (e *Evaluator) evaluateExpressionStatement(node *Binding.BoundExpressionSta
 
 func (e *Evaluator) evaluateVariableDeclaration(node *Binding.BoundVariableDeclaration) {
     value := e.evaluateExpression(node.Initializer)
-    e.globals[node.Variable] = value
     e.lastValue = value
+    e.assign(node.Variable, value)
+}
+
+func (e *Evaluator) assign(variable Symbols.IVariableSymbol, value interface{}) {
+    if variable.Kind() == SymbolKind.GlobalVariable {
+        e.globals[variable] = value
+    } else {
+        locals := e.locals.Peek()
+        locals[variable] = value
+    }
 }

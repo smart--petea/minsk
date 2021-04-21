@@ -13,6 +13,10 @@ func (stack *Stack) Push(elem interface{}) {
 }
 
 func (stack *Stack) Pop() interface{} {
+    if len(stack.stack) == 0 {
+        return nil
+    }
+
     elem := stack.stack[len(stack.stack) - 1]
     stack.stack = stack.stack[:len(stack.stack) - 1]
 

@@ -28,8 +28,10 @@ func NewBinder(parent *BoundScope, function *Symbols.FunctionSymbol) *Binder {
         function: function,
     }
 
-    for _, parameter := range function.Parameter {
-        b.scope.TryDeclareVariable(parameter)
+    if function != nil {
+        for _, parameter := range function.Parameter {
+            b.scope.TryDeclareVariable(parameter)
+        }
     }
 
     return b
@@ -149,7 +151,6 @@ func (b *Binder) BindParenthesizedExpression(syntax Syntax.ExpressionSyntax) Bou
 }
 
 func (b *Binder) BindLiteralExpression(syntax Syntax.ExpressionSyntax) BoundExpression {
-    //log.Printf("BindLiteralExpression %+v", syntax)
     literalSyntax := syntax.(*Syntax.LiteralExpressionSyntax)
 
     var value interface{}
@@ -446,17 +447,21 @@ func BinderBindProgram(globalScope *BoundGlobalScope, lowerer func(BoundStatemen
     functionBodies := make(map[*Symbols.FunctionSymbol]*BoundBlockStatement)
     diagnostics := Util.NewDiagnosticBag()
 
-    for _, function := range globalScope.Functions {
-        binder := NewBinder(parentScope, function)
+    scope := globalScope
+    for scope != nil {
+        for _, function := range scope.Functions {
+            binder := NewBinder(parentScope, function)
 
-        functionDeclaration := function.Declaration.(*Syntax.FunctionDeclarationSyntax)
-        body := binder.BindStatement(functionDeclaration.Body)
-        loweredBody := lowerer(body)
-        functionBodies[function] = loweredBody
+            functionDeclaration := function.Declaration.(*Syntax.FunctionDeclarationSyntax)
+            body := binder.BindStatement(functionDeclaration.Body)
+            loweredBody := lowerer(body)
+            functionBodies[function] = loweredBody
 
-        diagnostics.AddRange(binder.DiagnosticBag)
+            diagnostics.AddRange(binder.DiagnosticBag)
+        }
+
+        scope = scope.Previous
     }
 
-    boundProgram := NewBoundProgram(globalScope, diagnostics, functionBodies)
-    return boundProgram
+    return NewBoundProgram(globalScope, diagnostics, functionBodies)
 }

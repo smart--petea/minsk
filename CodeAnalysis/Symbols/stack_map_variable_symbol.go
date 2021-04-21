@@ -21,3 +21,20 @@ func (s *StackMapVariableSymbol) Peek() MapVariableSymbol {
 
     return s.stack[0]
 }
+
+func (s *StackMapVariableSymbol) Pop() MapVariableSymbol {
+    l := len(s.stack)
+    if l == 0 {
+        return nil
+    }
+
+    el := s.stack[0]
+
+    if l == 1 {
+        s.stack = []MapVariableSymbol{}
+    } else {
+        s.stack = s.stack[1:]
+    }
+
+    return el
+}
