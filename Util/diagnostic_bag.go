@@ -8,7 +8,7 @@ import (
 )
 
 type DiagnosticBag struct {
-    diagnostics []*Diagnostic
+    diagnostics SliceDiagnostic
 }
 
 func NewDiagnosticBag() *DiagnosticBag {

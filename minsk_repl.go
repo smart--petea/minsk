@@ -11,6 +11,7 @@ import (
     SyntaxKind "minsk/CodeAnalysis/Syntax/Kind"
     "minsk/CodeAnalysis/Text"
     "minsk/Util/Console"
+    "minsk/Util"
 )
 
 func (m *MinskRepl) EvaluateMetaCommand(input string) {
@@ -111,7 +112,7 @@ func (m *MinskRepl) EvaluateSubmission(text string) {
 
         m.previous = compilation
     } else {
-        for _, diagnostic := range result.Diagnostics {
+       for _, diagnostic := range result.Diagnostics.OrderBy(func(d *Util.Diagnostic) *Text.TextSpan { return d.Span }, Text.NewTextSpanComparer()) {
             lineIndex := syntaxTree.Text.GetLineIndex(diagnostic.Span.Start)
             lineNumber := lineIndex + 1
             line := syntaxTree.Text.Lines[lineIndex]
