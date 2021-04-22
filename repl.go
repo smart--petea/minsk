@@ -248,9 +248,12 @@ func (r *Repl) HandleBackspace(document *Util.ObservableCollection, view *Submis
 func (r *Repl) HandleEscape(document *Util.ObservableCollection, view *SubmissionView) {
     view.SetCurrentCharacter(0)
 
+    document.Clear()
+    document.Add("")
+    view.SetCurrentLine(0)
+
     currentLineIndex := view.GetCurrentLine()
     line := document.Get(currentLineIndex)
-    document.Set(currentLineIndex, "")
     Console.Print(strings.Repeat(" ", len(line)))
 }
 

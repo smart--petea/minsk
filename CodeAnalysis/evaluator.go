@@ -318,6 +318,8 @@ func equals(left, right interface{}, ttype *Symbols.TypeSymbol) bool {
         return left.(bool) == right.(bool)
     case Symbols.TypeSymbolInt:
         return left.(int) == right.(int)
+    case Symbols.TypeSymbolString:
+        return left.(string) == right.(string)
     default:
         return false
     }

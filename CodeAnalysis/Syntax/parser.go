@@ -264,7 +264,7 @@ func (p *Parser) ParseArguments() *SeparatedSyntaxList {
         expression := p.ParseExpression()
         nodeAndSeparators = append(nodeAndSeparators, expression)
 
-        if p.Current().Kind() == SyntaxKind.CloseParenthesisToken {
+        if p.Current().Kind() == SyntaxKind.CommaToken {
             comma := p.MatchToken(SyntaxKind.CommaToken)
             nodeAndSeparators = append(nodeAndSeparators, comma)
         } else {

@@ -224,6 +224,30 @@ func TestEvaluations(t *testing.T) {
             expectedValue: true,
         },
         {
+            text: "\"test\"",
+            expectedValue: "test",
+        },
+        {
+            text: "\"te\"\"st\"",
+            expectedValue: "te\"st",
+        },
+        {
+            text: "\"test\"==\"test\"",
+            expectedValue: true,
+        },
+        {
+            text: "\"test\"!=\"test\"",
+            expectedValue: false,
+        },
+        {
+            text: "\"test\"==\"abc\"",
+            expectedValue: false,
+        },
+        {
+            text: "\"test\"!=\"abc\"",
+            expectedValue: true,
+        },
+        {
             text: "{ var a = 0 (a = 10) * a }",
             expectedValue: 100,
         },
