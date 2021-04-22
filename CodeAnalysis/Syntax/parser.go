@@ -118,13 +118,16 @@ func (p *Parser) ParseFunctionDeclaration() MemberSyntax {
 func (p *Parser) ParseParameterList() *SeparatedSyntaxList {
     var nodeAndSeparators []SyntaxNode
 
-    for p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
+    parseNextParameter := true
+    for parseNextParameter && p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
         parameter := p.ParseParameter()
         nodeAndSeparators = append(nodeAndSeparators, parameter)
 
-        if p.Current().Kind() != SyntaxKind.CloseParenthesisToken {
+        if p.Current().Kind() == SyntaxKind.CommaToken {
             comma := p.MatchToken(SyntaxKind.CommaToken)
             nodeAndSeparators = append(nodeAndSeparators, comma)
+        } else {
+            parseNextParameter = false
         }
     }
 
@@ -256,13 +259,16 @@ func (p *Parser) ParseCallExpression() ExpressionSyntax {
 func (p *Parser) ParseArguments() *SeparatedSyntaxList {
     var nodeAndSeparators []SyntaxNode
 
-    for p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
+    parseNextArgument := true
+    for parseNextArgument && p.Current().Kind() != SyntaxKind.CloseParenthesisToken && p.Current().Kind() != SyntaxKind.EndOfFileToken {
         expression := p.ParseExpression()
         nodeAndSeparators = append(nodeAndSeparators, expression)
 
-        if p.Current().Kind() != SyntaxKind.CloseParenthesisToken {
+        if p.Current().Kind() == SyntaxKind.CloseParenthesisToken {
             comma := p.MatchToken(SyntaxKind.CommaToken)
             nodeAndSeparators = append(nodeAndSeparators, comma)
+        } else {
+            parseNextArgument = false
         }
     }
 
